@@ -132,8 +132,9 @@ class FederatedClient:
             self.model.set_lora_state_dict(global_state)
 
         # Setup optimizer
+        trainable_params = [p for p in self.model.model.parameters() if p.requires_grad]
         optimizer = torch.optim.AdamW(
-            self.model.model.parameters(),
+            trainable_params,
             lr=self.learning_rate,
         )
 
@@ -156,13 +157,18 @@ class FederatedClient:
 
                 # Forward
                 outputs = self.model.model(**batch)
-                loss = outputs.loss / self.gradient_accumulation_steps
+                loss = outputs.loss
+                if not torch.isfinite(loss):
+                    optimizer.zero_grad(set_to_none=True)
+                    continue
+                loss = loss / self.gradient_accumulation_steps
 
                 # Backward
                 loss.backward()
 
                 # Update
                 if (step + 1) % self.gradient_accumulation_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(trainable_params, max_norm=1.0)
                     optimizer.step()
                     optimizer.zero_grad()
 

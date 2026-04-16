@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Logs / experiment artifacts
+wandb/
+*.log
+
+# Local caches
+.cache/
+
+# Data/results outputs (keep .gitkeep placeholders)
+results/*
+!results/.gitkeep
+figures/*
+!figures/.gitkeep

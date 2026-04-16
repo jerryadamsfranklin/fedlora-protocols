@@ -12,7 +12,7 @@ CURSOR AI: Implement this file with all methods as specified.
 """
 
 import gc
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import torch
 from peft import LoraConfig, TaskType, get_peft_model
@@ -46,6 +46,7 @@ class FederatedLoRAModel:
         lora_dropout: float = 0.1,
         target_modules: Optional[List[str]] = None,
         device: str = "mps",
+        torch_dtype: Union[str, torch.dtype] = "float32",
     ):
         """
         Initialize model wrapper (does not load model yet).
@@ -64,6 +65,7 @@ class FederatedLoRAModel:
         self.lora_dropout = lora_dropout
         self.target_modules = target_modules or ["q_proj", "v_proj"]
         self.device = device
+        self.torch_dtype = torch_dtype
 
         self._model = None
         self._tokenizer = None
@@ -72,6 +74,8 @@ class FederatedLoRAModel:
         """Load base model and apply LoRA adapters."""
         print(f"Loading model: {self.model_name}")
         print(f"Device: {self.device}")
+        dtype = self._resolve_dtype(self.torch_dtype)
+        print(f"torch_dtype: {dtype}")
 
         # Load tokenizer
         self._tokenizer = AutoTokenizer.from_pretrained(
@@ -84,10 +88,13 @@ class FederatedLoRAModel:
         # Load base model
         base_model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
-            torch_dtype=torch.float16,
+            torch_dtype=dtype,
             device_map={"": self.device},
             trust_remote_code=True,
         )
+        # Training-friendly defaults
+        if getattr(base_model.config, "use_cache", None) is not None:
+            base_model.config.use_cache = False
 
         # Configure LoRA
         lora_config = LoraConfig(
@@ -102,6 +109,25 @@ class FederatedLoRAModel:
         # Apply LoRA
         self._model = get_peft_model(base_model, lora_config)
         self._model.print_trainable_parameters()
+
+    @staticmethod
+    def _resolve_dtype(torch_dtype: Union[str, torch.dtype]) -> torch.dtype:
+        if isinstance(torch_dtype, torch.dtype):
+            return torch_dtype
+        mapping = {
+            "float16": torch.float16,
+            "fp16": torch.float16,
+            "float32": torch.float32,
+            "fp32": torch.float32,
+            "bfloat16": torch.bfloat16,
+            "bf16": torch.bfloat16,
+        }
+        if torch_dtype not in mapping:
+            raise ValueError(
+                f"Unsupported torch_dtype: {torch_dtype}. "
+                f"Supported: {sorted(mapping.keys())}"
+            )
+        return mapping[torch_dtype]
 
     @property
     def model(self):
