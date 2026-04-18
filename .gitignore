@@ -52,8 +52,14 @@ logs/
 # Local caches
 .cache/
 
-# Data/results outputs (keep .gitkeep placeholders)
-results/*
-!results/.gitkeep
-figures/*
-!figures/.gitkeep
+# Experiment results: track summaries (JSON/CSV) for reproducibility.
+# Ignore heavy artifacts if you ever write checkpoints under results/.
+results/**/*.pt
+results/**/*.pth
+results/**/*.bin
+results/**/*.safetensors
+results/**/checkpoint*/
+
+# Figures: keep generated plots (usually small); ignore huge raw exports if needed
+figures/**/*.tif
+figures/**/*.psd
