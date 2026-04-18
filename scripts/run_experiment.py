@@ -204,6 +204,7 @@ def main() -> None:
         num_rounds=fed_cfg.get("num_rounds", 30),
         eval_every=eval_cfg.get("eval_every", 5),
         output_dir=output_dir,
+        lora_r=config.get("lora", {}).get("r", 16),
     )
     server.set_clients(clients)
 

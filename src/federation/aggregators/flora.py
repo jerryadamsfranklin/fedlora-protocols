@@ -36,49 +36,45 @@ class FLoRAAggregator:
         if not client_states:
             raise ValueError("No client states")
 
+        if weights is None:
+            weights = [1.0 / len(client_states)] * len(client_states)
+        total_w = sum(weights)
+        weights = [w / total_w for w in weights]
+
         aggregated = {}
 
         # Find A/B pairs (PEFT uses lora_A / lora_B)
         a_keys = [k for k in client_states[0].keys() if "lora_A" in k]
 
         for a_key in a_keys:
-            # Find corresponding B key
             b_key = a_key.replace("lora_A", "lora_B")
             if b_key not in client_states[0]:
                 continue
 
-            # Stack A matrices (along dim 0): (r, in) -> (K*r, in)
-            a_matrices = [s[a_key] for s in client_states]
-            stacked_a = torch.cat(a_matrices, dim=0)
+            # Weighted average of low-rank updates in full space:
+            #   ΔW_k = B_k @ A_k  →  ΔW = Σ_k w_k ΔW_k
+            # (Stacking B and concat A gives stacked_B @ stacked_A = Σ ΔW_k without
+            # weights — K times too large when clients are equally weighted.)
+            ba = None
+            for w, state in zip(weights, client_states):
+                a = state[a_key].float()
+                b = state[b_key].float()
+                term = w * (b @ a)
+                ba = term if ba is None else ba + term
 
-            # Concat B matrices (along dim 1): (out, r) -> (out, K*r)
-            b_matrices = [s[b_key] for s in client_states]
-            stacked_b = torch.cat(b_matrices, dim=1)
+            U, S, Vh = torch.linalg.svd(ba, full_matrices=False)
 
-            # Compress if needed
-            if stacked_a.shape[0] > self.max_rank:
-                # Compute BA product (out x in)
-                ba = stacked_b.float() @ stacked_a.float()
+            r = min(self.max_rank, S.shape[0])
+            U = U[:, :r]
+            S = S[:r]
+            Vh = Vh[:r, :]
 
-                # SVD
-                U, S, Vh = torch.linalg.svd(ba, full_matrices=False)
+            sqrt_s = torch.sqrt(S)
+            new_b = (U * sqrt_s.unsqueeze(0)).to(client_states[0][b_key].dtype)
+            new_a = (sqrt_s.unsqueeze(1) * Vh).to(client_states[0][a_key].dtype)
 
-                # Truncate
-                r = min(self.max_rank, S.shape[0])
-                U = U[:, :r]
-                S = S[:r]
-                Vh = Vh[:r, :]
-
-                # Reconstruct A (r x in), B (out x r)
-                sqrt_s = torch.sqrt(S)
-                new_b = (U * sqrt_s.unsqueeze(0)).to(b_matrices[0].dtype)
-                new_a = (sqrt_s.unsqueeze(1) * Vh).to(a_matrices[0].dtype)
-
-                aggregated[a_key] = new_a
-                aggregated[b_key] = new_b
-            else:
-                aggregated[a_key] = stacked_a
-                aggregated[b_key] = stacked_b
+            aggregated[a_key] = new_a
+            aggregated[b_key] = new_b
 
         return aggregated
 
