@@ -7,7 +7,7 @@
 model:
   name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Primary model for experiments
   # Alternative: "meta-llama/Llama-3.2-3B" for larger experiments
-  torch_dtype: "float16"
+  torch_dtype: "float32"
   device: "mps"  # Apple Silicon GPU
 
 # LoRA Configuration
