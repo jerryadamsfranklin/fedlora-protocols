@@ -1,0 +1,14 @@
+experiment:
+  name: "revised_exp3_noniid_qty"
+  description: "Non-IID quantity skew with revised protocol"
+
+_inherit: revised_base.yaml
+
+data:
+  dataset_name: "tatsu-lab/alpaca"
+  dataset_split: "train"
+  partition_method: "quantity_skew"
+  quantity_alpha: 0.3
+  min_samples_per_client: 50
+
+methods: ["fedit", "ffa_lora", "flora", "flexlora"]

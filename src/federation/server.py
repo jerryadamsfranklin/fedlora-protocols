@@ -53,6 +53,7 @@ class FederatedServer:
         # Initialize aggregator
         if aggregation_method not in self.AGGREGATORS:
             raise ValueError(f"Unknown method: {aggregation_method}")
+        self.aggregation_method = aggregation_method
         self.aggregator = self.AGGREGATORS[aggregation_method]()
 
         self.global_state = None
@@ -91,8 +92,9 @@ class FederatedServer:
             client_weights = []
             losses = []
 
+            freeze_a = self.aggregation_method == "ffa_lora"
             for client in tqdm(self.clients, desc="Training"):
-                result = client.train(self.global_state)
+                result = client.train(self.global_state, freeze_a=freeze_a)
                 client_states.append(result["state_dict"])
                 client_weights.append(result["num_samples"])
                 losses.append(result["loss"])

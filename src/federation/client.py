@@ -113,12 +113,14 @@ class FederatedClient:
     def train(
         self,
         global_state: Optional[Dict[str, torch.Tensor]] = None,
+        freeze_a: bool = False,
     ) -> Dict:
         """
         Perform local training.
 
         Args:
             global_state: LoRA state from server (None for first round)
+            freeze_a: If True, do not train lora_A (FFA-LoRA protocol)
 
         Returns:
             Dict with:
@@ -130,6 +132,11 @@ class FederatedClient:
         # Load global state if provided
         if global_state is not None:
             self.model.set_lora_state_dict(global_state)
+
+        # FFA-LoRA: keep A frozen during local optimization (train B only)
+        for name, param in self.model.model.named_parameters():
+            if "lora_A" in name or "lora_a" in name:
+                param.requires_grad = not freeze_a
 
         # Setup optimizer
         trainable_params = [p for p in self.model.model.parameters() if p.requires_grad]

@@ -1,3 +1,32 @@
+# -----------------------------------------------------------------------------
+# Secrets, credentials, and local environment (never commit these)
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+.envrc
+.python-env
+*.secret
+secrets/
+credentials/
+*credentials*.json
+service-account*.json
+*.pem
+id_rsa
+id_rsa.pub
+*.p12
+.netrc
+netrc
+
+# Optional local overrides that may contain tokens or paths
+config/local_config.yaml
+config/*local*.yaml
+*.override.yaml
+
+# Hugging Face / ML tooling (if stored inside the repo tree)
+.huggingface/
+
+# -----------------------------------------------------------------------------
 # Python
 __pycache__/
 *.py[cod]
@@ -18,6 +47,7 @@ venv/
 # Logs / experiment artifacts
 wandb/
 *.log
+logs/
 
 # Local caches
 .cache/
