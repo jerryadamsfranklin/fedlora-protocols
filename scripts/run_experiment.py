@@ -98,13 +98,16 @@ def main() -> None:
 
     # Load model
     print("\n[1/4] Loading model...")
+    model_cfg = config.get("model", {})
+    torch_dtype = model_cfg.get("torch_dtype", "float32")
     model = FederatedLoRAModel(
-        model_name=config.get("model", {}).get(
+        model_name=model_cfg.get(
             "name", "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
         ),
         lora_r=config.get("lora", {}).get("r", 16),
         lora_alpha=config.get("lora", {}).get("lora_alpha", 32),
         device=device,
+        torch_dtype=torch_dtype,
     )
     model.load_model()
 
