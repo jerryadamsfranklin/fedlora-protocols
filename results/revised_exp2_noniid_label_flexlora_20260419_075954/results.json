@@ -1,0 +1,92 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 3.1290044495704032,
+    "round_time": 753.5596349239349,
+    "communication_mb": 85.9375
+  },
+  {
+    "round": 2,
+    "avg_loss": 2.939915172661378,
+    "round_time": 751.931214094162,
+    "communication_mb": 171.875
+  },
+  {
+    "round": 3,
+    "avg_loss": 2.904462492677449,
+    "round_time": 751.0604898929596,
+    "communication_mb": 257.8125
+  },
+  {
+    "round": 4,
+    "avg_loss": 2.8894445127054604,
+    "round_time": 750.4766347408295,
+    "communication_mb": 343.75
+  },
+  {
+    "round": 5,
+    "avg_loss": 2.8693225633081174,
+    "round_time": 752.4952757358551,
+    "communication_mb": 429.6875
+  },
+  {
+    "round": 6,
+    "avg_loss": 2.8522296503433964,
+    "round_time": 752.6769263744354,
+    "communication_mb": 515.625
+  },
+  {
+    "round": 7,
+    "avg_loss": 2.8401410716663738,
+    "round_time": 751.8153111934662,
+    "communication_mb": 601.5625
+  },
+  {
+    "round": 8,
+    "avg_loss": 2.8209523838079833,
+    "round_time": 733.7296125888824,
+    "communication_mb": 687.5
+  },
+  {
+    "round": 9,
+    "avg_loss": 2.804553033287493,
+    "round_time": 714.613343000412,
+    "communication_mb": 773.4375
+  },
+  {
+    "round": 10,
+    "avg_loss": 2.7858434563535583,
+    "round_time": 722.4407567977905,
+    "communication_mb": 859.375
+  },
+  {
+    "round": 11,
+    "avg_loss": 2.771573561635562,
+    "round_time": 714.2685182094574,
+    "communication_mb": 945.3125
+  },
+  {
+    "round": 12,
+    "avg_loss": 2.753969494729693,
+    "round_time": 736.7325119972229,
+    "communication_mb": 1031.25
+  },
+  {
+    "round": 13,
+    "avg_loss": 2.7431252887825806,
+    "round_time": 730.5714821815491,
+    "communication_mb": 1117.1875
+  },
+  {
+    "round": 14,
+    "avg_loss": 2.7260419796743443,
+    "round_time": 729.9944040775299,
+    "communication_mb": 1203.125
+  },
+  {
+    "round": 15,
+    "avg_loss": 2.709503386222911,
+    "round_time": 727.0412530899048,
+    "communication_mb": 1289.0625
+  }
+]
