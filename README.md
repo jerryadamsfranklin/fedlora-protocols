@@ -94,7 +94,3 @@ Regenerate figures whenever you add new result directories or change plotting co
 | `results/` | Run outputs (git may omit large runs; regenerate locally) |
 | `analysis/` | Generated tables and research summary |
 | `figures/` | Generated figures |
-
-## License and citation
-
-Add your license and citation text when you publish the paper or dataset.
