@@ -45,6 +45,7 @@ class FederatedServer:
         num_rounds: int = 30,
         eval_every: int = 5,
         output_dir: str = "results",
+        lora_r: int = 16,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
@@ -53,7 +54,15 @@ class FederatedServer:
         # Initialize aggregator
         if aggregation_method not in self.AGGREGATORS:
             raise ValueError(f"Unknown method: {aggregation_method}")
-        self.aggregator = self.AGGREGATORS[aggregation_method]()
+        self.aggregation_method = aggregation_method
+        # FLoRA/FlexLoRA SVD outputs must match PEFT adapter shapes (rank r).
+        agg_cls = self.AGGREGATORS[aggregation_method]
+        if aggregation_method == "flora":
+            self.aggregator = agg_cls(max_rank=lora_r)
+        elif aggregation_method == "flexlora":
+            self.aggregator = agg_cls(global_rank=lora_r)
+        else:
+            self.aggregator = agg_cls()
 
         self.global_state = None
         self.clients: List = []
@@ -91,8 +100,9 @@ class FederatedServer:
             client_weights = []
             losses = []
 
+            freeze_a = self.aggregation_method == "ffa_lora"
             for client in tqdm(self.clients, desc="Training"):
-                result = client.train(self.global_state)
+                result = client.train(self.global_state, freeze_a=freeze_a)
                 client_states.append(result["state_dict"])
                 client_weights.append(result["num_samples"])
                 losses.append(result["loss"])

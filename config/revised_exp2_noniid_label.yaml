@@ -1,0 +1,16 @@
+experiment:
+  name: "revised_exp2_noniid_label"
+  description: "Non-IID label skew with revised protocol"
+
+_inherit: revised_base.yaml
+
+data:
+  dataset_name: "commonsense_qa"
+  dataset_split: "train"
+  partition_method: "label_skew"
+  dirichlet_alpha: 0.5
+  label_column: "answerKey"
+  eval_split: "validation"
+  eval_samples: 300
+
+methods: ["fedit", "ffa_lora", "flora", "flexlora"]

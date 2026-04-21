@@ -1,0 +1,15 @@
+experiment:
+  name: "revised_exp5_scaling"
+  description: "Client scaling - minimal grid"
+
+_inherit: revised_base.yaml
+
+data:
+  dataset_name: "tatsu-lab/alpaca"
+  dataset_split: "train"
+  partition_method: "iid"
+  max_samples: 3000
+
+client_counts: [5, 10]
+
+methods: ["fedit", "flora"]

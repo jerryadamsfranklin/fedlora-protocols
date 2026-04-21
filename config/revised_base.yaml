@@ -1,0 +1,18 @@
+# Revised base config based on pilot study evidence.
+# Pilot (FedIT, exp1_iid): loss converged steadily; ~87 min/round justified shorter protocol.
+#
+_inherit: base_config.yaml
+
+training:
+  local_epochs: 1
+  max_seq_length: 256
+
+federated:
+  num_rounds: 15
+  num_clients: 10
+  clients_per_round: 10
+  eval_every: 3
+
+data:
+  max_samples: 3000
+  eval_samples: 300

@@ -38,8 +38,12 @@ def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any
 
 
 def load_config(path: str) -> Dict[str, Any]:
-    """Load YAML config, resolving _inherit to merge with base config."""
-    with open(path) as f:
+    """
+    Load YAML with recursive `_inherit` (e.g. revised_exp1 → revised_base → base_config).
+    Each child file overrides its parent via deep merge.
+    """
+    abs_path = os.path.abspath(path)
+    with open(abs_path) as f:
         config = yaml.safe_load(f)
 
     if not config:
@@ -47,11 +51,9 @@ def load_config(path: str) -> Dict[str, Any]:
 
     inherit = config.pop("_inherit", None)
     if inherit:
-        config_dir = os.path.dirname(os.path.abspath(path))
+        config_dir = os.path.dirname(abs_path)
         base_path = os.path.join(config_dir, inherit)
-        with open(base_path) as bf:
-            base = yaml.safe_load(bf)
-        base = {k: v for k, v in base.items() if k != "_inherit"}
+        base = load_config(base_path)
         config = _deep_merge(base, config)
 
     return config
@@ -64,10 +66,29 @@ def main() -> None:
         "--method", default=None, help="Override aggregation method"
     )
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--lora_r",
+        type=int,
+        default=None,
+        help="Override LoRA rank (lora.r); for rank sweeps (EXP4)",
+    )
+    parser.add_argument(
+        "--num_clients",
+        type=int,
+        default=None,
+        help="Override federated.num_clients (and clients_per_round); for scaling (EXP5)",
+    )
     args = parser.parse_args()
 
-    # Load config (with base merge if _inherit present)
+    # Load config (recursive _inherit merge)
     config = load_config(args.config)
+
+    if args.lora_r is not None:
+        config.setdefault("lora", {})["r"] = args.lora_r
+    if args.num_clients is not None:
+        nc = args.num_clients
+        config.setdefault("federated", {})["num_clients"] = nc
+        config.setdefault("federated", {})["clients_per_round"] = nc
 
     # Override method if specified; else from config or methods[0]
     method = args.method
@@ -80,11 +101,16 @@ def main() -> None:
     # Set seed
     torch.manual_seed(args.seed)
 
-    # Output directory
+    # Output directory (suffix for sweeps so names stay readable)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     exp_name = config.get("experiment", {}).get("name", "exp")
+    suffix = ""
+    if args.lora_r is not None:
+        suffix += f"_r{args.lora_r}"
+    if args.num_clients is not None:
+        suffix += f"_c{args.num_clients}"
     output_dir = os.path.join(
-        "results", f"{exp_name}_{method}_{timestamp}"
+        "results", f"{exp_name}_{method}{suffix}_{timestamp}"
     )
     os.makedirs(output_dir, exist_ok=True)
 
@@ -178,6 +204,7 @@ def main() -> None:
         num_rounds=fed_cfg.get("num_rounds", 30),
         eval_every=eval_cfg.get("eval_every", 5),
         output_dir=output_dir,
+        lora_r=config.get("lora", {}).get("r", 16),
     )
     server.set_clients(clients)
 
