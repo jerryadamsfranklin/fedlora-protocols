@@ -1,10 +1,14 @@
 """
 FLoRA Aggregator: Stacking-based Aggregation
 
-From Wang et al., NeurIPS 2024.
-Instead of averaging, stack LoRA modules then compress with SVD.
+From Wang et al., NeurIPS 2024 "FLoRA: Federated Fine-Tuning Large Language
+Models with Heterogeneous Low-Rank Adaptations".
 
-CURSOR AI: Implement this file as specified.
+Key insight: Instead of averaging LoRA matrices (which introduces noise),
+STACK them to preserve each client's contribution exactly, then compress.
+
+This is DIFFERENT from FlexLoRA which computes weighted Σ(BA).
+FLoRA stacks without weighting, preserving client contributions.
 """
 
 from typing import Dict, List, Optional
@@ -14,11 +18,18 @@ import torch
 
 class FLoRAAggregator:
     """
-    FLoRA: Stack client LoRAs, compress with SVD.
+    FLoRA: Stack client LoRAs, then compress with SVD.
 
-    - Stack A matrices: [A_1; A_2; ... A_K]
-    - Concat B matrices: [B_1, B_2, ..., B_K]
-    - Compress using SVD to limit size
+    Algorithm:
+    1. Stack A matrices vertically: [A_1; A_2; ...; A_K] → shape (K*r, d_in)
+    2. Concat B matrices horizontally: [B_1, B_2, ..., B_K] → shape (d_out, K*r)
+    3. Product B_stacked @ A_stacked = Σ(B_k @ A_k) exactly
+    4. Apply SVD and truncate to max_rank
+    5. Reconstruct A_global, B_global
+
+    Key difference from FlexLoRA:
+    - FLoRA: Unweighted stacking (preserves each client equally)
+    - FlexLoRA: Weighted sum (clients weighted by data size)
     """
 
     def __init__(self, max_rank: int = 64):
@@ -28,22 +39,21 @@ class FLoRAAggregator:
     def aggregate(
         self,
         client_states: List[Dict[str, torch.Tensor]],
-        weights: Optional[List[float]] = None,
+        weights: Optional[List[float]] = None,  # IGNORED in true FLoRA
     ) -> Dict[str, torch.Tensor]:
         """
-        Stack and compress client LoRAs.
+        Aggregate client LoRA states using stacking (not averaging).
+
+        Note: weights parameter is accepted for API compatibility but
+        IGNORED because true FLoRA does not weight clients - it stacks
+        them equally and lets SVD determine importance.
         """
         if not client_states:
-            raise ValueError("No client states")
-
-        if weights is None:
-            weights = [1.0 / len(client_states)] * len(client_states)
-        total_w = sum(weights)
-        weights = [w / total_w for w in weights]
+            raise ValueError("No client states to aggregate")
 
         aggregated = {}
 
-        # Find A/B pairs (PEFT uses lora_A / lora_B)
+        # Find all LoRA A/B pairs (PEFT uses lora_A / lora_B)
         a_keys = [k for k in client_states[0].keys() if "lora_A" in k]
 
         for a_key in a_keys:
@@ -51,27 +61,36 @@ class FLoRAAggregator:
             if b_key not in client_states[0]:
                 continue
 
-            # Weighted average of low-rank updates in full space:
-            #   ΔW_k = B_k @ A_k  →  ΔW = Σ_k w_k ΔW_k
-            # (Stacking B and concat A gives stacked_B @ stacked_A = Σ ΔW_k without
-            # weights — K times too large when clients are equally weighted.)
-            ba = None
-            for w, state in zip(weights, client_states):
-                a = state[a_key].float()
-                b = state[b_key].float()
-                term = w * (b @ a)
-                ba = term if ba is None else ba + term
+            original_dtype = client_states[0][a_key].dtype
 
-            U, S, Vh = torch.linalg.svd(ba, full_matrices=False)
+            # STEP 1: Stack A vertically: (K*r, d_in)
+            a_matrices = [state[a_key].float() for state in client_states]
+            stacked_a = torch.cat(a_matrices, dim=0)
 
-            r = min(self.max_rank, S.shape[0])
-            U = U[:, :r]
-            S = S[:r]
-            Vh = Vh[:r, :]
+            # STEP 2: Concat B horizontally: (d_out, K*r)
+            b_matrices = [state[b_key].float() for state in client_states]
+            stacked_b = torch.cat(b_matrices, dim=1)
 
+            # Determine ranks
+            original_rank = a_matrices[0].shape[0]
+
+            # STEP 3: Full product (exact Σ(B_k @ A_k), unweighted)
+            ba_product = stacked_b @ stacked_a
+
+            # STEP 4: SVD compression
+            U, S, Vh = torch.linalg.svd(ba_product, full_matrices=False)
+
+            # Keep adapter rank compatible with PEFT (default: original_rank),
+            # capped by max_rank.
+            target_rank = min(original_rank, self.max_rank, S.shape[0])
+            U = U[:, :target_rank]
+            S = S[:target_rank]
+            Vh = Vh[:target_rank, :]
+
+            # STEP 5: Reconstruct A and B using sqrt(S) split
             sqrt_s = torch.sqrt(S)
-            new_b = (U * sqrt_s.unsqueeze(0)).to(client_states[0][b_key].dtype)
-            new_a = (sqrt_s.unsqueeze(1) * Vh).to(client_states[0][a_key].dtype)
+            new_b = (U * sqrt_s.unsqueeze(0)).to(original_dtype)
+            new_a = (sqrt_s.unsqueeze(1) * Vh).to(original_dtype)
 
             aggregated[a_key] = new_a
             aggregated[b_key] = new_b

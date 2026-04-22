@@ -12,11 +12,14 @@ import os
 import sys
 from copy import deepcopy
 from datetime import datetime
+import math
 from typing import Any, Dict
 
 import torch
 import yaml
 from datasets import load_dataset
+from torch.utils.data import DataLoader
+from transformers import DataCollatorForLanguageModeling
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -149,6 +152,116 @@ def main() -> None:
             range(min(data_cfg["max_samples"], len(dataset)))
         )
 
+    def _format_commonsenseqa_items(examples):
+        questions = examples["question"]
+        choices = examples["choices"]
+        answer_keys = examples.get("answerKey")
+
+        labels_list = choices["label"]
+        texts_list = choices["text"]
+
+        formatted = []
+        for i, q in enumerate(questions):
+            choices_lines = "\n".join(
+                f"{lab}) {txt}"
+                for lab, txt in zip(labels_list[i], texts_list[i])
+            )
+            ans = answer_keys[i] if answer_keys is not None else ""
+            formatted.append(
+                f"Question: {q}\n\nChoices:\n{choices_lines}\n\nAnswer: {ans}"
+            )
+        return {"text": formatted}
+
+    def _to_text_field(ds):
+        # Ensure we have a "text" field for eval tokenization, without
+        # disturbing partition labels used earlier.
+        cols = set(ds.column_names)
+        if "text" in cols:
+            return ds
+        if "instruction" in cols and "output" in cols:
+            def _fmt_alpaca(examples):
+                texts = [
+                    f"### Instruction:\n{inst}\n\n### Response:\n{out}"
+                    for inst, out in zip(examples["instruction"], examples["output"])
+                ]
+                return {"text": texts}
+            return ds.map(_fmt_alpaca, batched=True)
+        if "question" in cols and "choices" in cols and "answerKey" in cols:
+            return ds.map(_format_commonsenseqa_items, batched=True)
+        if "question" in cols:
+            return ds.map(lambda x: {"text": x["question"]})
+        return ds
+
+    def _tokenize_text(examples, max_seq_length: int):
+        return model.tokenizer(
+            examples["text"],
+            truncation=True,
+            max_length=max_seq_length,
+            padding="max_length",
+        )
+
+    # Optional held-out eval dataset (Phase 1c)
+    eval_fn = None
+    eval_split = data_cfg.get("eval_split")
+    eval_samples = data_cfg.get("eval_samples")
+    if eval_split:
+        try:
+            eval_ds = load_dataset(data_cfg["dataset_name"], split=eval_split)
+            if eval_samples:
+                eval_ds = eval_ds.select(range(min(int(eval_samples), len(eval_ds))))
+            eval_ds = _to_text_field(eval_ds)
+            eval_ds = eval_ds.map(
+                lambda x: _tokenize_text(x, train_cfg.get("max_seq_length", 512)),
+                batched=True,
+                remove_columns=eval_ds.column_names,
+            )
+            eval_ds.set_format("torch")
+
+            collator = DataCollatorForLanguageModeling(
+                tokenizer=model.tokenizer,
+                mlm=False,
+            )
+            eval_loader = DataLoader(
+                eval_ds,
+                batch_size=eval_cfg.get("eval_batch_size", 4),
+                shuffle=False,
+                collate_fn=collator,
+            )
+
+            def _eval_fn(_state_dict):
+                model.set_lora_state_dict(_state_dict)
+                model.model.eval()
+                total_loss = 0.0
+                total_tokens = 0
+                with torch.no_grad():
+                    for batch in eval_loader:
+                        batch = {k: v.to(model.device) for k, v in batch.items()}
+                        outputs = model.model(**batch)
+                        loss = outputs.loss
+                        labels = batch.get("labels")
+                        if labels is None:
+                            continue
+                        num_tokens = (labels != -100).sum().item()
+                        total_loss += float(loss.item()) * num_tokens
+                        total_tokens += num_tokens
+                model.model.train()
+                avg_loss = (
+                    total_loss / total_tokens if total_tokens > 0 else float("inf")
+                )
+                ppl = math.exp(avg_loss) if avg_loss < 100 else float("inf")
+                return {
+                    "val_loss": avg_loss,
+                    "val_perplexity": ppl,
+                    "val_tokens": total_tokens,
+                }
+
+            eval_fn = _eval_fn
+            print(
+                f"Eval: enabled (split={eval_split}, samples={len(eval_ds)})"
+            )
+        except Exception as e:
+            print(f"Eval: disabled (failed to load eval split '{eval_split}'): {e}")
+
     # Partition
     num_clients = config.get("federated", {}).get("num_clients", 10)
     partitioner = DataPartitioner(dataset, num_clients=num_clients, seed=args.seed)
@@ -210,7 +323,7 @@ def main() -> None:
 
     # Run training
     print("\n[4/4] Training...")
-    results = server.train()
+    results = server.train(eval_fn=eval_fn)
 
     print(f"\n{'='*60}")
     print("Complete!")
