@@ -51,6 +51,7 @@ class FLoRAAggregator:
         if not client_states:
             raise ValueError("No client states to aggregate")
 
+        num_clients = len(client_states)
         aggregated = {}
 
         # Find all LoRA A/B pairs (PEFT uses lora_A / lora_B)
@@ -76,6 +77,8 @@ class FLoRAAggregator:
 
             # STEP 3: Full product (exact Σ(B_k @ A_k), unweighted)
             ba_product = stacked_b @ stacked_a
+            # Normalize to keep update scale comparable across client counts.
+            ba_product = ba_product / max(1, num_clients)
 
             # STEP 4: SVD compression
             U, S, Vh = torch.linalg.svd(ba_product, full_matrices=False)
