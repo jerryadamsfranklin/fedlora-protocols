@@ -143,6 +143,8 @@ def main() -> None:
     # Load data
     print("\n[2/4] Loading data...")
     data_cfg = config.get("data", {})
+    train_cfg = config.get("training", {})
+    eval_cfg = config.get("evaluation", {})
     dataset = load_dataset(
         data_cfg["dataset_name"],
         split=data_cfg.get("dataset_split", "train"),
@@ -293,7 +295,6 @@ def main() -> None:
 
     # Create clients
     print("\n[3/4] Creating clients...")
-    train_cfg = config.get("training", {})
     clients = []
     for i, ds in enumerate(client_datasets):
         if len(ds) == 0:
@@ -318,7 +319,6 @@ def main() -> None:
 
     # Create server
     fed_cfg = config.get("federated", {})
-    eval_cfg = config.get("evaluation", {})
     server = FederatedServer(
         aggregation_method=method,
         num_rounds=fed_cfg.get("num_rounds", 30),
