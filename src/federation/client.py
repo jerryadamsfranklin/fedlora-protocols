@@ -71,14 +71,20 @@ class FederatedClient:
             choices = examples["choices"]
             answer_keys = examples.get("answerKey")
 
-            labels_list = choices["label"]
-            texts_list = choices["text"]
-
             formatted = []
             for i, q in enumerate(questions):
+                # `choices` can appear as either:
+                # - a dict-of-lists (batched): {"label": [[...]], "text": [[...]]}
+                # - a list-of-dicts: [{"label": [...], "text": [...]}, ...]
+                if isinstance(choices, dict):
+                    labels = choices["label"][i]
+                    texts = choices["text"][i]
+                else:
+                    labels = choices[i]["label"]
+                    texts = choices[i]["text"]
+
                 choices_lines = "\n".join(
-                    f"{lab}) {txt}"
-                    for lab, txt in zip(labels_list[i], texts_list[i])
+                    f"{lab}) {txt}" for lab, txt in zip(labels, texts)
                 )
                 ans = answer_keys[i] if answer_keys is not None else ""
                 formatted.append(
