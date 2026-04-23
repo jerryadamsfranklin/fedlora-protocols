@@ -127,21 +127,34 @@ class FedLoRAAdaptiveV2Aggregator(
                 if self.is_transition_complete(round_num):
                     self.global_phase = "FLoRA"
 
-        # Compute both candidate aggregates once, then select per-layer.
-        ffa_state = self.ffa_lora.aggregate(client_states, weights=weights)
-        flora_state = self.flora.aggregate(client_states, weights=weights)
-
         if not self.per_layer_enabled:
             freeze_ratio = self.get_freeze_ratio(round_num, self.global_phase)
-            return ffa_state if freeze_ratio > 0.5 else flora_state
+            agg = self.ffa_lora if freeze_ratio > 0.5 else self.flora
+            return agg.aggregate(client_states, weights=weights)
+
+        # True per-layer dispatch: each layer chooses its own aggregator.
+        # Group all keys by layer id.
+        all_keys = set()
+        for state in client_states:
+            all_keys.update(state.keys())
+
+        layer_to_keys: Dict[str, List[str]] = {}
+        for key in all_keys:
+            layer_id = self._extract_layer_id_from_key(key)
+            layer_to_keys.setdefault(layer_id, []).append(key)
 
         layer_freeze = self.get_layer_freeze_ratios(round_num)
-        out: Dict[str, torch.Tensor] = {}
-        for key in set(ffa_state.keys()) | set(flora_state.keys()):
-            layer_id = self._extract_layer_id_from_key(key)
+
+        aggregated: Dict[str, torch.Tensor] = {}
+        for layer_id, keys in layer_to_keys.items():
             ratio = layer_freeze.get(layer_id, 1.0)
-            out[key] = (ffa_state if ratio > 0.5 else flora_state)[key]
-        return out
+            agg = self.ffa_lora if ratio > 0.5 else self.flora
+
+            layer_client_states = [{k: s[k] for k in keys if k in s} for s in client_states]
+            layer_agg = agg.aggregate(layer_client_states, weights=weights)
+            aggregated.update(layer_agg)
+
+        return aggregated
 
     def get_stats(self) -> Dict:
         stats = {

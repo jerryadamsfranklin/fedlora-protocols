@@ -44,6 +44,9 @@ class FFALoRAAggregator:
                 if "lora_A" in name or "lora_a" in name:
                     self.frozen_a[name] = param.clone()
             self.initialized = True
+        elif self.frozen_a is None:
+            # Defensive: should not happen, but keep behavior sane.
+            self.frozen_a = {}
 
         # Default weights
         if weights is None:
@@ -55,7 +58,10 @@ class FFALoRAAggregator:
         aggregated = {}
         for name in client_states[0].keys():
             if "lora_A" in name or "lora_a" in name:
-                # Use frozen A
+                # Use frozen A. If we haven't seen this A key yet (e.g. when
+                # aggregating layer subsets), cache it lazily.
+                if name not in self.frozen_a:
+                    self.frozen_a[name] = client_states[0][name].clone()
                 aggregated[name] = self.frozen_a[name].clone()
             else:
                 # Average B (and any other params)
