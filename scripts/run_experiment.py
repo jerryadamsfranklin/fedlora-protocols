@@ -341,6 +341,7 @@ def main() -> None:
     # Create server
     fed_cfg = config.get("federated", {})
     adaptive_cfg = config.get("fedlora_adaptive", {})
+    adaptive_v2_cfg = config.get("fedlora_adaptive_v2", {})
     server = FederatedServer(
         aggregation_method=method,
         num_rounds=fed_cfg.get("num_rounds", 30),
@@ -350,6 +351,12 @@ def main() -> None:
         switch_threshold=adaptive_cfg.get("switch_threshold", 0.01),
         warmup_rounds=adaptive_cfg.get("warmup_rounds", 3),
         fixed_switch_round=adaptive_cfg.get("fixed_switch_round", None),
+        transition_rounds=adaptive_v2_cfg.get("transition_rounds", 3),
+        stability_threshold=adaptive_v2_cfg.get("stability_threshold", 1.1),
+        per_layer_enabled=adaptive_v2_cfg.get("per_layer_enabled", True),
+        layer_names=adaptive_v2_cfg.get(
+            "layer_names", ["q_proj", "k_proj", "v_proj", "o_proj"]
+        ),
     )
     server.set_clients(clients)
 
