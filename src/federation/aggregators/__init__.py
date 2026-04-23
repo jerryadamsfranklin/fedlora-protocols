@@ -1,15 +1,14 @@
-"""Federated LoRA aggregation methods."""
+"""
+Federated LoRA aggregation methods.
 
-from .fedit import FedITAggregator
-from .ffa_lora import FFALoRAAggregator
-from .fedlora_adaptive import FedLoRAAdaptiveAggregator
-from .flora import FLoRAAggregator
-from .flexlora import FlexLoRAAggregator
+Note: keep this package lightweight to avoid importing heavyweight deps (e.g. torch)
+at module import time. Individual aggregators should be imported from their modules:
 
-__all__ = [
-    "FedITAggregator",
-    "FFALoRAAggregator",
-    "FedLoRAAdaptiveAggregator",
-    "FLoRAAggregator",
-    "FlexLoRAAggregator",
-]
+- `src.federation.aggregators.fedit`
+- `src.federation.aggregators.ffa_lora`
+- `src.federation.aggregators.flora`
+- `src.federation.aggregators.flexlora`
+- `src.federation.aggregators.fedlora_adaptive`
+"""
+
+__all__ = []
