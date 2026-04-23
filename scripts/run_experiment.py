@@ -342,15 +342,32 @@ def main() -> None:
     fed_cfg = config.get("federated", {})
     adaptive_cfg = config.get("fedlora_adaptive", {})
     adaptive_v2_cfg = config.get("fedlora_adaptive_v2", {})
+
+    # v2 uses its own config block; fall back to v1 keys for backwards compat.
+    if method == "fedlora_adaptive_v2":
+        switch_threshold = adaptive_v2_cfg.get(
+            "switch_threshold", adaptive_cfg.get("switch_threshold", 0.01)
+        )
+        warmup_rounds = adaptive_v2_cfg.get(
+            "warmup_rounds", adaptive_cfg.get("warmup_rounds", 3)
+        )
+        fixed_switch_round = adaptive_v2_cfg.get(
+            "fixed_switch_round", adaptive_cfg.get("fixed_switch_round", None)
+        )
+    else:
+        switch_threshold = adaptive_cfg.get("switch_threshold", 0.01)
+        warmup_rounds = adaptive_cfg.get("warmup_rounds", 3)
+        fixed_switch_round = adaptive_cfg.get("fixed_switch_round", None)
+
     server = FederatedServer(
         aggregation_method=method,
         num_rounds=fed_cfg.get("num_rounds", 30),
         eval_every=eval_cfg.get("eval_every", 5),
         output_dir=output_dir,
         lora_r=config.get("lora", {}).get("r", 16),
-        switch_threshold=adaptive_cfg.get("switch_threshold", 0.01),
-        warmup_rounds=adaptive_cfg.get("warmup_rounds", 3),
-        fixed_switch_round=adaptive_cfg.get("fixed_switch_round", None),
+        switch_threshold=switch_threshold,
+        warmup_rounds=warmup_rounds,
+        fixed_switch_round=fixed_switch_round,
         transition_rounds=adaptive_v2_cfg.get("transition_rounds", 3),
         stability_threshold=adaptive_v2_cfg.get("stability_threshold", 1.1),
         per_layer_enabled=adaptive_v2_cfg.get("per_layer_enabled", True),

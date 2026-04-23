@@ -9,6 +9,41 @@ at module import time. Individual aggregators should be imported from their modu
 - `src.federation.aggregators.flora`
 - `src.federation.aggregators.flexlora`
 - `src.federation.aggregators.fedlora_adaptive`
+- `src.federation.aggregators.fedlora_adaptive_v2`
 """
 
-__all__ = []
+from __future__ import annotations
+
+from importlib import import_module
+from typing import Dict, Type
+
+__all__ = [
+    "get_aggregator_cls",
+    "AGGREGATOR_IMPORTS",
+]
+
+
+# Lazy registry (module path, class name). Keeps import-time lightweight.
+AGGREGATOR_IMPORTS: Dict[str, tuple[str, str]] = {
+    "fedit": ("src.federation.aggregators.fedit", "FedITAggregator"),
+    "ffa_lora": ("src.federation.aggregators.ffa_lora", "FFALoRAAggregator"),
+    "flora": ("src.federation.aggregators.flora", "FLoRAAggregator"),
+    "flexlora": ("src.federation.aggregators.flexlora", "FlexLoRAAggregator"),
+    "fedlora_adaptive": (
+        "src.federation.aggregators.fedlora_adaptive",
+        "FedLoRAAdaptiveAggregator",
+    ),
+    "fedlora_adaptive_v2": (
+        "src.federation.aggregators.fedlora_adaptive_v2",
+        "FedLoRAAdaptiveV2Aggregator",
+    ),
+}
+
+
+def get_aggregator_cls(method: str) -> Type:
+    """Resolve an aggregator class from the lazy registry."""
+    if method not in AGGREGATOR_IMPORTS:
+        raise KeyError(f"Unknown aggregator method: {method}")
+    mod_path, cls_name = AGGREGATOR_IMPORTS[method]
+    mod = import_module(mod_path)
+    return getattr(mod, cls_name)
