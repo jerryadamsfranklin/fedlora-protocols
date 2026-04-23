@@ -81,6 +81,12 @@ def main() -> None:
         default=None,
         help="Override federated.num_clients (and clients_per_round); for scaling (EXP5)",
     )
+    parser.add_argument(
+        "--switch_threshold",
+        type=float,
+        default=None,
+        help="Override switch threshold for fedlora_adaptive (tau)",
+    )
     args = parser.parse_args()
 
     # Load config (recursive _inherit merge)
@@ -92,6 +98,10 @@ def main() -> None:
         nc = args.num_clients
         config.setdefault("federated", {})["num_clients"] = nc
         config.setdefault("federated", {})["clients_per_round"] = nc
+    if args.switch_threshold is not None:
+        config.setdefault("fedlora_adaptive", {})["switch_threshold"] = float(
+            args.switch_threshold
+        )
 
     # Override method if specified; else from config or methods[0]
     method = args.method
@@ -319,12 +329,16 @@ def main() -> None:
 
     # Create server
     fed_cfg = config.get("federated", {})
+    adaptive_cfg = config.get("fedlora_adaptive", {})
     server = FederatedServer(
         aggregation_method=method,
         num_rounds=fed_cfg.get("num_rounds", 30),
         eval_every=eval_cfg.get("eval_every", 5),
         output_dir=output_dir,
         lora_r=config.get("lora", {}).get("r", 16),
+        switch_threshold=adaptive_cfg.get("switch_threshold", 0.01),
+        warmup_rounds=adaptive_cfg.get("warmup_rounds", 3),
+        fixed_switch_round=adaptive_cfg.get("fixed_switch_round", None),
     )
     server.set_clients(clients)
 

@@ -23,6 +23,7 @@ from tqdm import tqdm
 
 from .aggregators.fedit import FedITAggregator
 from .aggregators.ffa_lora import FFALoRAAggregator
+from .aggregators.fedlora_adaptive import FedLoRAAdaptiveAggregator
 from .aggregators.flora import FLoRAAggregator
 from .aggregators.flexlora import FlexLoRAAggregator
 
@@ -37,6 +38,7 @@ class FederatedServer:
         "ffa_lora": FFALoRAAggregator,
         "flora": FLoRAAggregator,
         "flexlora": FlexLoRAAggregator,
+        "fedlora_adaptive": FedLoRAAdaptiveAggregator,
     }
 
     def __init__(
@@ -46,6 +48,9 @@ class FederatedServer:
         eval_every: int = 5,
         output_dir: str = "results",
         lora_r: int = 16,
+        switch_threshold: float = 0.01,
+        warmup_rounds: int = 3,
+        fixed_switch_round: Optional[int] = None,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
@@ -61,6 +66,13 @@ class FederatedServer:
             self.aggregator = agg_cls(max_rank=lora_r)
         elif aggregation_method == "flexlora":
             self.aggregator = agg_cls(global_rank=lora_r)
+        elif aggregation_method == "fedlora_adaptive":
+            self.aggregator = agg_cls(
+                max_rank=lora_r,
+                switch_threshold=switch_threshold,
+                warmup_rounds=warmup_rounds,
+                fixed_switch_round=fixed_switch_round,
+            )
         else:
             self.aggregator = agg_cls()
 
@@ -100,7 +112,12 @@ class FederatedServer:
             client_weights = []
             losses = []
 
-            freeze_a = self.aggregation_method == "ffa_lora"
+            if self.aggregation_method == "fedlora_adaptive" and hasattr(
+                self.aggregator, "get_mode"
+            ):
+                freeze_a = self.aggregator.get_mode() == "FFA-LoRA"
+            else:
+                freeze_a = self.aggregation_method == "ffa_lora"
             for client in tqdm(self.clients, desc="Training"):
                 result = client.train(self.global_state, freeze_a=freeze_a)
                 client_states.append(result["state_dict"])
@@ -112,11 +129,28 @@ class FederatedServer:
                     p.numel() * 2 for p in result["state_dict"].values()
                 )
 
-            # Aggregate
-            self.global_state = self.aggregator.aggregate(
-                client_states,
-                weights=client_weights,
-            )
+            # Aggregate (FedLoRA-Adaptive needs current_loss for switching)
+            avg_loss = sum(losses) / len(losses) if losses else 0.0
+            try:
+                import inspect
+
+                sig = inspect.signature(self.aggregator.aggregate)
+                if "current_loss" in sig.parameters:
+                    self.global_state = self.aggregator.aggregate(
+                        client_states,
+                        weights=client_weights,
+                        current_loss=avg_loss,
+                    )
+                else:
+                    self.global_state = self.aggregator.aggregate(
+                        client_states,
+                        weights=client_weights,
+                    )
+            except Exception:
+                self.global_state = self.aggregator.aggregate(
+                    client_states,
+                    weights=client_weights,
+                )
 
             # Add download communication (server -> each client)
             total_communication += (
@@ -125,7 +159,6 @@ class FederatedServer:
             )
 
             round_time = time.time() - round_start
-            avg_loss = sum(losses) / len(losses) if losses else 0.0
 
             # Log
             metrics = {
@@ -134,6 +167,10 @@ class FederatedServer:
                 "round_time": round_time,
                 "communication_mb": total_communication / (1024 * 1024),
             }
+            if hasattr(self.aggregator, "get_mode"):
+                metrics["agg_mode"] = self.aggregator.get_mode()
+            if hasattr(self.aggregator, "get_switch_round"):
+                metrics["switch_round"] = self.aggregator.get_switch_round()
 
             # Evaluate
             if eval_fn and (round_num + 1) % self.eval_every == 0:
