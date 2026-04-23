@@ -1,0 +1,13 @@
+experiment:
+  name: "revised_exp1_iid_lr1e4"
+  description: "IID baseline with revised protocol (LR=1e-4 for stability)"
+
+_inherit: revised_base_lr1e4.yaml
+
+data:
+  dataset_name: "tatsu-lab/alpaca"
+  dataset_split: "train"
+  partition_method: "iid"
+
+methods: ["fedit", "ffa_lora", "flora", "flexlora"]
+

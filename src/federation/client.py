@@ -66,6 +66,32 @@ class FederatedClient:
 
     def _prepare_dataloader(self):
         """Tokenize dataset and create dataloader."""
+        def _format_commonsenseqa(examples):
+            questions = examples["question"]
+            choices = examples["choices"]
+            answer_keys = examples.get("answerKey")
+
+            formatted = []
+            for i, q in enumerate(questions):
+                # `choices` can appear as either:
+                # - a dict-of-lists (batched): {"label": [[...]], "text": [[...]]}
+                # - a list-of-dicts: [{"label": [...], "text": [...]}, ...]
+                if isinstance(choices, dict):
+                    labels = choices["label"][i]
+                    texts = choices["text"][i]
+                else:
+                    labels = choices[i]["label"]
+                    texts = choices[i]["text"]
+
+                choices_lines = "\n".join(
+                    f"{lab}) {txt}" for lab, txt in zip(labels, texts)
+                )
+                ans = answer_keys[i] if answer_keys is not None else ""
+                formatted.append(
+                    f"Question: {q}\n\nChoices:\n{choices_lines}\n\nAnswer: {ans}"
+                )
+            return formatted
+
         def tokenize(examples):
             # Handle different dataset formats
             if "instruction" in examples:
@@ -76,7 +102,11 @@ class FederatedClient:
                     )
                 ]
             elif "question" in examples:
-                texts = examples["question"]
+                # CommonsenseQA: include choices + answer for a meaningful task.
+                if "choices" in examples and "answerKey" in examples:
+                    texts = _format_commonsenseqa(examples)
+                else:
+                    texts = examples["question"]
             elif "text" in examples:
                 texts = examples["text"]
             else:

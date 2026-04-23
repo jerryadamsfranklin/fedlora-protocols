@@ -1,0 +1,6 @@
+# Revised base config with a lower LR for stability checks.
+_inherit: revised_base.yaml
+
+training:
+  learning_rate: 1.0e-4
+
