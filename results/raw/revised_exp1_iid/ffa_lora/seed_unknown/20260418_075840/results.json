@@ -1,0 +1,92 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.3955668007532755,
+    "round_time": 695.8066141605377,
+    "communication_mb": 30.9375
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3283400375843049,
+    "round_time": 701.2433800697327,
+    "communication_mb": 61.875
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.3216198545296987,
+    "round_time": 703.0375199317932,
+    "communication_mb": 92.8125
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.3180004219214123,
+    "round_time": 701.1089150905609,
+    "communication_mb": 123.75
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.3108547502358756,
+    "round_time": 700.177520275116,
+    "communication_mb": 154.6875
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.3060119811693827,
+    "round_time": 700.005607843399,
+    "communication_mb": 185.625
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.3019946008523307,
+    "round_time": 701.3263459205627,
+    "communication_mb": 216.5625
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.295368502298991,
+    "round_time": 705.1865689754486,
+    "communication_mb": 247.5
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2932291148503623,
+    "round_time": 697.3209640979767,
+    "communication_mb": 278.4375
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2890437885125476,
+    "round_time": 693.8019540309906,
+    "communication_mb": 309.375
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.2903334123293557,
+    "round_time": 717.1737339496613,
+    "communication_mb": 340.3125
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2898099621136985,
+    "round_time": 726.2571136951447,
+    "communication_mb": 371.25
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2852602356274925,
+    "round_time": 726.2843329906464,
+    "communication_mb": 402.1875
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.2799212585290272,
+    "round_time": 726.4767911434174,
+    "communication_mb": 433.125
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2795926943620046,
+    "round_time": 724.8939661979675,
+    "communication_mb": 464.0625
+  }
+]

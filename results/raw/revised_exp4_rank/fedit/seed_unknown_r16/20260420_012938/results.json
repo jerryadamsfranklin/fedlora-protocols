@@ -1,0 +1,92 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.365604894399643,
+    "round_time": 487.3640019893646,
+    "communication_mb": 85.9375
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.2909525017738344,
+    "round_time": 487.3312120437622,
+    "communication_mb": 171.875
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.2847712640762328,
+    "round_time": 487.1133699417114,
+    "communication_mb": 257.8125
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.2746033352613448,
+    "round_time": 487.37060618400574,
+    "communication_mb": 343.75
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.272144744515419,
+    "round_time": 487.5232939720154,
+    "communication_mb": 429.6875
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.264122570991516,
+    "round_time": 487.1651258468628,
+    "communication_mb": 515.625
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.2637387256622314,
+    "round_time": 487.6275370121002,
+    "communication_mb": 601.5625
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.257759471297264,
+    "round_time": 487.7319059371948,
+    "communication_mb": 687.5
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2516966458559036,
+    "round_time": 487.2417438030243,
+    "communication_mb": 773.4375
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2481262990236281,
+    "round_time": 487.2919580936432,
+    "communication_mb": 859.375
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.2439883966445922,
+    "round_time": 487.47223711013794,
+    "communication_mb": 945.3125
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2422290995121001,
+    "round_time": 487.4410891532898,
+    "communication_mb": 1031.25
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2378946154117585,
+    "round_time": 487.1622769832611,
+    "communication_mb": 1117.1875
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.2327162196636199,
+    "round_time": 487.26774406433105,
+    "communication_mb": 1203.125
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2263086795806883,
+    "round_time": 487.39424991607666,
+    "communication_mb": 1289.0625
+  }
+]
