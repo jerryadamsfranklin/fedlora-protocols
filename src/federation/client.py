@@ -10,7 +10,7 @@ CURSOR AI: Implement this file with all methods as specified.
 """
 
 import time
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import torch
 from torch.utils.data import DataLoader
@@ -145,6 +145,8 @@ class FederatedClient:
         global_state: Optional[Dict[str, torch.Tensor]] = None,
         freeze_a: bool = False,
         freeze_ratio: float = 0.0,
+        freeze_ratios: Optional[Dict[str, float]] = None,
+        collect_layer_metrics: bool = False,
     ) -> Dict:
         """
         Perform local training.
@@ -156,6 +158,9 @@ class FederatedClient:
                          - 1.0: Freeze all A (pure FFA-LoRA)
                          - 0.0: Freeze none (pure FLoRA)
                          - 0.5: Freeze half the A matrices
+            freeze_ratios: Optional per-layer freeze ratios (layer_name -> [0,1]).
+                          If provided, overrides freeze_ratio/freeze_a.
+            collect_layer_metrics: If True, returns per-layer grad-norm metrics.
 
         Returns:
             Dict with:
@@ -163,24 +168,29 @@ class FederatedClient:
             - loss: Average training loss
             - num_samples: Number of samples trained on
             - training_time: Time taken in seconds
+            - layer_metrics: Optional per-layer metrics (if collect_layer_metrics)
         """
         # Load global state if provided
         if global_state is not None:
             self.model.set_lora_state_dict(global_state)
 
-        # Backwards compatibility: `freeze_a=True` implies fully frozen A.
-        if freeze_a:
-            freeze_ratio = 1.0
+        # Apply per-layer freezing if provided; otherwise use global freezing knobs.
+        if freeze_ratios is not None:
+            self._apply_per_layer_freeze(freeze_ratios)
+        else:
+            # Backwards compatibility: `freeze_a=True` implies fully frozen A.
+            if freeze_a:
+                freeze_ratio = 1.0
 
-        freeze_ratio = float(freeze_ratio)
-        if freeze_ratio < 0.0:
-            freeze_ratio = 0.0
-        if freeze_ratio > 1.0:
-            freeze_ratio = 1.0
+            freeze_ratio = float(freeze_ratio)
+            if freeze_ratio < 0.0:
+                freeze_ratio = 0.0
+            if freeze_ratio > 1.0:
+                freeze_ratio = 1.0
 
-        # Apply partial A freezing (deterministic by parameter name order).
-        if freeze_ratio > 0.0:
-            self._apply_partial_freeze(freeze_ratio)
+            # Apply partial A freezing (deterministic by parameter name order).
+            if freeze_ratio > 0.0:
+                self._apply_partial_freeze(freeze_ratio)
 
         # Setup optimizer
         trainable_params = [p for p in self.model.model.parameters() if p.requires_grad]
@@ -194,6 +204,9 @@ class FederatedClient:
         total_loss = 0.0
         num_steps = 0
         start_time = time.time()
+
+        # Track gradient norms per layer
+        layer_grad_norms: Dict[str, List[float]] = {}
 
         for epoch in range(self.local_epochs):
             for step, batch in enumerate(
@@ -217,6 +230,10 @@ class FederatedClient:
                 # Backward
                 loss.backward()
 
+                # Collect per-layer grad norms before optimizer step
+                if collect_layer_metrics:
+                    self._collect_grad_norms(layer_grad_norms)
+
                 # Update
                 if (step + 1) % self.gradient_accumulation_steps == 0:
                     torch.nn.utils.clip_grad_norm_(trainable_params, max_norm=1.0)
@@ -232,6 +249,13 @@ class FederatedClient:
         # After training, unfreeze everything for clean state.
         self._unfreeze_all_lora()
 
+        avg_layer_metrics: Optional[Dict[str, float]] = None
+        if collect_layer_metrics:
+            avg_layer_metrics = {
+                layer: (sum(vals) / len(vals) if vals else 0.0)
+                for layer, vals in layer_grad_norms.items()
+            }
+
         # Get updated state
         updated_state = self.model.get_lora_state_dict()
 
@@ -239,12 +263,15 @@ class FederatedClient:
         optimizer.zero_grad(set_to_none=True)
         self.model.clear_memory()
 
-        return {
+        result = {
             "state_dict": updated_state,
             "loss": avg_loss,
             "num_samples": len(self.dataset),
             "training_time": training_time,
         }
+        if avg_layer_metrics is not None:
+            result["layer_metrics"] = avg_layer_metrics
+        return result
 
     def _apply_partial_freeze(self, freeze_ratio: float) -> None:
         """
@@ -270,3 +297,53 @@ class FederatedClient:
         for name, param in self.model.model.named_parameters():
             if "lora" in name.lower():
                 param.requires_grad = True
+
+    def _extract_layer_id(self, param_name: str) -> str:
+        """
+        Extract layer identifier from parameter name.
+
+        Examples:
+            "...q_proj.lora_A.weight" -> "q_proj"
+            "...mlp.gate_proj.lora_A.weight" -> "gate_proj"
+        """
+        parts = param_name.split(".")
+        for i, part in enumerate(parts):
+            if "lora" in part.lower():
+                if i > 0:
+                    return parts[i - 1]
+        return "unknown"
+
+    def _apply_per_layer_freeze(self, freeze_ratios: Dict[str, float]) -> None:
+        """
+        Apply per-layer freezing of LoRA A parameters.
+
+        For each layer_id, freeze the first `ratio` fraction of that layer's
+        LoRA-A parameters by deterministic name order.
+        """
+        # Collect LoRA-A params grouped by layer id
+        grouped: Dict[str, List[tuple]] = {}
+        for name, param in self.model.model.named_parameters():
+            if ("lora_A" in name or "lora_a" in name):
+                layer_id = self._extract_layer_id(name)
+                grouped.setdefault(layer_id, []).append((name, param))
+
+        for layer_id, params in grouped.items():
+            ratio = float(freeze_ratios.get(layer_id, 0.0))
+            ratio = max(0.0, min(1.0, ratio))
+
+            params.sort(key=lambda x: x[0])
+            num_to_freeze = int(len(params) * ratio)
+            for i, (_name, param) in enumerate(params):
+                param.requires_grad = i >= num_to_freeze
+
+    def _collect_grad_norms(self, layer_grad_norms: Dict[str, List[float]]) -> None:
+        """Collect gradient norms for each LoRA layer (A and B combined)."""
+        for name, param in self.model.model.named_parameters():
+            if "lora" not in name.lower():
+                continue
+            if param.grad is None:
+                continue
+            layer_id = self._extract_layer_id(name)
+            layer_grad_norms.setdefault(layer_id, []).append(
+                float(param.grad.norm().detach().cpu().item())
+            )
