@@ -8,7 +8,10 @@ CURSOR AI: Implement this script as specified.
 """
 
 import argparse
+import json
 import os
+import platform
+import subprocess
 import sys
 from copy import deepcopy
 from datetime import datetime
@@ -122,8 +125,16 @@ def main() -> None:
         suffix += f"_r{args.lora_r}"
     if args.num_clients is not None:
         suffix += f"_c{args.num_clients}"
+    # Organize runs under results/raw/<exp>/<method>/seed_<seed>/<timestamp>/
+    # Keep sweep context in the seed directory name for easy browsing.
+    seed_dir = f"seed_{args.seed}{suffix}" if suffix else f"seed_{args.seed}"
     output_dir = os.path.join(
-        "results", f"{exp_name}_{method}{suffix}_{timestamp}"
+        "results",
+        "raw",
+        exp_name,
+        method,
+        seed_dir,
+        timestamp,
     )
     os.makedirs(output_dir, exist_ok=True)
 
@@ -345,6 +356,43 @@ def main() -> None:
     # Run training
     print("\n[4/4] Training...")
     results = server.train(eval_fn=eval_fn)
+
+    # Persist merged config + run metadata for reproducibility
+    try:
+        with open(os.path.join(output_dir, "config_merged.yaml"), "w") as f:
+            yaml.safe_dump(config, f, sort_keys=False)
+    except Exception as e:
+        print(f"Warning: failed to write config_merged.yaml: {e}")
+
+    def _git(cmd: list[str]) -> str:
+        try:
+            return subprocess.check_output(cmd, text=True).strip()
+        except Exception:
+            return ""
+
+    run_meta = {
+        "experiment": exp_name,
+        "method": method,
+        "seed": args.seed,
+        "timestamp": timestamp,
+        "device": device,
+        "output_dir": output_dir,
+        "git_commit": _git(["git", "rev-parse", "HEAD"]),
+        "git_branch": _git(["git", "rev-parse", "--abbrev-ref", "HEAD"]),
+        "git_dirty": bool(_git(["git", "status", "--porcelain"])),
+        "python": sys.version.split()[0],
+        "platform": platform.platform(),
+        "overrides": {
+            "lora_r": args.lora_r,
+            "num_clients": args.num_clients,
+            "switch_threshold": args.switch_threshold,
+        },
+    }
+    try:
+        with open(os.path.join(output_dir, "run_meta.json"), "w") as f:
+            json.dump(run_meta, f, indent=2)
+    except Exception as e:
+        print(f"Warning: failed to write run_meta.json: {e}")
 
     print(f"\n{'='*60}")
     print("Complete!")
