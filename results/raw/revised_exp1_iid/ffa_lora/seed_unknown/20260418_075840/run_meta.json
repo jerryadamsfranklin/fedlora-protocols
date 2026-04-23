@@ -1,0 +1,16 @@
+{
+  "experiment": "revised_exp1_iid",
+  "method": "ffa_lora",
+  "seed": null,
+  "timestamp": "20260418_075840",
+  "device": null,
+  "output_dir": "results/raw/revised_exp1_iid/ffa_lora/seed_unknown/20260418_075840",
+  "git_commit": null,
+  "git_branch": null,
+  "git_dirty": null,
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null
+  },
+  "migrated_from": "results/revised_exp1_iid_ffa_lora_20260418_075840"
+}

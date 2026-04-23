@@ -2,7 +2,7 @@
 """
 Analyze experiment results and generate comparison tables.
 
-Loads every results/*/results.json and writes CSV summaries under analysis/.
+Loads results/**/results.json and writes CSV summaries under analysis/.
 """
 
 from __future__ import annotations
@@ -83,18 +83,47 @@ def parse_run_directory(dirname: str) -> Optional[Dict[str, Any]]:
     }
 
 
+def _iter_results_files(results_dir: str) -> List[str]:
+    # Support both legacy layout (results/<run>/results.json) and new organized
+    # layout (results/raw/<exp>/<method>/seed_*/<ts>/results.json).
+    return sorted(glob(os.path.join(results_dir, "**", "results.json"), recursive=True))
+
+
+def _load_run_meta(run_dir: str) -> Dict[str, Any]:
+    meta_path = os.path.join(run_dir, "run_meta.json")
+    if not os.path.exists(meta_path):
+        return {}
+    try:
+        with open(meta_path) as f:
+            return json.load(f) or {}
+    except Exception:
+        return {}
+
+
 def load_all_results(results_dir: str = RESULTS_DIR) -> pd.DataFrame:
     records: List[Dict[str, Any]] = []
-    for exp_dir in sorted(glob(os.path.join(results_dir, "*"))):
-        if not os.path.isdir(exp_dir):
-            continue
-        results_file = os.path.join(exp_dir, "results.json")
-        if not os.path.exists(results_file):
-            continue
+    for results_file in _iter_results_files(results_dir):
+        exp_dir = os.path.dirname(results_file)
         dirname = os.path.basename(exp_dir)
-        meta = parse_run_directory(dirname)
-        if meta is None:
-            continue
+
+        run_meta = _load_run_meta(exp_dir)
+        if run_meta:
+            meta = {
+                "slug": run_meta.get("experiment", dirname),
+                "method": run_meta.get("method"),
+                "lora_r": run_meta.get("overrides", {}).get("lora_r"),
+                "num_clients_override": run_meta.get("overrides", {}).get("num_clients"),
+                "experiment_type": classify_experiment(str(run_meta.get("experiment", dirname))),
+            }
+            if not meta["method"]:
+                # Fall back to legacy parsing if needed.
+                parsed = parse_run_directory(dirname)
+                if parsed is not None:
+                    meta.update(parsed)
+        else:
+            meta = parse_run_directory(dirname)
+            if meta is None:
+                continue
 
         with open(results_file) as f:
             data = json.load(f)
@@ -106,7 +135,7 @@ def load_all_results(results_dir: str = RESULTS_DIR) -> pd.DataFrame:
         total_sec = sum(float(r["round_time"]) for r in data)
 
         row: Dict[str, Any] = {
-            "run_dir": dirname,
+            "run_dir": os.path.relpath(exp_dir, results_dir),
             "experiment_type": meta["experiment_type"],
             "slug": meta["slug"],
             "method": meta["method"],
@@ -291,7 +320,7 @@ def main() -> None:
     print("Loading results...")
     df = load_all_results()
     if df.empty:
-        print("No results found under results/*/results.json")
+        print("No results found under results/**/results.json")
         sys.exit(1)
 
     print(f"\nFound {len(df)} experiment runs\n")

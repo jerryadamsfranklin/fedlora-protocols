@@ -1,0 +1,182 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.2846466885328294,
+    "round_time": 5241.866749048233,
+    "communication_mb": 85.9375
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.2342403504967687,
+    "round_time": 5195.88481092453,
+    "communication_mb": 171.875
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.2212780636906622,
+    "round_time": 5253.98387503624,
+    "communication_mb": 257.8125
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.2089016321182249,
+    "round_time": 5762.484140872955,
+    "communication_mb": 343.75
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.2008668996572494,
+    "round_time": 5721.169562101364,
+    "communication_mb": 429.6875
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.191065773272514,
+    "round_time": 5607.005274057388,
+    "communication_mb": 515.625
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.1798492659807205,
+    "round_time": 5464.957503080368,
+    "communication_mb": 601.5625
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.172053145623207,
+    "round_time": 5086.925758123398,
+    "communication_mb": 687.5
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.1600880971074106,
+    "round_time": 5276.976507902145,
+    "communication_mb": 773.4375
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.1498124931693077,
+    "round_time": 5302.551802873611,
+    "communication_mb": 859.375
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.1405192454338073,
+    "round_time": 5333.456167221069,
+    "communication_mb": 945.3125
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.1304872028827666,
+    "round_time": 5264.165818929672,
+    "communication_mb": 1031.25
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.1188965020656587,
+    "round_time": 5190.449155092239,
+    "communication_mb": 1117.1875
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.1102218315005303,
+    "round_time": 5183.941689014435,
+    "communication_mb": 1203.125
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.100553767335415,
+    "round_time": 5147.769744873047,
+    "communication_mb": 1289.0625
+  },
+  {
+    "round": 16,
+    "avg_loss": 1.0910603718280791,
+    "round_time": 5142.120673894882,
+    "communication_mb": 1375.0
+  },
+  {
+    "round": 17,
+    "avg_loss": 1.0809877311944962,
+    "round_time": 5153.854692935944,
+    "communication_mb": 1460.9375
+  },
+  {
+    "round": 18,
+    "avg_loss": 1.0718600660324096,
+    "round_time": 5203.084299087524,
+    "communication_mb": 1546.875
+  },
+  {
+    "round": 19,
+    "avg_loss": 1.061078145134449,
+    "round_time": 5137.639366865158,
+    "communication_mb": 1632.8125
+  },
+  {
+    "round": 20,
+    "avg_loss": 1.0522727319002152,
+    "round_time": 5308.33433508873,
+    "communication_mb": 1718.75
+  },
+  {
+    "round": 21,
+    "avg_loss": 1.042242704176903,
+    "round_time": 5295.92342877388,
+    "communication_mb": 1804.6875
+  },
+  {
+    "round": 22,
+    "avg_loss": 1.0335175481796264,
+    "round_time": 5296.059080839157,
+    "communication_mb": 1890.625
+  },
+  {
+    "round": 23,
+    "avg_loss": 1.026442392528057,
+    "round_time": 5113.164171934128,
+    "communication_mb": 1976.5625
+  },
+  {
+    "round": 24,
+    "avg_loss": 1.0134306301236153,
+    "round_time": 5253.893164873123,
+    "communication_mb": 2062.5
+  },
+  {
+    "round": 25,
+    "avg_loss": 1.0042524502396581,
+    "round_time": 5250.019938707352,
+    "communication_mb": 2148.4375
+  },
+  {
+    "round": 26,
+    "avg_loss": 0.997079615688324,
+    "round_time": 5121.656897068024,
+    "communication_mb": 2234.375
+  },
+  {
+    "round": 27,
+    "avg_loss": 0.986410210621357,
+    "round_time": 5269.021767139435,
+    "communication_mb": 2320.3125
+  },
+  {
+    "round": 28,
+    "avg_loss": 0.9760779478549958,
+    "round_time": 5309.026969909668,
+    "communication_mb": 2406.25
+  },
+  {
+    "round": 29,
+    "avg_loss": 0.9676963133096695,
+    "round_time": 5210.567045927048,
+    "communication_mb": 2492.1875
+  },
+  {
+    "round": 30,
+    "avg_loss": 0.9583988858342171,
+    "round_time": 5293.59858417511,
+    "communication_mb": 2578.125
+  }
+]

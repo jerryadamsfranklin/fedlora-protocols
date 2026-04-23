@@ -1,0 +1,16 @@
+{
+  "experiment": "revised_exp2_noniid_label",
+  "method": "flexlora",
+  "seed": null,
+  "timestamp": "20260419_075954",
+  "device": null,
+  "output_dir": "results/raw/revised_exp2_noniid_label/flexlora/seed_unknown/20260419_075954",
+  "git_commit": null,
+  "git_branch": null,
+  "git_dirty": null,
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null
+  },
+  "migrated_from": "results/revised_exp2_noniid_label_flexlora_20260419_075954"
+}

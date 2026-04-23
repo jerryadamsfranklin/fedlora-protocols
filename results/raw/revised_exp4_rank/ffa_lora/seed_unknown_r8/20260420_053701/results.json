@@ -1,0 +1,92 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.4301757981777192,
+    "round_time": 485.9369390010834,
+    "communication_mb": 15.46875
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3363086075782775,
+    "round_time": 485.5333068370819,
+    "communication_mb": 30.9375
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.3276746164560316,
+    "round_time": 485.71313309669495,
+    "communication_mb": 46.40625
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.3236695176362994,
+    "round_time": 485.9253489971161,
+    "communication_mb": 61.875
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.316423789381981,
+    "round_time": 485.9119050502777,
+    "communication_mb": 77.34375
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.3143274273872376,
+    "round_time": 486.0303530693054,
+    "communication_mb": 92.8125
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.3070605792999266,
+    "round_time": 485.8062801361084,
+    "communication_mb": 108.28125
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.3036063272953036,
+    "round_time": 485.9845178127289,
+    "communication_mb": 123.75
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2962747966051098,
+    "round_time": 486.0580117702484,
+    "communication_mb": 139.21875
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2993909618854524,
+    "round_time": 486.1598551273346,
+    "communication_mb": 154.6875
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.292513860940933,
+    "round_time": 486.2227439880371,
+    "communication_mb": 170.15625
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2907923187017443,
+    "round_time": 485.6445610523224,
+    "communication_mb": 185.625
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2907082030773165,
+    "round_time": 485.88044118881226,
+    "communication_mb": 201.09375
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.2851726825237275,
+    "round_time": 485.8551471233368,
+    "communication_mb": 216.5625
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2799850919246674,
+    "round_time": 485.7620949745178,
+    "communication_mb": 232.03125
+  }
+]

@@ -56,29 +56,35 @@ METHOD_LABELS = {
 }
 
 _RUN_TAIL_RE = re.compile(
-    r"_(fedit|ffa_lora|flora|flexlora)((?:_r\d+)?)((?:_c\d+)?)_(\d{8}_\d{6})$"
+    r"_(fedit|ffa_lora|flora|flexlora|fedlora_adaptive)((?:_r\d+)?)((?:_c\d+)?)_(\d{8}_\d{6})$"
 )
 
 
 def load_experiment_data(results_dir: str = RESULTS_DIR) -> Dict[str, List[Dict[str, Any]]]:
     out: Dict[str, List[Dict[str, Any]]] = {}
-    for exp_dir in glob(os.path.join(results_dir, "*")):
-        if not os.path.isdir(exp_dir):
-            continue
-        rf = os.path.join(exp_dir, "results.json")
-        if not os.path.exists(rf):
-            continue
+    for rf in glob(os.path.join(results_dir, "**", "results.json"), recursive=True):
+        exp_dir = os.path.dirname(rf)
+        key = os.path.relpath(exp_dir, results_dir)
         with open(rf) as f:
-            out[os.path.basename(exp_dir)] = json.load(f)
+            out[key] = json.load(f)
     return out
 
 
 def _method_from_name(name: str) -> str | None:
+    # Prefer run_meta.json for organized layout; fall back to legacy name parse.
+    parts = name.split(os.sep)
+    # organized: raw/<exp>/<method>/seed_*/<ts>
+    if len(parts) >= 5 and parts[0] == "raw":
+        return parts[2]
     m = _RUN_TAIL_RE.search(name)
     return m.group(1) if m else None
 
 
 def extract_timestamp(name: str) -> str:
+    # organized layout ends with /<YYYYMMDD_HHMMSS>
+    tail = name.split(os.sep)[-1]
+    if re.fullmatch(r"\d{8}_\d{6}", tail):
+        return tail
     m = re.search(r"_(\d{8}_\d{6})$", name)
     return m.group(1) if m else ""
 
@@ -90,7 +96,7 @@ def dedupe_latest_per_method(
     candidates = {
         k: v
         for k, v in experiments.items()
-        if prefix in k and k.startswith("revised_")
+        if prefix in k and (k.startswith("revised_") or k.startswith("raw/revised_"))
     }
     if not candidates:
         candidates = {k: v for k, v in experiments.items() if prefix in k}

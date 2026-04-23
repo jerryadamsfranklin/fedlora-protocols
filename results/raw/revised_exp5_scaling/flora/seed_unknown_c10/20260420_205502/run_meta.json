@@ -1,0 +1,16 @@
+{
+  "experiment": "revised_exp5_scaling",
+  "method": "flora",
+  "seed": null,
+  "timestamp": "20260420_205502",
+  "device": null,
+  "output_dir": "results/raw/revised_exp5_scaling/flora/seed_unknown_c10/20260420_205502",
+  "git_commit": null,
+  "git_branch": null,
+  "git_dirty": null,
+  "overrides": {
+    "lora_r": null,
+    "num_clients": 10
+  },
+  "migrated_from": "results/revised_exp5_scaling_flora_c10_20260420_205502"
+}

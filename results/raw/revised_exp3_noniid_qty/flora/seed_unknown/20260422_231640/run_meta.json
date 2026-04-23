@@ -1,0 +1,16 @@
+{
+  "experiment": "revised_exp3_noniid_qty",
+  "method": "flora",
+  "seed": null,
+  "timestamp": "20260422_231640",
+  "device": null,
+  "output_dir": "results/raw/revised_exp3_noniid_qty/flora/seed_unknown/20260422_231640",
+  "git_commit": null,
+  "git_branch": null,
+  "git_dirty": null,
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null
+  },
+  "migrated_from": "results/revised_exp3_noniid_qty_flora_20260422_231640"
+}
