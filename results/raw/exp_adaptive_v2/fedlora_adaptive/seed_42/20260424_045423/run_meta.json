@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_adaptive_v2",
+  "method": "fedlora_adaptive",
+  "seed": 42,
+  "timestamp": "20260424_045423",
+  "device": "mps",
+  "output_dir": "results/raw/exp_adaptive_v2/fedlora_adaptive/seed_42/20260424_045423",
+  "git_commit": "221cf6a75bde422eaaa92c4982a6d0fee2b2f64b",
+  "git_branch": "impl/fedlora-adaptive-v2",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}
