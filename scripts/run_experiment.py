@@ -18,6 +18,10 @@ from datetime import datetime
 import math
 from typing import Any, Dict
 
+# Silence HF tokenizers fork-parallelism warning by default.
+# This only affects tokenization throughput; it does not change model numerics.
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
 import torch
 import yaml
 from datasets import load_dataset
