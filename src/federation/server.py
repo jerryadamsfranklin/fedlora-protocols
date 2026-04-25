@@ -16,17 +16,21 @@ CURSOR AI: Implement this file as specified.
 import json
 import os
 import time
-from typing import Dict, List, Optional
+import inspect
+from typing import Any, Dict, List, Optional
 
 import torch
 from tqdm import tqdm
 
+from .aggregators.budget_adaptive import BudgetAdaptiveAggregator
 from .aggregators.fedit import FedITAggregator
 from .aggregators.ffa_lora import FFALoRAAggregator
 from .aggregators.fedlora_adaptive import FedLoRAAdaptiveAggregator
 from .aggregators.fedlora_adaptive_v2 import FedLoRAAdaptiveV2Aggregator
 from .aggregators.flora import FLoRAAggregator
 from .aggregators.flexlora import FlexLoRAAggregator
+from .aggregators.reverse_adaptive import ReverseAdaptiveAggregator
+from .aggregators.two_phase import TwoPhaseAggregator
 
 
 class FederatedServer:
@@ -41,6 +45,9 @@ class FederatedServer:
         "flexlora": FlexLoRAAggregator,
         "fedlora_adaptive": FedLoRAAdaptiveAggregator,
         "fedlora_adaptive_v2": FedLoRAAdaptiveV2Aggregator,
+        "two_phase": TwoPhaseAggregator,
+        "reverse_adaptive": ReverseAdaptiveAggregator,
+        "budget_adaptive": BudgetAdaptiveAggregator,
     }
 
     def __init__(
@@ -57,6 +64,9 @@ class FederatedServer:
         stability_threshold: float = 1.1,
         per_layer_enabled: bool = True,
         layer_names: Optional[List[str]] = None,
+        two_phase: Optional[Dict[str, Any]] = None,
+        reverse_adaptive: Optional[Dict[str, Any]] = None,
+        budget_adaptive: Optional[Dict[str, Any]] = None,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
@@ -88,6 +98,31 @@ class FederatedServer:
                 transition_rounds=transition_rounds,
                 stability_threshold=stability_threshold,
                 per_layer_enabled=per_layer_enabled,
+            )
+        elif aggregation_method == "two_phase":
+            tp = two_phase or {}
+            self.aggregator = TwoPhaseAggregator(
+                phase_boundary=int(tp.get("phase_boundary", 8)),
+                max_rank=lora_r,
+            )
+        elif aggregation_method == "reverse_adaptive":
+            ra = reverse_adaptive or {}
+            self.aggregator = ReverseAdaptiveAggregator(
+                switch_threshold=float(ra.get("switch_threshold", 0.01)),
+                warmup_rounds=int(ra.get("warmup_rounds", 5)),
+                transition_rounds=int(ra.get("transition_rounds", 2)),
+                stability_threshold=float(ra.get("stability_threshold", 1.1)),
+                max_rank=lora_r,
+            )
+        elif aggregation_method == "budget_adaptive":
+            ba = budget_adaptive or {}
+            self.aggregator = BudgetAdaptiveAggregator(
+                total_budget_mb=float(
+                    ba.get("total_budget_mb", 1_000_000.0)
+                ),
+                num_rounds=int(ba.get("num_rounds", num_rounds)),
+                priority=str(ba.get("priority", "quality")),
+                max_rank=lora_r,
             )
         else:
             self.aggregator = agg_cls()
@@ -145,7 +180,9 @@ class FederatedServer:
             losses = []
             all_layer_metrics: List[Dict[str, float]] = []
 
-            if self.aggregation_method == "fedlora_adaptive" and hasattr(
+            if hasattr(self.aggregator, "get_freeze_a"):
+                freeze_a = bool(self.aggregator.get_freeze_a())
+            elif self.aggregation_method == "fedlora_adaptive" and hasattr(
                 self.aggregator, "get_mode"
             ):
                 freeze_a = self.aggregator.get_mode() == "FFA-LoRA"
@@ -184,31 +221,17 @@ class FederatedServer:
             # Aggregate (FedLoRA-Adaptive needs current_loss for switching)
             avg_loss = sum(losses) / len(losses) if losses else 0.0
             aggregated_layer_metrics = self._aggregate_layer_metrics(all_layer_metrics)
-            try:
-                import inspect
-
-                sig = inspect.signature(self.aggregator.aggregate)
-                if "current_loss" in sig.parameters:
-                    kwargs = {
-                        "client_states": client_states,
-                        "weights": client_weights,
-                        "current_loss": avg_loss,
-                    }
-                    if "layer_metrics" in sig.parameters:
-                        kwargs["layer_metrics"] = aggregated_layer_metrics
-                    if "round_num" in sig.parameters:
-                        kwargs["round_num"] = round_num + 1
-                    self.global_state = self.aggregator.aggregate(**kwargs)
-                else:
-                    self.global_state = self.aggregator.aggregate(
-                        client_states,
-                        weights=client_weights,
-                    )
-            except Exception:
-                self.global_state = self.aggregator.aggregate(
-                    client_states,
-                    weights=client_weights,
-                )
+            sig = inspect.signature(self.aggregator.aggregate)
+            call_kw: Dict[str, Any] = {"client_states": client_states}
+            if "weights" in sig.parameters:
+                call_kw["weights"] = client_weights
+            if "round_num" in sig.parameters:
+                call_kw["round_num"] = round_num + 1
+            if "current_loss" in sig.parameters:
+                call_kw["current_loss"] = avg_loss
+            if "layer_metrics" in sig.parameters:
+                call_kw["layer_metrics"] = aggregated_layer_metrics
+            self.global_state = self.aggregator.aggregate(**call_kw)
 
             # Add download communication (server -> each client)
             total_communication += (

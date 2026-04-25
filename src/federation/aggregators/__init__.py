@@ -10,6 +10,9 @@ at module import time. Individual aggregators should be imported from their modu
 - `src.federation.aggregators.flexlora`
 - `src.federation.aggregators.fedlora_adaptive`
 - `src.federation.aggregators.fedlora_adaptive_v2`
+- `src.federation.aggregators.two_phase`
+- `src.federation.aggregators.reverse_adaptive`
+- `src.federation.aggregators.budget_adaptive`
 """
 
 from __future__ import annotations
@@ -36,6 +39,15 @@ AGGREGATOR_IMPORTS: Dict[str, tuple[str, str]] = {
     "fedlora_adaptive_v2": (
         "src.federation.aggregators.fedlora_adaptive_v2",
         "FedLoRAAdaptiveV2Aggregator",
+    ),
+    "two_phase": ("src.federation.aggregators.two_phase", "TwoPhaseAggregator"),
+    "reverse_adaptive": (
+        "src.federation.aggregators.reverse_adaptive",
+        "ReverseAdaptiveAggregator",
+    ),
+    "budget_adaptive": (
+        "src.federation.aggregators.budget_adaptive",
+        "BudgetAdaptiveAggregator",
     ),
 }
 

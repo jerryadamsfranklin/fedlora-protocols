@@ -342,6 +342,11 @@ def main() -> None:
     fed_cfg = config.get("federated", {})
     adaptive_cfg = config.get("fedlora_adaptive", {})
     adaptive_v2_cfg = config.get("fedlora_adaptive_v2", {})
+    two_phase_cfg = config.get("two_phase", {}) or {}
+    reverse_adaptive_cfg = config.get("reverse_adaptive", {}) or {}
+    budget_adaptive_cfg = dict(config.get("budget_adaptive", {}) or {})
+    if budget_adaptive_cfg and "num_rounds" not in budget_adaptive_cfg:
+        budget_adaptive_cfg["num_rounds"] = fed_cfg.get("num_rounds", 15)
 
     # v2 uses its own config block; fall back to v1 keys for backwards compat.
     if method == "fedlora_adaptive_v2":
@@ -374,6 +379,9 @@ def main() -> None:
         layer_names=adaptive_v2_cfg.get(
             "layer_names", ["q_proj", "k_proj", "v_proj", "o_proj"]
         ),
+        two_phase=two_phase_cfg,
+        reverse_adaptive=reverse_adaptive_cfg,
+        budget_adaptive=budget_adaptive_cfg,
     )
     server.set_clients(clients)
 
