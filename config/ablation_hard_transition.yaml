@@ -1,0 +1,9 @@
+_inherit: exp_adaptive_v2.yaml
+
+experiment:
+  name: "ablation_hard_transition"
+  description: "FedLoRA-Adaptive v2 with hard transition (transition_rounds=0)"
+
+fedlora_adaptive_v2:
+  transition_rounds: 0
+

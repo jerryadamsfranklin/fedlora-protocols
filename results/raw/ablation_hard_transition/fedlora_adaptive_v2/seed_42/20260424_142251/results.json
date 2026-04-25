@@ -1,0 +1,596 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.4545359365940096,
+    "round_time": 715.2686388492584,
+    "communication_mb": 85.9375,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 1,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 1,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FFA-LoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FFA-LoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": null,
+          "k_proj": null,
+          "v_proj": null,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [],
+        "earliest_switch": null,
+        "latest_switch": null
+      }
+    }
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3628730059464775,
+    "round_time": 714.5496408939362,
+    "communication_mb": 171.875,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 2,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 2,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FFA-LoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FFA-LoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": null,
+          "k_proj": null,
+          "v_proj": null,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [],
+        "earliest_switch": null,
+        "latest_switch": null
+      }
+    }
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.3507216568787892,
+    "round_time": 714.6469309329987,
+    "communication_mb": 257.8125,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 3,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 3,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FFA-LoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FFA-LoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": null,
+          "k_proj": null,
+          "v_proj": null,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [],
+        "earliest_switch": null,
+        "latest_switch": null
+      }
+    }
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.3450839394728342,
+    "round_time": 714.9293599128723,
+    "communication_mb": 343.75,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 4,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 4,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "TRANSITION",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "TRANSITION",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.330467455625534,
+    "round_time": 745.4267027378082,
+    "communication_mb": 429.6875,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 5,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 5,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.3164945403734845,
+    "round_time": 745.8772449493408,
+    "communication_mb": 515.625,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 6,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 6,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.3078423170248668,
+    "round_time": 746.5795450210571,
+    "communication_mb": 601.5625,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 7,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 7,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.2978226226170857,
+    "round_time": 746.6238551139832,
+    "communication_mb": 687.5,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 8,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 8,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2935394143263501,
+    "round_time": 746.5280048847198,
+    "communication_mb": 773.4375,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 9,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 9,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2871704745292663,
+    "round_time": 748.9813249111176,
+    "communication_mb": 859.375,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 10,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 10,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.286888859987259,
+    "round_time": 747.7545640468597,
+    "communication_mb": 945.3125,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 11,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 11,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2851201001008352,
+    "round_time": 751.3086488246918,
+    "communication_mb": 1031.25,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 12,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 12,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2789650345643362,
+    "round_time": 750.589616060257,
+    "communication_mb": 1117.1875,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 13,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 13,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.2728920396169028,
+    "round_time": 749.3642711639404,
+    "communication_mb": 1203.125,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 14,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 14,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2715314228534698,
+    "round_time": 747.8830499649048,
+    "communication_mb": 1289.0625,
+    "aggregator_stats": {
+      "name": "FedLoRA-Adaptive-v2",
+      "round_count": 15,
+      "per_layer_enabled": true,
+      "revert_count": 0,
+      "loss_history_length": 15,
+      "last_stable_round": 0,
+      "spike_threshold": 1.1,
+      "sustained_rounds": 2,
+      "layer_analysis": {
+        "layer_phases": {
+          "q_proj": "FLoRA",
+          "k_proj": "FFA-LoRA",
+          "v_proj": "FLoRA",
+          "o_proj": "FFA-LoRA"
+        },
+        "layer_switch_rounds": {
+          "q_proj": 4,
+          "k_proj": null,
+          "v_proj": 4,
+          "o_proj": null
+        },
+        "layers_still_ffa_lora": [
+          "k_proj",
+          "o_proj"
+        ],
+        "layers_in_flora": [
+          "q_proj",
+          "v_proj"
+        ],
+        "earliest_switch": 4,
+        "latest_switch": 4
+      }
+    }
+  }
+]
