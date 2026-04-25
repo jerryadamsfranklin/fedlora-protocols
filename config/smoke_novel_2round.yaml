@@ -1,0 +1,20 @@
+# 2-round smoke: same 4-layer Alpaca setup as base_config_4layers, minimal wall time.
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "smoke_novel_2round"
+  description: "Sanity check for two-phase / reverse / budget before long runs"
+
+federated:
+  num_rounds: 2
+
+# Keep budget num_rounds in sync with federated (run_experiment merges this if present)
+budget_adaptive:
+  num_rounds: 2
+
+evaluation:
+  eval_every: 1
+
+# So 2 rounds hit both phases: R1 FLoRA, R2 FFA (optional; remove to use defaults from exp_two_phase when inheriting)
+two_phase:
+  phase_boundary: 1
