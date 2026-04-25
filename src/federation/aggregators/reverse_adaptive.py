@@ -152,7 +152,9 @@ class ReverseAdaptiveAggregator:
         return out
 
     def get_freeze_a(self) -> bool:
-        return self._get_freeze_ratio(self.round_count) >= 0.5
+        # Align with the upcoming round: `round_count` = rounds already aggregated.
+        nxt = self.round_count + 1
+        return self._get_freeze_ratio(nxt) >= 0.5
 
     def get_stats(self) -> Dict[str, Any]:
         savings = 0.0

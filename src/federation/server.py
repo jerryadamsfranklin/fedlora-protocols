@@ -180,6 +180,11 @@ class FederatedServer:
             losses = []
             all_layer_metrics: List[Dict[str, float]] = []
 
+            if self.aggregation_method == "budget_adaptive" and hasattr(
+                self.aggregator, "plan_round"
+            ):
+                self.aggregator.plan_round(round_num + 1)
+
             if hasattr(self.aggregator, "get_freeze_a"):
                 freeze_a = bool(self.aggregator.get_freeze_a())
             elif self.aggregation_method == "fedlora_adaptive" and hasattr(

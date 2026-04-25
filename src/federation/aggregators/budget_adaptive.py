@@ -36,6 +36,8 @@ class BudgetAdaptiveAggregator:
         self.ffa_lora_rounds = 0
         self.round_methods: List[str] = []
         self._last_fr = 0.0  # 0 = FLoRA path, 1 = FFA path (for reset)
+        # Chosen in plan_round() before client training; aggregate() must match it.
+        self._plan_use_flora: Optional[bool] = None
 
     def _measure_costs(self, client_states: List[Dict[str, torch.Tensor]]) -> None:
         if not client_states:
@@ -66,6 +68,20 @@ class BudgetAdaptiveAggregator:
         avg = self.budget_remaining / r_rem
         return bool(avg >= self.flora_comm_per_round * 1.1)
 
+    def plan_round(self, round_num: int) -> None:
+        """
+        Call once at the start of each federated round (1-based) before get_freeze_a.
+        Picks FLoRA vs FFA for this round so client training matches aggregation.
+        """
+        r = int(round_num)
+        if self.flora_comm_per_round is None or self.ffa_comm_per_round is None:
+            # No measured costs yet: first policy decision defaults to FLoRA.
+            # Costs are filled after the first aggregate() from real client state.
+            self._plan_use_flora = True
+        else:
+            self._plan_use_flora = self._should_use_flora(r)
+        return None
+
     def aggregate(
         self,
         client_states: List[Dict[str, torch.Tensor]],
@@ -83,7 +99,11 @@ class BudgetAdaptiveAggregator:
             self._measure_costs(client_states)
         assert self.flora_comm_per_round is not None
         assert self.ffa_comm_per_round is not None
-        use_flora = self._should_use_flora(self.round_count)
+        if self._plan_use_flora is not None:
+            use_flora = self._plan_use_flora
+            self._plan_use_flora = None
+        else:
+            use_flora = self._should_use_flora(self.round_count)
         if use_flora:
             cost = self.flora_comm_per_round
             out = self.flora.aggregate(client_states, weights)
@@ -102,6 +122,8 @@ class BudgetAdaptiveAggregator:
         return out
 
     def get_freeze_a(self) -> bool:
+        if self._plan_use_flora is not None:
+            return not self._plan_use_flora
         if not self.round_methods:
             return False
         return self.round_methods[-1] == "FFA-LoRA"
@@ -133,3 +155,4 @@ class BudgetAdaptiveAggregator:
         self.ffa_lora_rounds = 0
         self.round_methods.clear()
         self._last_fr = 0.0
+        self._plan_use_flora = None

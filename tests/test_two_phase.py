@@ -24,10 +24,14 @@ def _mock_states(n: int = 3):
 def test_phase1_flora_freeze_false():
     agg = TwoPhaseAggregator(phase_boundary=8, max_rank=16)
     states = _mock_states()
-    for r in range(1, 9):
+    for r in range(1, 8):
         agg.aggregate(states, round_num=r)
         assert agg.current_phase == 1
         assert agg.get_freeze_a() is False
+    # After round-8 aggregate, the *next* training round (9) is FFA-prep: freeze A
+    agg.aggregate(states, round_num=8)
+    assert agg.current_phase == 1
+    assert agg.get_freeze_a() is True
 
 
 def test_phase2_ffa_freeze_true():

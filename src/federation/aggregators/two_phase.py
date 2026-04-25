@@ -76,7 +76,10 @@ class TwoPhaseAggregator:
         return out
 
     def get_freeze_a(self) -> bool:
-        return self.current_phase == 2
+        # Server calls this *before* aggregate; `round_count` is rounds already finished.
+        # This round's training (1-based) is round_count + 1, which must match aggregate().
+        nxt = self.round_count + 1
+        return nxt > self.phase_boundary
 
     def get_stats(self) -> Dict[str, Any]:
         savings = 0.0
