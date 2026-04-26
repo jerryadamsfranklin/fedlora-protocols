@@ -1,0 +1,7 @@
+_inherit: exp_two_phase.yaml
+
+experiment:
+  name: "exp_two_phase_k8"
+
+two_phase:
+  phase_boundary: 8

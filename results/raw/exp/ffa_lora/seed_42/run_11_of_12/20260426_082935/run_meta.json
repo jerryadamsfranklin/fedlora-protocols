@@ -1,0 +1,21 @@
+{
+  "experiment": "exp",
+  "method": "ffa_lora",
+  "seed": 42,
+  "timestamp": "20260426_082935",
+  "device": "mps",
+  "output_dir": "results/raw/exp/ffa_lora/seed_42/run_11_of_12/20260426_082935",
+  "git_commit": "684279c31817e0383c301e3239433cbc1b524aab",
+  "git_branch": "feat/novel-federated-lora-implementation",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  },
+  "run_index": 11,
+  "run_total": 12,
+  "run_label": "11/12"
+}

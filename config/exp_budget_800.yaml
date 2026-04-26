@@ -1,0 +1,13 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_budget_800"
+  description: "Budget-adaptive with total upload budget (MB) over all rounds"
+
+federated:
+  aggregation_method: "budget_adaptive"
+
+budget_adaptive:
+  total_budget_mb: 800.0
+  num_rounds: 15
+  priority: "quality"

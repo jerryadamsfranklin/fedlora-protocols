@@ -18,6 +18,10 @@ from datetime import datetime
 import math
 from typing import Any, Dict
 
+# Silence HF tokenizers fork-parallelism warning by default.
+# This only affects tokenization throughput; it does not change model numerics.
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
 import torch
 import yaml
 from datasets import load_dataset
@@ -90,7 +94,28 @@ def main() -> None:
         default=None,
         help="Override switch threshold for fedlora_adaptive (tau)",
     )
+    parser.add_argument(
+        "--run-index",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Position in a batch of runs (1-based); use with --run-total",
+    )
+    parser.add_argument(
+        "--run-total",
+        type=int,
+        default=None,
+        metavar="M",
+        help="Total runs in the batch; adds run_N_of_M to the output path",
+    )
     args = parser.parse_args()
+    if (args.run_index is None) ^ (args.run_total is None):
+        parser.error("--run-index and --run-total must be used together")
+    if args.run_index is not None:
+        if args.run_total < 1 or args.run_index < 1 or args.run_index > args.run_total:
+            parser.error(
+                "--run-index must be 1..--run-total and --run-total must be >= 1"
+            )
 
     # Load config (recursive _inherit merge)
     config = load_config(args.config)
@@ -125,19 +150,29 @@ def main() -> None:
         suffix += f"_r{args.lora_r}"
     if args.num_clients is not None:
         suffix += f"_c{args.num_clients}"
-    # Organize runs under results/raw/<exp>/<method>/seed_<seed>/<timestamp>/
+    # Organize runs under results/raw/<exp>/<method>/seed_<seed>/[run_NN_of_MM/]<timestamp>/
     # Keep sweep context in the seed directory name for easy browsing.
     seed_dir = f"seed_{args.seed}{suffix}" if suffix else f"seed_{args.seed}"
+    run_folder = None
+    if args.run_index is not None:
+        run_folder = f"run_{args.run_index:02d}_of_{args.run_total:02d}"
     output_dir = os.path.join(
         "results",
         "raw",
         exp_name,
         method,
         seed_dir,
+        *( [run_folder] if run_folder else [] ),
         timestamp,
     )
     os.makedirs(output_dir, exist_ok=True)
 
+    if args.run_index is not None:
+        print(
+            f"\n{'='*60}\n"
+            f"  BATCH RUN  {args.run_index}/{args.run_total}\n"
+            f"{'='*60}"
+        )
     print(f"\nExperiment: {exp_name}")
     print(f"Method: {method}")
     print(f"Output: {output_dir}")
@@ -342,6 +377,11 @@ def main() -> None:
     fed_cfg = config.get("federated", {})
     adaptive_cfg = config.get("fedlora_adaptive", {})
     adaptive_v2_cfg = config.get("fedlora_adaptive_v2", {})
+    two_phase_cfg = config.get("two_phase", {}) or {}
+    reverse_adaptive_cfg = config.get("reverse_adaptive", {}) or {}
+    budget_adaptive_cfg = dict(config.get("budget_adaptive", {}) or {})
+    if budget_adaptive_cfg and "num_rounds" not in budget_adaptive_cfg:
+        budget_adaptive_cfg["num_rounds"] = fed_cfg.get("num_rounds", 15)
 
     # v2 uses its own config block; fall back to v1 keys for backwards compat.
     if method == "fedlora_adaptive_v2":
@@ -374,6 +414,9 @@ def main() -> None:
         layer_names=adaptive_v2_cfg.get(
             "layer_names", ["q_proj", "k_proj", "v_proj", "o_proj"]
         ),
+        two_phase=two_phase_cfg,
+        reverse_adaptive=reverse_adaptive_cfg,
+        budget_adaptive=budget_adaptive_cfg,
     )
     server.set_clients(clients)
 
@@ -412,6 +455,10 @@ def main() -> None:
             "switch_threshold": args.switch_threshold,
         },
     }
+    if args.run_index is not None:
+        run_meta["run_index"] = args.run_index
+        run_meta["run_total"] = args.run_total
+        run_meta["run_label"] = f"{args.run_index}/{args.run_total}"
     try:
         with open(os.path.join(output_dir, "run_meta.json"), "w") as f:
             json.dump(run_meta, f, indent=2)
@@ -420,6 +467,8 @@ def main() -> None:
 
     print(f"\n{'='*60}")
     print("Complete!")
+    if args.run_index is not None:
+        print(f"Batch run: {args.run_index}/{args.run_total}")
     print(f"Communication: {results['total_communication_mb']:.2f} MB")
     print(f"Results: {output_dir}")
 

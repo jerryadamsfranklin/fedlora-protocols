@@ -1,0 +1,92 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.4545359365940096,
+    "round_time": 700.3550701141357,
+    "communication_mb": 85.9375
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3628730059464775,
+    "round_time": 703.0065710544586,
+    "communication_mb": 171.875
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.3507216568787892,
+    "round_time": 703.1098318099976,
+    "communication_mb": 257.8125
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.3450839394728342,
+    "round_time": 707.0976068973541,
+    "communication_mb": 343.75
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.3370117878913879,
+    "round_time": 706.9769370555878,
+    "communication_mb": 429.6875
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.3315967787901561,
+    "round_time": 703.2559130191803,
+    "communication_mb": 515.625
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.3274003047148386,
+    "round_time": 708.4348540306091,
+    "communication_mb": 601.5625
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.3206534168720245,
+    "round_time": 709.6864790916443,
+    "communication_mb": 687.5
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.3183344751993817,
+    "round_time": 707.8904211521149,
+    "communication_mb": 773.4375
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.313988920132319,
+    "round_time": 707.3758387565613,
+    "communication_mb": 859.375
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.3150097074508669,
+    "round_time": 709.360867023468,
+    "communication_mb": 945.3125
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.314888292312622,
+    "round_time": 709.7812221050262,
+    "communication_mb": 1031.25
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.3103932603995005,
+    "round_time": 709.1665637493134,
+    "communication_mb": 1117.1875
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.3048592828909558,
+    "round_time": 709.267548084259,
+    "communication_mb": 1203.125
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.3045590263207754,
+    "round_time": 708.9595367908478,
+    "communication_mb": 1289.0625
+  }
+]

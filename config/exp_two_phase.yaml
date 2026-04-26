@@ -1,0 +1,11 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_two_phase"
+  description: "Two-Phase: FLoRA (early) then FFA-LoRA (late) at a fixed round"
+
+federated:
+  aggregation_method: "two_phase"
+
+two_phase:
+  phase_boundary: 8

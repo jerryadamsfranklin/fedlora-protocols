@@ -1,0 +1,15 @@
+# Curriculum rank (schedule of effective LoRA rank over rounds) requires the client
+# model to resize PEFT adapters when rank changes. Not wired yet; use as a placeholder
+# for the experiment name only once `CurriculumRankAggregator` + model support land.
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_curriculum_rank"
+  description: "Placeholder: curriculum rank needs dynamic adapter rank in the client"
+
+federated:
+  aggregation_method: "fedit"
+
+# curriculum_rank:
+#   rank_schedule: {5: 4, 10: 8, 15: 16}
+#   final_rank: 16
