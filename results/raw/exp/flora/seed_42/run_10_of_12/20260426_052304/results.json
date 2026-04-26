@@ -1,0 +1,92 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.37814102435112,
+    "round_time": 740.8300292491913,
+    "communication_mb": 85.9375
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3032632342974346,
+    "round_time": 741.2034101486206,
+    "communication_mb": 171.875
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.2977241606712344,
+    "round_time": 739.883278131485,
+    "communication_mb": 257.8125
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.2951904661655427,
+    "round_time": 740.9337251186371,
+    "communication_mb": 343.75
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.2892012256781262,
+    "round_time": 741.3212502002716,
+    "communication_mb": 429.6875
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.2855456428527834,
+    "round_time": 741.5200169086456,
+    "communication_mb": 515.625
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.2821928567091625,
+    "round_time": 740.6964619159698,
+    "communication_mb": 601.5625
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.2757447610696158,
+    "round_time": 741.7996141910553,
+    "communication_mb": 687.5
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2743395833969118,
+    "round_time": 740.6598191261292,
+    "communication_mb": 773.4375
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2700310600598652,
+    "round_time": 741.8969900608063,
+    "communication_mb": 859.375
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.2711785545349121,
+    "round_time": 741.0463371276855,
+    "communication_mb": 945.3125
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2707087863286337,
+    "round_time": 740.586254119873,
+    "communication_mb": 1031.25
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.265481982707977,
+    "round_time": 740.7280271053314,
+    "communication_mb": 1117.1875
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.260152719259262,
+    "round_time": 740.6181280612946,
+    "communication_mb": 1203.125
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2594342811902364,
+    "round_time": 735.0812349319458,
+    "communication_mb": 1289.0625
+  }
+]

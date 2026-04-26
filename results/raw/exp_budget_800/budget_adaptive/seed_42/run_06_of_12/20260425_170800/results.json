@@ -1,0 +1,407 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.37814102435112,
+    "round_time": 713.6917459964752,
+    "communication_mb": 85.9375,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 85.9375,
+      "budget_remaining_mb": 714.0625,
+      "budget_utilization": 0.107421875,
+      "round_count": 1,
+      "flora_rounds": 1,
+      "ffa_lora_rounds": 0,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA"
+      ]
+    }
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3032632342974346,
+    "round_time": 724.7878029346466,
+    "communication_mb": 171.875,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 171.875,
+      "budget_remaining_mb": 628.125,
+      "budget_utilization": 0.21484375,
+      "round_count": 2,
+      "flora_rounds": 2,
+      "ffa_lora_rounds": 0,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA"
+      ]
+    }
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.2977241606712344,
+    "round_time": 744.1228678226471,
+    "communication_mb": 257.8125,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 257.8125,
+      "budget_remaining_mb": 542.1875,
+      "budget_utilization": 0.322265625,
+      "round_count": 3,
+      "flora_rounds": 3,
+      "ffa_lora_rounds": 0,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA"
+      ]
+    }
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.2951904661655427,
+    "round_time": 741.344437122345,
+    "communication_mb": 343.75,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 343.75,
+      "budget_remaining_mb": 456.25,
+      "budget_utilization": 0.4296875,
+      "round_count": 4,
+      "flora_rounds": 4,
+      "ffa_lora_rounds": 0,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA"
+      ]
+    }
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.2892012256781262,
+    "round_time": 743.1101791858673,
+    "communication_mb": 429.6875,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 429.6875,
+      "budget_remaining_mb": 370.3125,
+      "budget_utilization": 0.537109375,
+      "round_count": 5,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 0,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA"
+      ]
+    }
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.2855456428527834,
+    "round_time": 742.3554108142853,
+    "communication_mb": 515.625,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 515.625,
+      "budget_remaining_mb": 284.375,
+      "budget_utilization": 0.64453125,
+      "round_count": 6,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 0,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA"
+      ]
+    }
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.2818842151165009,
+    "round_time": 719.5132830142975,
+    "communication_mb": 601.5625,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 546.5625,
+      "budget_remaining_mb": 253.4375,
+      "budget_utilization": 0.683203125,
+      "round_count": 7,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 1,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.2775381902853649,
+    "round_time": 719.2487728595734,
+    "communication_mb": 687.5,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 577.5,
+      "budget_remaining_mb": 222.5,
+      "budget_utilization": 0.721875,
+      "round_count": 8,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 2,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2777944657802582,
+    "round_time": 719.4444470405579,
+    "communication_mb": 773.4375,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 608.4375,
+      "budget_remaining_mb": 191.5625,
+      "budget_utilization": 0.760546875,
+      "round_count": 9,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 3,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2752478946050008,
+    "round_time": 719.1604988574982,
+    "communication_mb": 859.375,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 639.375,
+      "budget_remaining_mb": 160.625,
+      "budget_utilization": 0.79921875,
+      "round_count": 10,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 4,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.2781915632883707,
+    "round_time": 719.3511092662811,
+    "communication_mb": 945.3125,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 670.3125,
+      "budget_remaining_mb": 129.6875,
+      "budget_utilization": 0.837890625,
+      "round_count": 11,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 5,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2795305845737457,
+    "round_time": 718.9284460544586,
+    "communication_mb": 1031.25,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 701.25,
+      "budget_remaining_mb": 98.75,
+      "budget_utilization": 0.8765625,
+      "round_count": 12,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 6,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2761276156902313,
+    "round_time": 719.115250825882,
+    "communication_mb": 1117.1875,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 732.1875,
+      "budget_remaining_mb": 67.8125,
+      "budget_utilization": 0.915234375,
+      "round_count": 13,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 7,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.2724052840073903,
+    "round_time": 719.2649779319763,
+    "communication_mb": 1203.125,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 763.125,
+      "budget_remaining_mb": 36.875,
+      "budget_utilization": 0.95390625,
+      "round_count": 14,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 8,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2735087777773537,
+    "round_time": 719.3257746696472,
+    "communication_mb": 1289.0625,
+    "aggregator_stats": {
+      "name": "Budget-Adaptive",
+      "total_budget_mb": 800.0,
+      "budget_spent_mb": 794.0625,
+      "budget_remaining_mb": 5.9375,
+      "budget_utilization": 0.992578125,
+      "round_count": 15,
+      "flora_rounds": 6,
+      "ffa_lora_rounds": 9,
+      "priority": "quality",
+      "round_methods": [
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FLoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA",
+        "FFA-LoRA"
+      ]
+    }
+  }
+]
