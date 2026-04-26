@@ -29,6 +29,7 @@ from .aggregators.fedlora_adaptive import FedLoRAAdaptiveAggregator
 from .aggregators.fedlora_adaptive_v2 import FedLoRAAdaptiveV2Aggregator
 from .aggregators.flora import FLoRAAggregator
 from .aggregators.flexlora import FlexLoRAAggregator
+from .aggregators.curriculum_rank import CurriculumRankAggregator
 from .aggregators.reverse_adaptive import ReverseAdaptiveAggregator
 from .aggregators.two_phase import TwoPhaseAggregator
 
@@ -45,6 +46,7 @@ class FederatedServer:
         "flexlora": FlexLoRAAggregator,
         "fedlora_adaptive": FedLoRAAdaptiveAggregator,
         "fedlora_adaptive_v2": FedLoRAAdaptiveV2Aggregator,
+        "curriculum_rank": CurriculumRankAggregator,
         "two_phase": TwoPhaseAggregator,
         "reverse_adaptive": ReverseAdaptiveAggregator,
         "budget_adaptive": BudgetAdaptiveAggregator,
@@ -67,6 +69,7 @@ class FederatedServer:
         two_phase: Optional[Dict[str, Any]] = None,
         reverse_adaptive: Optional[Dict[str, Any]] = None,
         budget_adaptive: Optional[Dict[str, Any]] = None,
+        curriculum_rank: Optional[Dict[str, Any]] = None,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
@@ -123,6 +126,13 @@ class FederatedServer:
                 num_rounds=int(ba.get("num_rounds", num_rounds)),
                 priority=str(ba.get("priority", "quality")),
                 max_rank=lora_r,
+            )
+        elif aggregation_method == "curriculum_rank":
+            cr = curriculum_rank or {}
+            self.aggregator = CurriculumRankAggregator(
+                rank_schedule=cr.get("rank_schedule"),
+                final_rank=int(cr.get("final_rank", lora_r)),
+                full_rank=lora_r,
             )
         else:
             self.aggregator = agg_cls()

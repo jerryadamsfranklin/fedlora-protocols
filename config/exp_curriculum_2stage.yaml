@@ -1,0 +1,15 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_curriculum_2stage"
+  description: "Curriculum rank: 2-stage {7:4, 15:16}"
+
+federated:
+  aggregation_method: "curriculum_rank"
+
+curriculum_rank:
+  rank_schedule:
+    7: 4
+    15: 16
+  final_rank: 16
+

@@ -49,6 +49,10 @@ AGGREGATOR_IMPORTS: Dict[str, tuple[str, str]] = {
         "src.federation.aggregators.budget_adaptive",
         "BudgetAdaptiveAggregator",
     ),
+    "curriculum_rank": (
+        "src.federation.aggregators.curriculum_rank",
+        "CurriculumRankAggregator",
+    ),
 }
 
 
