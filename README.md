@@ -32,7 +32,7 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Optional: copy **`.env.example`** to **`.env`** for Hugging Face or Weights & Biases tokens if you use gated models or logging (see comments in `.env.example`).
+Optional: add a **`.env`** with Hugging Face or Weights & Biases tokens if you use gated models or logging.
 
 ## Quick start — one run
 
