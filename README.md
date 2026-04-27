@@ -1,6 +1,11 @@
 # Federated LoRA experiments
 
-Comparison of four federated fine-tuning approaches that aggregate client-side LoRA adapters: **FedIT**, **FFA-LoRA**, **FLoRA**, and **FlexLoRA**. Training is simulated with a central orchestrator (single-process prototype): clients hold partitioned data; each round updates LoRA weights locally; the server applies the chosen aggregator.
+Comparison of federated fine-tuning approaches that aggregate client-side LoRA adapters. Training is simulated with a central orchestrator (single-process prototype): clients hold partitioned data; each round updates LoRA weights locally; the server applies the chosen aggregator.
+
+Implemented aggregators:
+- **Baselines**: **FedIT**, **FFA-LoRA**, **FLoRA**, **FlexLoRA**
+- **Adaptive**: **FedLoRA-Adaptive v1** (`fedlora_adaptive`), **FedLoRA-Adaptive v2** (`fedlora_adaptive_v2`)
+- **Novel methods (week plan)**: **Two-Phase** (`two_phase`), **Reverse-Adaptive** (`reverse_adaptive`), **Budget-Adaptive** (`budget_adaptive`), **Curriculum-Rank** (`curriculum_rank`)
 
 Full methodology, research questions (RQ1–RQ5), experiment matrix, and publication checklist are in **`Federated_LoRA_Complete_Guide.md`** at the repo root.
 
@@ -37,7 +42,7 @@ From the repository root:
 python scripts/run_experiment.py --config config/revised_exp1_iid.yaml --method fedit
 ```
 
-Aggregation methods: `fedit`, `ffa_lora`, `flora`, `flexlora`.
+Aggregation methods (most common): `fedit`, `ffa_lora`, `flora`, `flexlora`, `fedlora_adaptive`, `fedlora_adaptive_v2`, `two_phase`, `reverse_adaptive`, `budget_adaptive`, `curriculum_rank`.
 
 Sweeps (used in EXP4 / EXP5):
 
@@ -62,13 +67,46 @@ Runtime is long; runs are intended for overnight or cluster-style execution.
 
 ## Results layout
 
-Each run writes a timestamped directory under **`results/`**:
+Each run writes a timestamped directory under **`results/raw/`**:
 
 ```text
-results/<experiment_name>_<method>[_r<rank>][_c<clients>]_<YYYYMMDD_HHMMSS>/results.json
+results/raw/<experiment>/<method>/seed_<seed>[_r<rank>][_c<clients>]/[run_NN_of_MM/]<YYYYMMDD_HHMMSS>/
+  results.json
+  config_merged.yaml
+  run_meta.json
 ```
 
 `results.json` is a list of per-round records (`round`, `avg_loss`, `communication_mb`, `round_time`, …) used by analysis and plotting.
+
+The optional `run_NN_of_MM/` folder is used by batch scripts to make it easy to locate “run 7/12” etc.
+
+## Novel methods (Two-Phase / Reverse-Adaptive / Budget-Adaptive / Curriculum-Rank)
+
+The novel-method protocol and rationale are described in `NOVEL_METHODS_IMPLEMENTATION.md` (local notes). The key config for meaningful per-layer / 4-projection LoRA experiments is:
+- `config/base_config_4layers.yaml` (LoRA targets: `q_proj`, `k_proj`, `v_proj`, `o_proj`)
+
+### Run the 12-run novel-method batch (seed 42)
+
+```bash
+SEED=42 ./scripts/run_novel_methods.sh
+```
+
+This runs:
+- Two-Phase sweep (`exp_two_phase_k5`, `k8`, `k10`, `k12`)
+- Reverse-Adaptive (`exp_reverse_adaptive`)
+- Budget-Adaptive sweep (`exp_budget_800`, `1200`, `1600`, `2000`)
+- Baselines on the same 4-layer setup (`flora`, `ffa_lora`, `fedit`)
+
+### Run curriculum-rank schedule sweep (seed 42)
+
+```bash
+python3 scripts/run_experiment.py --config config/exp_curriculum_default.yaml --method curriculum_rank --seed 42
+python3 scripts/run_experiment.py --config config/exp_curriculum_2stage.yaml  --method curriculum_rank --seed 42
+python3 scripts/run_experiment.py --config config/exp_curriculum_r8start.yaml --method curriculum_rank --seed 42
+python3 scripts/run_experiment.py --config config/exp_curriculum_gradual.yaml --method curriculum_rank --seed 42
+```
+
+Curriculum-rank is implemented **server-side**: clients keep full-rank adapters; the server truncates effective rank via SVD and pads back to full rank for PEFT compatibility.
 
 ## Analysis and figures
 
