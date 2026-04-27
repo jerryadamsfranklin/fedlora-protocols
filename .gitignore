@@ -59,6 +59,13 @@ results/**/*.bin
 results/**/*.safetensors
 results/**/checkpoint*/
 
+# Handoffs / Claude or external analysis exports (generate locally; do not commit)
+docs/HANDOFF*.md
+**/*handoff*.txt
+**/*handoff*.md
+exports/**
+!exports/.gitkeep
+
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed
 figures/**/*.tif
 figures/**/*.psd

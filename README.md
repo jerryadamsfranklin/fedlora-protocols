@@ -34,6 +34,8 @@ pip install -r requirements.txt
 
 Optional: add a **`.env`** with Hugging Face or Weights & Biases tokens if you use gated models or logging.
 
+Local handoff bundles for external tools (e.g. Claude) belong under **`exports/`** or **`docs/HANDOFF_*.md`**; those paths are listed in **`.gitignore`** and will not be committed.
+
 ## Quick start — one run
 
 From the repository root:
