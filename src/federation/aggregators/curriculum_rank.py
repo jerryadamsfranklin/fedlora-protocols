@@ -1,13 +1,16 @@
 """
-Curriculum Rank Aggregator (server-side effective rank schedule).
+Curriculum Rank Aggregator (client-side rank control, server-side schedule).
 
-Clients always train with full adapter rank r_full (e.g. 16). The server aggregates
-client updates by computing ΔW = Σ w_k (B_k @ A_k), then taking an SVD and keeping
-only the top-r components for the current round's scheduled rank.
+In the *fixed* curriculum-rank protocol, clients actually *train and send* LoRA
+updates at the current rank r_t. This yields real communication savings because
+clients upload smaller tensors.
 
-To avoid any client/model changes, the aggregated LoRA tensors are padded back to
-the original adapter rank so `FederatedLoRAModel.set_lora_state_dict()` can copy
-them into existing PEFT parameters without shape mismatches.
+Implementation notes for this repo:
+- The server provides `current_rank` each round via `get_current_rank(round_num)`.
+- Clients keep a full-rank adapter in memory but freeze/slice so they only train
+  and *send* the leading r_t rows/cols of LoRA A/B.
+- This aggregator must therefore handle variable-shaped A/B tensors by padding
+  them back to full rank before doing weighted averaging.
 """
 
 from __future__ import annotations
@@ -73,6 +76,10 @@ class CurriculumRankAggregator:
         b_full[:, :r_eff] = b.to(b_dtype)
         return a_full, b_full
 
+    def get_current_rank(self, round_num: int) -> int:
+        """Server calls this to tell clients what rank to use this round."""
+        return self._rank_for_round(int(round_num))
+
     def aggregate(
         self,
         client_states: List[Dict[str, torch.Tensor]],
@@ -97,46 +104,42 @@ class CurriculumRankAggregator:
         total = float(sum(weights))
         weights = [float(w) / total for w in weights]
 
-        # Find A/B pairs
-        a_keys = [k for k in client_states[0].keys() if "lora_A" in k or "lora_a" in k]
-        aggregated: Dict[str, torch.Tensor] = {}
+        # Find all A/B pairs from the union of keys.
+        all_keys = set()
+        for st in client_states:
+            all_keys.update(st.keys())
+        a_keys = [k for k in all_keys if "lora_A" in k or "lora_a" in k]
 
+        aggregated: Dict[str, torch.Tensor] = {}
         for a_key in a_keys:
-            # Support both lora_A and lora_a casing if present (PEFT uses lora_A)
             b_key = a_key.replace("lora_A", "lora_B").replace("lora_a", "lora_b")
-            if b_key not in client_states[0]:
+            # Gather present tensors across clients.
+            a_list = [(w, st[a_key]) for w, st in zip(weights, client_states) if a_key in st]
+            b_list = [(w, st[b_key]) for w, st in zip(weights, client_states) if b_key in st]
+            if not a_list or not b_list:
                 continue
 
-            a0 = client_states[0][a_key]
-            b0 = client_states[0][b_key]
-            full_rank = self.full_rank or int(a0.shape[0])
+            # Infer full rank from config or max seen across clients this round.
+            full_rank = self.full_rank
+            if full_rank is None:
+                full_rank = max(int(t.shape[0]) for _, t in a_list)
 
-            # Compute weighted ΔW
-            accumulated = None
-            for w, st in zip(weights, client_states):
-                a = st[a_key].float()
-                b = st[b_key].float()
-                upd = b @ a  # [d_out, d_in]
-                accumulated = (w * upd) if accumulated is None else (accumulated + w * upd)
+            a0 = a_list[0][1]
+            b0 = b_list[0][1]
 
-            # SVD and truncate to effective rank (capped by full rank)
-            U, S, Vh = torch.linalg.svd(accumulated, full_matrices=False)
-            r_eff = int(min(self.current_rank, full_rank, S.shape[0]))
-            U_r = U[:, :r_eff]
-            S_r = S[:r_eff]
-            Vh_r = Vh[:r_eff, :]
+            # Weighted average in full-rank space (pad per-client tensors).
+            A_acc = torch.zeros((full_rank, a0.shape[1]), dtype=torch.float32, device=a0.device)
+            B_acc = torch.zeros((b0.shape[0], full_rank), dtype=torch.float32, device=b0.device)
 
-            sqrt_s = torch.sqrt(S_r)
-            new_b = U_r * sqrt_s.unsqueeze(0)          # [d_out, r_eff]
-            new_a = sqrt_s.unsqueeze(1) * Vh_r         # [r_eff, d_in]
+            for w, a in a_list:
+                r_eff = int(a.shape[0])
+                A_acc[:r_eff, :] += float(w) * a.float()
+            for w, b in b_list:
+                r_eff = int(b.shape[1])
+                B_acc[:, :r_eff] += float(w) * b.float()
 
-            # Pad back to full adapter rank so client can load without shape mismatch
-            a_full, b_full = self._pad_to_full_rank(
-                new_a, new_b, full_rank=full_rank, a_dtype=a0.dtype, b_dtype=b0.dtype
-            )
-
-            aggregated[a_key] = a_full.detach()
-            aggregated[b_key] = b_full.detach()
+            aggregated[a_key] = A_acc.to(a0.dtype).detach()
+            aggregated[b_key] = B_acc.to(b0.dtype).detach()
 
         return aggregated
 
