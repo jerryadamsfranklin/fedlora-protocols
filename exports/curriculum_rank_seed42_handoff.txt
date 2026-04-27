@@ -1,0 +1,208 @@
+Curriculum-Rank — seed 42 — handoff
+Generated: 2026-04-27T07:49:52
+Repo: /Users/jerryadamsfranklin/Documents/Git Repos/federated-lora-experiments
+
+=== SUMMARY ===
+variant | ts              | rounds | final_avg_loss | final_comm_mb | schedule                 | path                                                                                   
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+default | 20260426_160303 | 15     | 1.273545391    | 1289.0625     | {5:4, 10:8, 15:16}       | results/raw/exp_curriculum_default/curriculum_rank/seed_42/20260426_160303/results.json
+2stage  | 20260426_190954 | 15     | 1.273174962    | 1289.0625     | {7:4, 15:16}             | results/raw/exp_curriculum_2stage/curriculum_rank/seed_42/20260426_190954/results.json 
+r8start | 20260426_221548 | 15     | 1.265306678    | 1289.0625     | {5:8, 15:16}             | results/raw/exp_curriculum_r8start/curriculum_rank/seed_42/20260426_221548/results.json
+gradual | 20260427_012134 | 15     | 1.271042529    | 1289.0625     | {3:4, 6:8, 10:12, 15:16} | results/raw/exp_curriculum_gradual/curriculum_rank/seed_42/20260427_012134/results.json
+
+=== RANK HISTORY (per round) ===
+- default: [4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 16, 16, 16, 16, 16]
+- 2stage: [4, 4, 4, 4, 4, 4, 4, 16, 16, 16, 16, 16, 16, 16, 16]
+- r8start: [8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]
+- gradual: [4, 4, 4, 8, 8, 8, 12, 12, 12, 12, 16, 16, 16, 16, 16]
+
+=== PER-RUN SERIES (one JSON object per line) ===
+
+--- default  exp=exp_curriculum_default  ts=20260426_160303  path=results/raw/exp_curriculum_default/curriculum_rank/seed_42/20260426_160303/results.json ---
+{"round": 1, "avg_loss": 1.37814102435112, "round_time": 739.5027821063995, "communication_mb": 85.9375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 1, "current_rank": 4, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4], "full_rank": 16}}
+{"round": 2, "avg_loss": 1.3063143481413522, "round_time": 742.9713971614838, "communication_mb": 171.875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 2, "current_rank": 4, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4], "full_rank": 16}}
+{"round": 3, "avg_loss": 1.3023330543835958, "round_time": 736.3773860931396, "communication_mb": 257.8125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 3, "current_rank": 4, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4], "full_rank": 16}}
+{"round": 4, "avg_loss": 1.301108027458191, "round_time": 733.9397537708282, "communication_mb": 343.75, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 4, "current_rank": 4, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4], "full_rank": 16}}
+{"round": 5, "avg_loss": 1.2961569729646045, "round_time": 751.4186639785767, "communication_mb": 429.6875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 5, "current_rank": 4, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4], "full_rank": 16}}
+{"round": 6, "avg_loss": 1.2935985383192699, "round_time": 743.5378632545471, "communication_mb": 515.625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 6, "current_rank": 8, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8], "full_rank": 16}}
+{"round": 7, "avg_loss": 1.2911831525961557, "round_time": 738.7677290439606, "communication_mb": 601.5625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 7, "current_rank": 8, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8], "full_rank": 16}}
+{"round": 8, "avg_loss": 1.2856915869712828, "round_time": 743.0882339477539, "communication_mb": 687.5, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 8, "current_rank": 8, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8], "full_rank": 16}}
+{"round": 9, "avg_loss": 1.2849568691253663, "round_time": 743.6619160175323, "communication_mb": 773.4375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 9, "current_rank": 8, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8], "full_rank": 16}}
+{"round": 10, "avg_loss": 1.2813870046138764, "round_time": 746.5348870754242, "communication_mb": 859.375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 10, "current_rank": 8, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8, 8], "full_rank": 16}}
+{"round": 11, "avg_loss": 1.283301206111908, "round_time": 742.0873317718506, "communication_mb": 945.3125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 11, "current_rank": 16, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 16], "full_rank": 16}}
+{"round": 12, "avg_loss": 1.283479158639908, "round_time": 737.4623310565948, "communication_mb": 1031.25, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 12, "current_rank": 16, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 16, 16], "full_rank": 16}}
+{"round": 13, "avg_loss": 1.2788191730181375, "round_time": 735.966334104538, "communication_mb": 1117.1875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 13, "current_rank": 16, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 16, 16, 16], "full_rank": 16}}
+{"round": 14, "avg_loss": 1.2738418699105583, "round_time": 743.5512979030609, "communication_mb": 1203.125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 14, "current_rank": 16, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 15, "avg_loss": 1.2735453909238181, "round_time": 745.2655568122864, "communication_mb": 1289.0625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 15, "current_rank": 16, "rank_schedule": {"5": 4, "10": 8, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 16, 16, 16, 16, 16], "full_rank": 16}}
+
+--- 2stage  exp=exp_curriculum_2stage  ts=20260426_190954  path=results/raw/exp_curriculum_2stage/curriculum_rank/seed_42/20260426_190954/results.json ---
+{"round": 1, "avg_loss": 1.37814102435112, "round_time": 734.8481559753418, "communication_mb": 85.9375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 1, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4], "full_rank": 16}}
+{"round": 2, "avg_loss": 1.3063143481413522, "round_time": 739.5464468002319, "communication_mb": 171.875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 2, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4], "full_rank": 16}}
+{"round": 3, "avg_loss": 1.3023330543835958, "round_time": 741.0818812847137, "communication_mb": 257.8125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 3, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4], "full_rank": 16}}
+{"round": 4, "avg_loss": 1.301108027458191, "round_time": 736.5718870162964, "communication_mb": 343.75, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 4, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4], "full_rank": 16}}
+{"round": 5, "avg_loss": 1.2961569729646045, "round_time": 738.8317699432373, "communication_mb": 429.6875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 5, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4], "full_rank": 16}}
+{"round": 6, "avg_loss": 1.2935985383192699, "round_time": 741.1796569824219, "communication_mb": 515.625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 6, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4], "full_rank": 16}}
+{"round": 7, "avg_loss": 1.2912235244115193, "round_time": 742.8631031513214, "communication_mb": 601.5625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 7, "current_rank": 4, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4], "full_rank": 16}}
+{"round": 8, "avg_loss": 1.2858795131842296, "round_time": 740.5834529399872, "communication_mb": 687.5, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 8, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16], "full_rank": 16}}
+{"round": 9, "avg_loss": 1.2852749150594076, "round_time": 728.1430850028992, "communication_mb": 773.4375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 9, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16], "full_rank": 16}}
+{"round": 10, "avg_loss": 1.2817263277371727, "round_time": 727.6814367771149, "communication_mb": 859.375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 10, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16, 16], "full_rank": 16}}
+{"round": 11, "avg_loss": 1.2835221194426218, "round_time": 738.573319196701, "communication_mb": 945.3125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 11, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 12, "avg_loss": 1.2835081737836203, "round_time": 741.1946759223938, "communication_mb": 1031.25, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 12, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 13, "avg_loss": 1.2787280871073405, "round_time": 734.1644299030304, "communication_mb": 1117.1875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 13, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 14, "avg_loss": 1.2736250393390656, "round_time": 735.0635976791382, "communication_mb": 1203.125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 14, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 15, "avg_loss": 1.2731749616463977, "round_time": 739.6136038303375, "communication_mb": 1289.0625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 15, "current_rank": 16, "rank_schedule": {"7": 4, "15": 16}, "rank_history": [4, 4, 4, 4, 4, 4, 4, 16, 16, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+
+--- r8start  exp=exp_curriculum_r8start  ts=20260426_221548  path=results/raw/exp_curriculum_r8start/curriculum_rank/seed_42/20260426_221548/results.json ---
+{"round": 1, "avg_loss": 1.37814102435112, "round_time": 722.3801209926605, "communication_mb": 85.9375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 1, "current_rank": 8, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8], "full_rank": 16}}
+{"round": 2, "avg_loss": 1.304456005016963, "round_time": 747.4367349147797, "communication_mb": 171.875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 2, "current_rank": 8, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8], "full_rank": 16}}
+{"round": 3, "avg_loss": 1.2997651968797048, "round_time": 750.5902831554413, "communication_mb": 257.8125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 3, "current_rank": 8, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8], "full_rank": 16}}
+{"round": 4, "avg_loss": 1.2979566113948822, "round_time": 748.3891711235046, "communication_mb": 343.75, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 4, "current_rank": 8, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8], "full_rank": 16}}
+{"round": 5, "avg_loss": 1.2925266734759013, "round_time": 736.0761938095093, "communication_mb": 429.6875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 5, "current_rank": 8, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8], "full_rank": 16}}
+{"round": 6, "avg_loss": 1.2895198394457499, "round_time": 741.5334463119507, "communication_mb": 515.625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 6, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16], "full_rank": 16}}
+{"round": 7, "avg_loss": 1.2866374953587851, "round_time": 741.852117061615, "communication_mb": 601.5625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 7, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16], "full_rank": 16}}
+{"round": 8, "avg_loss": 1.2806246352990467, "round_time": 744.2263288497925, "communication_mb": 687.5, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 8, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16], "full_rank": 16}}
+{"round": 9, "avg_loss": 1.2794655849933625, "round_time": 727.0786190032959, "communication_mb": 773.4375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 9, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 10, "avg_loss": 1.2753490591843923, "round_time": 715.1963939666748, "communication_mb": 859.375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 10, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 11, "avg_loss": 1.2766923055648802, "round_time": 715.1520020961761, "communication_mb": 945.3125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 11, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 12, "avg_loss": 1.276323837598165, "round_time": 731.1129131317139, "communication_mb": 1031.25, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 12, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 13, "avg_loss": 1.271250967502594, "round_time": 734.9823710918427, "communication_mb": 1117.1875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 13, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 14, "avg_loss": 1.2659211911360422, "round_time": 752.2798490524292, "communication_mb": 1203.125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 14, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 15, "avg_loss": 1.2653066781361897, "round_time": 752.2719280719757, "communication_mb": 1289.0625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 15, "current_rank": 16, "rank_schedule": {"5": 8, "15": 16}, "rank_history": [8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16], "full_rank": 16}}
+
+--- gradual  exp=exp_curriculum_gradual  ts=20260427_012134  path=results/raw/exp_curriculum_gradual/curriculum_rank/seed_42/20260427_012134/results.json ---
+{"round": 1, "avg_loss": 1.37814102435112, "round_time": 750.5796298980713, "communication_mb": 85.9375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 1, "current_rank": 4, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4], "full_rank": 16}}
+{"round": 2, "avg_loss": 1.3063143481413522, "round_time": 752.8802881240845, "communication_mb": 171.875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 2, "current_rank": 4, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4], "full_rank": 16}}
+{"round": 3, "avg_loss": 1.3023330543835958, "round_time": 751.963387966156, "communication_mb": 257.8125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 3, "current_rank": 4, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4], "full_rank": 16}}
+{"round": 4, "avg_loss": 1.301108027458191, "round_time": 756.1484899520874, "communication_mb": 343.75, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 4, "current_rank": 8, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8], "full_rank": 16}}
+{"round": 5, "avg_loss": 1.2960925183296204, "round_time": 754.1959109306335, "communication_mb": 429.6875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 5, "current_rank": 8, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8], "full_rank": 16}}
+{"round": 6, "avg_loss": 1.2933624709447227, "round_time": 752.6295230388641, "communication_mb": 515.625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 6, "current_rank": 8, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8], "full_rank": 16}}
+{"round": 7, "avg_loss": 1.2906882229646048, "round_time": 753.3187630176544, "communication_mb": 601.5625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 7, "current_rank": 12, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12], "full_rank": 16}}
+{"round": 8, "avg_loss": 1.284860811630885, "round_time": 753.0729830265045, "communication_mb": 687.5, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 8, "current_rank": 12, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12], "full_rank": 16}}
+{"round": 9, "avg_loss": 1.2838089562257131, "round_time": 751.8428287506104, "communication_mb": 773.4375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 9, "current_rank": 12, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12], "full_rank": 16}}
+{"round": 10, "avg_loss": 1.279909299770991, "round_time": 756.8017468452454, "communication_mb": 859.375, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 10, "current_rank": 12, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12, 12], "full_rank": 16}}
+{"round": 11, "avg_loss": 1.2815116081237792, "round_time": 752.2767198085785, "communication_mb": 945.3125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 11, "current_rank": 16, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12, 12, 16], "full_rank": 16}}
+{"round": 12, "avg_loss": 1.281460979541143, "round_time": 755.1587209701538, "communication_mb": 1031.25, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 12, "current_rank": 16, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12, 12, 16, 16], "full_rank": 16}}
+{"round": 13, "avg_loss": 1.2765645738442737, "round_time": 751.9912180900574, "communication_mb": 1117.1875, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 13, "current_rank": 16, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12, 12, 16, 16, 16], "full_rank": 16}}
+{"round": 14, "avg_loss": 1.271481330871582, "round_time": 754.9287149906158, "communication_mb": 1203.125, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 14, "current_rank": 16, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12, 12, 16, 16, 16, 16], "full_rank": 16}}
+{"round": 15, "avg_loss": 1.2710425288677214, "round_time": 753.5480089187622, "communication_mb": 1289.0625, "aggregator_stats": {"name": "Curriculum-Rank", "round_count": 15, "current_rank": 16, "rank_schedule": {"3": 4, "6": 8, "10": 12, "15": 16}, "rank_history": [4, 4, 4, 8, 8, 8, 12, 12, 12, 12, 16, 16, 16, 16, 16], "full_rank": 16}}
+
+=== FINAL aggregator_stats (pretty) ===
+
+--- default ---
+{
+  "name": "Curriculum-Rank",
+  "round_count": 15,
+  "current_rank": 16,
+  "rank_schedule": {
+    "5": 4,
+    "10": 8,
+    "15": 16
+  },
+  "rank_history": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    8,
+    8,
+    8,
+    8,
+    8,
+    16,
+    16,
+    16,
+    16,
+    16
+  ],
+  "full_rank": 16
+}
+
+--- 2stage ---
+{
+  "name": "Curriculum-Rank",
+  "round_count": 15,
+  "current_rank": 16,
+  "rank_schedule": {
+    "7": 4,
+    "15": 16
+  },
+  "rank_history": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16
+  ],
+  "full_rank": 16
+}
+
+--- r8start ---
+{
+  "name": "Curriculum-Rank",
+  "round_count": 15,
+  "current_rank": 16,
+  "rank_schedule": {
+    "5": 8,
+    "15": 16
+  },
+  "rank_history": [
+    8,
+    8,
+    8,
+    8,
+    8,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16
+  ],
+  "full_rank": 16
+}
+
+--- gradual ---
+{
+  "name": "Curriculum-Rank",
+  "round_count": 15,
+  "current_rank": 16,
+  "rank_schedule": {
+    "3": 4,
+    "6": 8,
+    "10": 12,
+    "15": 16
+  },
+  "rank_history": [
+    4,
+    4,
+    4,
+    8,
+    8,
+    8,
+    12,
+    12,
+    12,
+    12,
+    16,
+    16,
+    16,
+    16,
+    16
+  ],
+  "full_rank": 16
+}
