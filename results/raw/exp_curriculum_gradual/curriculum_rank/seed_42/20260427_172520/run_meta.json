@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_curriculum_gradual",
+  "method": "curriculum_rank",
+  "seed": 42,
+  "timestamp": "20260427_172520",
+  "device": "mps",
+  "output_dir": "results/raw/exp_curriculum_gradual/curriculum_rank/seed_42/20260427_172520",
+  "git_commit": "68135af794932d189d41581da73abaa1b28a4786",
+  "git_branch": "impl/curriculum-rank",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}
