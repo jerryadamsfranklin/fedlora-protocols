@@ -108,7 +108,21 @@ python3 scripts/run_experiment.py --config config/exp_curriculum_r8start.yaml --
 python3 scripts/run_experiment.py --config config/exp_curriculum_gradual.yaml --method curriculum_rank --seed 42
 ```
 
-Curriculum-rank is implemented **server-side**: clients keep full-rank adapters; the server truncates effective rank via SVD and pads back to full rank for PEFT compatibility.
+Curriculum-rank uses **client-side** gradient masking at the scheduled rank and **sliced LoRA uploads**; the server aggregates and pads back to full rank for compatibility.
+
+### Final experiments (Two-Phase paper — multi-seed + non-IID)
+
+18 runs (3 seeds × 6 configs): IID Two-Phase K=8/K=10, FLoRA IID baseline, then the same three methods with **label_skew** Dirichlet **partition_alpha=0.5** (Alpaca uses instruction-length proxy labels when no `label` column exists).
+
+```bash
+./scripts/run_final_experiments.sh
+```
+
+Summarize all runs under `results/raw/`:
+
+```bash
+python3 scripts/analyze_final_results.py
+```
 
 ## Analysis and figures
 

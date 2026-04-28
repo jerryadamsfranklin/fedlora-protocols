@@ -1,0 +1,9 @@
+# FLoRA IID baseline on the same 4-layer protocol as Two-Phase paper experiments.
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_flora_iid"
+  description: "FLoRA IID baseline (4-layer Alpaca 3k protocol)"
+
+federated:
+  aggregation_method: "flora"

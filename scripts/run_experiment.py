@@ -329,23 +329,62 @@ def main() -> None:
 
     # Partition
     num_clients = config.get("federated", {}).get("num_clients", 10)
-    partitioner = DataPartitioner(dataset, num_clients=num_clients, seed=args.seed)
     partition_method = data_cfg.get("partition_method", "iid")
+    label_column = data_cfg.get("label_column", "label")
+    partition_alpha = float(
+        data_cfg.get(
+            "partition_alpha",
+            data_cfg.get("dirichlet_alpha", 0.5),
+        )
+    )
+
+    dataset_for_partition = dataset
+    if partition_method == "label_skew" and label_column not in dataset.column_names:
+        # Alpaca has no class labels; bucket by instruction length as a task-diversity proxy.
+        def _proxy_labels_from_length(examples):
+            if "instruction" in examples:
+                texts = examples["instruction"]
+            elif "text" in examples:
+                texts = examples["text"]
+            else:
+                n = len(next(iter(examples.values())))
+                texts = [""] * n
+            return {
+                label_column: [min(len(t or "") // 50, 9) for t in texts]
+            }
+
+        dataset_for_partition = dataset.map(
+            _proxy_labels_from_length,
+            batched=True,
+            desc="Proxy labels (length buckets) for label_skew",
+        )
+        print(
+            f"Partition: added '{label_column}' via instruction-length buckets "
+            "(non-IID label_skew on Alpaca)."
+        )
+
+    partitioner = DataPartitioner(
+        dataset_for_partition, num_clients=num_clients, seed=args.seed
+    )
 
     if partition_method == "iid":
         client_datasets = partitioner.iid_partition()
     elif partition_method == "label_skew":
         client_datasets = partitioner.label_skew_partition(
-            label_column=data_cfg.get("label_column", "label"),
-            alpha=data_cfg.get("dirichlet_alpha", 0.5),
+            label_column=label_column,
+            alpha=partition_alpha,
         )
     elif partition_method == "quantity_skew":
+        q_alpha = float(data_cfg.get("quantity_alpha", partition_alpha))
         client_datasets = partitioner.quantity_skew_partition(
-            alpha=data_cfg.get("quantity_alpha", 0.5),
+            alpha=q_alpha,
             min_samples=data_cfg.get("min_samples_per_client", 10),
         )
     else:
-        client_datasets = partitioner.iid_partition()
+        raise ValueError(
+            f"Unknown data.partition_method: {partition_method!r} "
+            "(expected 'iid', 'label_skew', or 'quantity_skew')"
+        )
 
     print(f"Partition stats: {partitioner.get_stats(client_datasets)}")
 
