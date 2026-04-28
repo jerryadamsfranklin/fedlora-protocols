@@ -1,0 +1,15 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_curriculum_r8start"
+  description: "Curriculum rank: start at r=8 then r=16 ({5:8, 15:16})"
+
+federated:
+  aggregation_method: "curriculum_rank"
+
+curriculum_rank:
+  rank_schedule:
+    5: 8
+    15: 16
+  final_rank: 16
+

@@ -1,15 +1,18 @@
-# Curriculum rank (schedule of effective LoRA rank over rounds) requires the client
-# model to resize PEFT adapters when rank changes. Not wired yet; use as a placeholder
-# for the experiment name only once `CurriculumRankAggregator` + model support land.
 _inherit: base_config_4layers.yaml
 
 experiment:
   name: "exp_curriculum_rank"
-  description: "Placeholder: curriculum rank needs dynamic adapter rank in the client"
+  description: "Curriculum rank (server-side effective rank via SVD truncation + padding)"
 
 federated:
-  aggregation_method: "fedit"
+  aggregation_method: "curriculum_rank"
 
-# curriculum_rank:
-#   rank_schedule: {5: 4, 10: 8, 15: 16}
-#   final_rank: 16
+curriculum_rank:
+  # Inclusive thresholds: 1-5 => r=4, 6-10 => r=8, 11-15 => r=16.
+  # Clients still train with full-rank adapters; server truncates effective rank
+  # and pads back to full rank so shapes stay loadable.
+  rank_schedule:
+    5: 4
+    10: 8
+    15: 16
+  final_rank: 16

@@ -1,0 +1,422 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.4097778449058533,
+    "round_time": 716.9108910560608,
+    "communication_mb": 128.90625,
+    "upload_mb": 42.96875,
+    "download_mb": 85.9375,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 1,
+      "current_rank": 8,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3234282870292664,
+    "round_time": 723.7387452125549,
+    "communication_mb": 257.8125,
+    "upload_mb": 85.9375,
+    "download_mb": 171.875,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 2,
+      "current_rank": 8,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.3146916453838347,
+    "round_time": 714.693400144577,
+    "communication_mb": 386.71875,
+    "upload_mb": 128.90625,
+    "download_mb": 257.8125,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 3,
+      "current_rank": 8,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.3104884695212045,
+    "round_time": 722.2014920711517,
+    "communication_mb": 515.625,
+    "upload_mb": 171.875,
+    "download_mb": 343.75,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 4,
+      "current_rank": 8,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.3033493913014729,
+    "round_time": 719.785670042038,
+    "communication_mb": 644.53125,
+    "upload_mb": 214.84375,
+    "download_mb": 429.6875,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 5,
+      "current_rank": 8,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.2989540178775787,
+    "round_time": 719.2538979053497,
+    "communication_mb": 816.40625,
+    "upload_mb": 300.78125,
+    "download_mb": 515.625,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 6,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.2956090483665466,
+    "round_time": 715.3866949081421,
+    "communication_mb": 988.28125,
+    "upload_mb": 386.71875,
+    "download_mb": 601.5625,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 7,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.2889392029444378,
+    "round_time": 719.5514228343964,
+    "communication_mb": 1160.15625,
+    "upload_mb": 472.65625,
+    "download_mb": 687.5,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 8,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2876341928641002,
+    "round_time": 714.1790118217468,
+    "communication_mb": 1332.03125,
+    "upload_mb": 558.59375,
+    "download_mb": 773.4375,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 9,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.283807550350825,
+    "round_time": 709.2758867740631,
+    "communication_mb": 1503.90625,
+    "upload_mb": 644.53125,
+    "download_mb": 859.375,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 10,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.2852688977718354,
+    "round_time": 705.3116879463196,
+    "communication_mb": 1675.78125,
+    "upload_mb": 730.46875,
+    "download_mb": 945.3125,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 11,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2851328946749372,
+    "round_time": 727.8084027767181,
+    "communication_mb": 1847.65625,
+    "upload_mb": 816.40625,
+    "download_mb": 1031.25,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 12,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2804919552008311,
+    "round_time": 729.5156769752502,
+    "communication_mb": 2019.53125,
+    "upload_mb": 902.34375,
+    "download_mb": 1117.1875,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 13,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.275778414328893,
+    "round_time": 729.8628118038177,
+    "communication_mb": 2191.40625,
+    "upload_mb": 988.28125,
+    "download_mb": 1203.125,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 14,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.275764008998871,
+    "round_time": 729.7507970333099,
+    "communication_mb": 2363.28125,
+    "upload_mb": 1074.21875,
+    "download_mb": 1289.0625,
+    "aggregator_stats": {
+      "name": "Curriculum-Rank",
+      "round_count": 15,
+      "current_rank": 16,
+      "rank_schedule": {
+        "5": 8,
+        "15": 16
+      },
+      "rank_history": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "full_rank": 16
+    }
+  }
+]

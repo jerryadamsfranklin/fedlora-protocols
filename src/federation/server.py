@@ -29,6 +29,7 @@ from .aggregators.fedlora_adaptive import FedLoRAAdaptiveAggregator
 from .aggregators.fedlora_adaptive_v2 import FedLoRAAdaptiveV2Aggregator
 from .aggregators.flora import FLoRAAggregator
 from .aggregators.flexlora import FlexLoRAAggregator
+from .aggregators.curriculum_rank import CurriculumRankAggregator
 from .aggregators.reverse_adaptive import ReverseAdaptiveAggregator
 from .aggregators.two_phase import TwoPhaseAggregator
 
@@ -45,6 +46,7 @@ class FederatedServer:
         "flexlora": FlexLoRAAggregator,
         "fedlora_adaptive": FedLoRAAdaptiveAggregator,
         "fedlora_adaptive_v2": FedLoRAAdaptiveV2Aggregator,
+        "curriculum_rank": CurriculumRankAggregator,
         "two_phase": TwoPhaseAggregator,
         "reverse_adaptive": ReverseAdaptiveAggregator,
         "budget_adaptive": BudgetAdaptiveAggregator,
@@ -67,6 +69,7 @@ class FederatedServer:
         two_phase: Optional[Dict[str, Any]] = None,
         reverse_adaptive: Optional[Dict[str, Any]] = None,
         budget_adaptive: Optional[Dict[str, Any]] = None,
+        curriculum_rank: Optional[Dict[str, Any]] = None,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
@@ -124,6 +127,13 @@ class FederatedServer:
                 priority=str(ba.get("priority", "quality")),
                 max_rank=lora_r,
             )
+        elif aggregation_method == "curriculum_rank":
+            cr = curriculum_rank or {}
+            self.aggregator = CurriculumRankAggregator(
+                rank_schedule=cr.get("rank_schedule"),
+                final_rank=int(cr.get("final_rank", lora_r)),
+                full_rank=lora_r,
+            )
         else:
             self.aggregator = agg_cls()
 
@@ -168,7 +178,8 @@ class FederatedServer:
         print(f"Clients: {len(self.clients)}, Rounds: {self.num_rounds}")
         print(f"{'='*60}\n")
 
-        total_communication = 0
+        total_upload_bytes = 0
+        total_download_bytes = 0
 
         for round_num in range(self.num_rounds):
             round_start = time.time()
@@ -184,6 +195,12 @@ class FederatedServer:
                 self.aggregator, "plan_round"
             ):
                 self.aggregator.plan_round(round_num + 1)
+
+            current_rank = None
+            if self.aggregation_method == "curriculum_rank" and hasattr(
+                self.aggregator, "get_current_rank"
+            ):
+                current_rank = int(self.aggregator.get_current_rank(round_num + 1))
 
             if hasattr(self.aggregator, "get_freeze_a"):
                 freeze_a = bool(self.aggregator.get_freeze_a())
@@ -211,7 +228,11 @@ class FederatedServer:
                         collect_layer_metrics=True,
                     )
                 else:
-                    result = client.train(self.global_state, freeze_a=freeze_a)
+                    result = client.train(
+                        self.global_state,
+                        freeze_a=freeze_a,
+                        current_rank=current_rank,
+                    )
                 client_states.append(result["state_dict"])
                 client_weights.append(result["num_samples"])
                 losses.append(result["loss"])
@@ -219,8 +240,9 @@ class FederatedServer:
                     all_layer_metrics.append(result["layer_metrics"])
 
                 # Track communication (upload: client -> server)
-                total_communication += sum(
-                    p.numel() * 2 for p in result["state_dict"].values()
+                total_upload_bytes += sum(
+                    p.numel() * p.element_size()
+                    for p in result["state_dict"].values()
                 )
 
             # Aggregate (FedLoRA-Adaptive needs current_loss for switching)
@@ -239,19 +261,24 @@ class FederatedServer:
             self.global_state = self.aggregator.aggregate(**call_kw)
 
             # Add download communication (server -> each client)
-            total_communication += (
-                sum(p.numel() * 2 for p in self.global_state.values())
-                * len(self.clients)
+            bytes_per_client = sum(
+                p.numel() * p.element_size() for p in self.global_state.values()
             )
+            total_download_bytes += bytes_per_client * len(self.clients)
 
             round_time = time.time() - round_start
 
             # Log
+            total_communication_mb = (total_upload_bytes + total_download_bytes) / (
+                1024 * 1024
+            )
             metrics = {
                 "round": round_num + 1,
                 "avg_loss": avg_loss,
                 "round_time": round_time,
-                "communication_mb": total_communication / (1024 * 1024),
+                "communication_mb": total_communication_mb,
+                "upload_mb": total_upload_bytes / (1024 * 1024),
+                "download_mb": total_download_bytes / (1024 * 1024),
             }
             if hasattr(self.aggregator, "get_mode"):
                 metrics["agg_mode"] = self.aggregator.get_mode()
@@ -275,7 +302,10 @@ class FederatedServer:
         return {
             "final_state": self.global_state,
             "metrics": self.metrics_history,
-            "total_communication_mb": total_communication / (1024 * 1024),
+            "total_communication_mb": (total_upload_bytes + total_download_bytes)
+            / (1024 * 1024),
+            "total_upload_mb": total_upload_bytes / (1024 * 1024),
+            "total_download_mb": total_download_bytes / (1024 * 1024),
         }
 
     def _save_results(self) -> None:

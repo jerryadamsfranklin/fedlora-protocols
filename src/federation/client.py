@@ -146,6 +146,7 @@ class FederatedClient:
         freeze_a: bool = False,
         freeze_ratio: float = 0.0,
         freeze_ratios: Optional[Dict[str, float]] = None,
+        current_rank: Optional[int] = None,
         collect_layer_metrics: bool = False,
     ) -> Dict:
         """
@@ -173,6 +174,12 @@ class FederatedClient:
         # Load global state if provided
         if global_state is not None:
             self.model.set_lora_state_dict(global_state)
+
+        # Curriculum-rank: constrain training to the leading `current_rank`
+        # dimensions of LoRA A/B. We do this by masking gradients after backward
+        # (no persistent hooks), then slicing the state dict for upload.
+        if current_rank is not None:
+            current_rank = int(current_rank)
 
         # Apply per-layer freezing if provided; otherwise use global freezing knobs.
         if freeze_ratios is not None:
@@ -230,6 +237,9 @@ class FederatedClient:
                 # Backward
                 loss.backward()
 
+                if current_rank is not None:
+                    self._mask_lora_grads(current_rank)
+
                 # Collect per-layer grad norms before optimizer step
                 if collect_layer_metrics:
                     self._collect_grad_norms(layer_grad_norms)
@@ -258,6 +268,8 @@ class FederatedClient:
 
         # Get updated state
         updated_state = self.model.get_lora_state_dict()
+        if current_rank is not None:
+            updated_state = self._slice_lora_state(updated_state, int(current_rank))
 
         # Cleanup
         optimizer.zero_grad(set_to_none=True)
@@ -272,6 +284,41 @@ class FederatedClient:
         if avg_layer_metrics is not None:
             result["layer_metrics"] = avg_layer_metrics
         return result
+
+    def _mask_lora_grads(self, rank: int) -> None:
+        """Zero gradient outside the leading `rank` LoRA dimensions."""
+        rank = int(rank)
+        for name, param in self.model.model.named_parameters():
+            if param.grad is None:
+                continue
+            lname = name.lower()
+            if "lora_a" in lname and param.grad.ndim >= 2 and param.grad.shape[0] > rank:
+                param.grad[rank:, :] = 0
+            elif "lora_b" in lname and param.grad.ndim >= 2 and param.grad.shape[1] > rank:
+                param.grad[:, rank:] = 0
+
+    @staticmethod
+    def _slice_lora_state(
+        state: Dict[str, torch.Tensor],
+        rank: int,
+    ) -> Dict[str, torch.Tensor]:
+        """
+        Slice LoRA tensors down to `rank` for upload.
+
+        - A: keep first `rank` rows
+        - B: keep first `rank` cols
+        """
+        rank = int(rank)
+        out: Dict[str, torch.Tensor] = {}
+        for k, t in state.items():
+            lk = k.lower()
+            if "lora_a" in lk and t.ndim >= 2 and t.shape[0] > rank:
+                out[k] = t[:rank, :].contiguous()
+            elif "lora_b" in lk and t.ndim >= 2 and t.shape[1] > rank:
+                out[k] = t[:, :rank].contiguous()
+            else:
+                out[k] = t
+        return out
 
     def _apply_partial_freeze(self, freeze_ratio: float) -> None:
         """

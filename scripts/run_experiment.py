@@ -380,6 +380,7 @@ def main() -> None:
     two_phase_cfg = config.get("two_phase", {}) or {}
     reverse_adaptive_cfg = config.get("reverse_adaptive", {}) or {}
     budget_adaptive_cfg = dict(config.get("budget_adaptive", {}) or {})
+    curriculum_rank_cfg = config.get("curriculum_rank", {}) or {}
     if budget_adaptive_cfg and "num_rounds" not in budget_adaptive_cfg:
         budget_adaptive_cfg["num_rounds"] = fed_cfg.get("num_rounds", 15)
 
@@ -417,6 +418,7 @@ def main() -> None:
         two_phase=two_phase_cfg,
         reverse_adaptive=reverse_adaptive_cfg,
         budget_adaptive=budget_adaptive_cfg,
+        curriculum_rank=curriculum_rank_cfg,
     )
     server.set_clients(clients)
 
