@@ -148,6 +148,7 @@ class FederatedClient:
         freeze_ratios: Optional[Dict[str, float]] = None,
         current_rank: Optional[int] = None,
         collect_layer_metrics: bool = False,
+        b_only_upload: bool = False,
     ) -> Dict:
         """
         Perform local training.
@@ -271,12 +272,18 @@ class FederatedClient:
         if current_rank is not None:
             updated_state = self._slice_lora_state(updated_state, int(current_rank))
 
+        # Communication optimization: optionally upload only LoRA-B tensors.
+        # Used for FFA-LoRA / Two-Phase phase-2 after frozen A has been initialized server-side.
+        upload_state = updated_state
+        if b_only_upload:
+            upload_state = self._filter_b_only(updated_state)
+
         # Cleanup
         optimizer.zero_grad(set_to_none=True)
         self.model.clear_memory()
 
         result = {
-            "state_dict": updated_state,
+            "state_dict": upload_state,
             "loss": avg_loss,
             "num_samples": len(self.dataset),
             "training_time": training_time,
@@ -319,6 +326,13 @@ class FederatedClient:
             else:
                 out[k] = t
         return out
+
+    @staticmethod
+    def _filter_b_only(state: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        """
+        Filter LoRA state dict to B matrices only for communication-efficient upload.
+        """
+        return {k: v for k, v in state.items() if ("lora_B" in k or "lora_b" in k)}
 
     def _apply_partial_freeze(self, freeze_ratio: float) -> None:
         """
