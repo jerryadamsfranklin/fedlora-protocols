@@ -1,7 +1,0 @@
-_inherit: exp_two_phase.yaml
-
-experiment:
-  name: "exp_two_phase_k12"
-
-two_phase:
-  phase_boundary: 12
