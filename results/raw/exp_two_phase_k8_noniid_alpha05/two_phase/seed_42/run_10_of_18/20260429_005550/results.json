@@ -1,0 +1,302 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.355462317855352,
+    "round_time": 736.4479780197144,
+    "communication_mb": 171.875,
+    "upload_mb": 85.9375,
+    "download_mb": 85.9375,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 1,
+      "phase1_rounds": 1,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 85.9375,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.3289659644482097,
+    "round_time": 733.3985278606415,
+    "communication_mb": 343.75,
+    "upload_mb": 171.875,
+    "download_mb": 171.875,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 2,
+      "phase1_rounds": 2,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 171.875,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.3246377539642729,
+    "round_time": 737.0295419692993,
+    "communication_mb": 515.625,
+    "upload_mb": 257.8125,
+    "download_mb": 257.8125,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 3,
+      "phase1_rounds": 3,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 257.8125,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.3126098306950753,
+    "round_time": 732.5797071456909,
+    "communication_mb": 687.5,
+    "upload_mb": 343.75,
+    "download_mb": 343.75,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 4,
+      "phase1_rounds": 4,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 343.75,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.2934052772156917,
+    "round_time": 725.1922490596771,
+    "communication_mb": 859.375,
+    "upload_mb": 429.6875,
+    "download_mb": 429.6875,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 5,
+      "phase1_rounds": 5,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 429.6875,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.2931484965106779,
+    "round_time": 747.155152797699,
+    "communication_mb": 1031.25,
+    "upload_mb": 515.625,
+    "download_mb": 515.625,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 6,
+      "phase1_rounds": 6,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 515.625,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.2996773583269399,
+    "round_time": 752.1524951457977,
+    "communication_mb": 1203.125,
+    "upload_mb": 601.5625,
+    "download_mb": 601.5625,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 7,
+      "phase1_rounds": 7,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 601.5625,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.2852806362707747,
+    "round_time": 751.2005679607391,
+    "communication_mb": 1375.0,
+    "upload_mb": 687.5,
+    "download_mb": 687.5,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 1,
+      "round_count": 8,
+      "phase1_rounds": 8,
+      "phase2_rounds": 0,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": null,
+      "total_comm_mb": 687.5,
+      "comm_savings_vs_flora": 0.0
+    }
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.2896203152551091,
+    "round_time": 727.2350318431854,
+    "communication_mb": 1546.875,
+    "upload_mb": 773.4375,
+    "download_mb": 773.4375,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 9,
+      "phase1_rounds": 8,
+      "phase2_rounds": 1,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 718.4375,
+      "comm_savings_vs_flora": 0.07111111111111112
+    }
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.2864562452137338,
+    "round_time": 727.1986210346222,
+    "communication_mb": 1718.75,
+    "upload_mb": 859.375,
+    "download_mb": 859.375,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 10,
+      "phase1_rounds": 8,
+      "phase2_rounds": 2,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 749.375,
+      "comm_savings_vs_flora": 0.128
+    }
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.2782513019876738,
+    "round_time": 727.2086017131805,
+    "communication_mb": 1890.625,
+    "upload_mb": 945.3125,
+    "download_mb": 945.3125,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 11,
+      "phase1_rounds": 8,
+      "phase2_rounds": 3,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 780.3125,
+      "comm_savings_vs_flora": 0.17454545454545456
+    }
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.2847653985202165,
+    "round_time": 727.9720289707184,
+    "communication_mb": 2062.5,
+    "upload_mb": 1031.25,
+    "download_mb": 1031.25,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 12,
+      "phase1_rounds": 8,
+      "phase2_rounds": 4,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 811.25,
+      "comm_savings_vs_flora": 0.21333333333333337
+    }
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.2802189899293106,
+    "round_time": 728.1659052371979,
+    "communication_mb": 2234.375,
+    "upload_mb": 1117.1875,
+    "download_mb": 1117.1875,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 13,
+      "phase1_rounds": 8,
+      "phase2_rounds": 5,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 842.1875,
+      "comm_savings_vs_flora": 0.24615384615384617
+    }
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.3010461222854834,
+    "round_time": 728.7510957717896,
+    "communication_mb": 2406.25,
+    "upload_mb": 1203.125,
+    "download_mb": 1203.125,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 14,
+      "phase1_rounds": 8,
+      "phase2_rounds": 6,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 873.125,
+      "comm_savings_vs_flora": 0.27428571428571424
+    }
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.2839239563990401,
+    "round_time": 727.4440660476685,
+    "communication_mb": 2578.125,
+    "upload_mb": 1289.0625,
+    "download_mb": 1289.0625,
+    "aggregator_stats": {
+      "name": "Two-Phase",
+      "phase_boundary": 8,
+      "current_phase": 2,
+      "round_count": 15,
+      "phase1_rounds": 8,
+      "phase2_rounds": 7,
+      "flora_comm_per_round_mb": 85.9375,
+      "ffa_comm_per_round_mb": 30.9375,
+      "total_comm_mb": 904.0625,
+      "comm_savings_vs_flora": 0.29866666666666664
+    }
+  }
+]

@@ -100,6 +100,27 @@ class TwoPhaseAggregator:
             "comm_savings_vs_flora": savings,
         }
 
+    def get_frozen_a(self) -> Dict[str, torch.Tensor]:
+        """
+        Return cached frozen A matrices from the internal FFA-LoRA aggregator.
+
+        Used by the server to reconstruct full client states from B-only uploads.
+        Returns empty dict if FFA-LoRA has not been initialized yet.
+        """
+        return self.ffa_lora.get_frozen_a()
+
+    def should_upload_b_only(self) -> bool:
+        """
+        Whether clients should upload B-only tensors for this round.
+
+        The first FFA round (round phase_boundary+1) must upload full A+B so the
+        server-side FFA aggregator can initialize frozen A. Therefore B-only
+        begins starting at round phase_boundary+2.
+        """
+        # Server queries this before training the next round. At the start of
+        # round (phase_boundary+2), self.round_count == phase_boundary+1.
+        return self.round_count > self.phase_boundary
+
     def reset(self) -> None:
         self.ffa_lora.reset()
         self.round_count = 0

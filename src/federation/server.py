@@ -211,6 +211,15 @@ class FederatedServer:
             else:
                 freeze_a = self.aggregation_method == "ffa_lora"
 
+            # Communication optimization: upload B-only when the aggregator says
+            # it's safe (i.e., after frozen A has been initialized server-side).
+            b_only_upload = False
+            if freeze_a and hasattr(self.aggregator, "should_upload_b_only"):
+                try:
+                    b_only_upload = bool(self.aggregator.should_upload_b_only())
+                except Exception:
+                    b_only_upload = False
+
             freeze_ratios = None
             if hasattr(self.aggregator, "get_layer_freeze_ratios"):
                 try:
@@ -232,6 +241,7 @@ class FederatedServer:
                         self.global_state,
                         freeze_a=freeze_a,
                         current_rank=current_rank,
+                        b_only_upload=b_only_upload,
                     )
                 client_states.append(result["state_dict"])
                 client_weights.append(result["num_samples"])
@@ -244,6 +254,19 @@ class FederatedServer:
                     p.numel() * p.element_size()
                     for p in result["state_dict"].values()
                 )
+
+            # Reconstruction: merge B-only uploads with frozen A so downstream
+            # aggregators still receive full (A+B) states.
+            if b_only_upload and hasattr(self.aggregator, "get_frozen_a"):
+                try:
+                    frozen_a = self.aggregator.get_frozen_a()
+                except Exception:
+                    frozen_a = {}
+                if frozen_a:
+                    for state in client_states:
+                        for a_key, a_tensor in frozen_a.items():
+                            if a_key not in state:
+                                state[a_key] = a_tensor.clone()
 
             # Aggregate (FedLoRA-Adaptive needs current_loss for switching)
             avg_loss = sum(losses) / len(losses) if losses else 0.0

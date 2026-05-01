@@ -86,3 +86,23 @@ class FFALoRAAggregator:
         """Reset for new experiment."""
         self.frozen_a = None
         self.initialized = False
+
+    def get_frozen_a(self) -> Dict[str, torch.Tensor]:
+        """
+        Return cached frozen A matrices.
+
+        Used by the server to reconstruct full client states from B-only uploads.
+        Returns empty dict if not yet initialized.
+        """
+        if self.frozen_a is None:
+            return {}
+        return {k: v.clone() for k, v in self.frozen_a.items()}
+
+    def should_upload_b_only(self) -> bool:
+        """
+        Whether clients should upload B-only tensors for this round.
+
+        We can only do B-only uploads after at least one aggregate() call has
+        initialized frozen A on the server side.
+        """
+        return bool(self.initialized)
