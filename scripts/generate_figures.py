@@ -56,7 +56,7 @@ METHOD_LABELS = {
 }
 
 _RUN_TAIL_RE = re.compile(
-    r"_(fedit|ffa_lora|flora|flexlora|fedlora_adaptive)((?:_r\d+)?)((?:_c\d+)?)_(\d{8}_\d{6})$"
+    r"_(fedit|ffa_lora|flora|flexlora)((?:_r\d+)?)((?:_c\d+)?)_(\d{8}_\d{6})$"
 )
 
 
