@@ -1,4 +1,4 @@
-# Path B follow-ups (TMLR bidirectional communication accounting)
+# Stage 1: Path B (TMLR bidirectional communication accounting)
 
 **Purpose:** Track decisions and deferred work that are *not* part of the stable Path B
 implementation spec. The local `docs/TMLR_PATH_B_IMPLEMENTATION_GUIDE.md` (gitignored)
