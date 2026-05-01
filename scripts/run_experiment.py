@@ -77,6 +77,18 @@ def main() -> None:
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
+        "--tag",
+        default=None,
+        help="Optional run tag (adds a folder in the output path)",
+    )
+    parser.add_argument(
+        "--override",
+        action="append",
+        default=None,
+        metavar="KEY=VALUE",
+        help="Override a config value using dot paths (repeatable), e.g. federated.num_rounds=1",
+    )
+    parser.add_argument(
         "--lora_r",
         type=int,
         default=None,
@@ -92,7 +104,7 @@ def main() -> None:
         "--switch_threshold",
         type=float,
         default=None,
-        help="Override switch threshold for fedlora_adaptive (tau)",
+        help="Override reverse_adaptive.switch_threshold (tau)",
     )
     parser.add_argument(
         "--run-index",
@@ -120,6 +132,31 @@ def main() -> None:
     # Load config (recursive _inherit merge)
     config = load_config(args.config)
 
+    def _set_dot_path(d: Dict[str, Any], path: str, value: Any) -> None:
+        parts = [p for p in path.split(".") if p]
+        if not parts:
+            return
+        cur: Dict[str, Any] = d
+        for p in parts[:-1]:
+            nxt = cur.get(p)
+            if not isinstance(nxt, dict):
+                nxt = {}
+                cur[p] = nxt
+            cur = nxt
+        cur[parts[-1]] = value
+
+    if args.override:
+        for item in args.override:
+            if "=" not in item:
+                parser.error(f"--override must be KEY=VALUE, got: {item!r}")
+            k, v = item.split("=", 1)
+            # YAML parse lets users write ints/bools/null/lists naturally.
+            try:
+                parsed = yaml.safe_load(v)
+            except Exception:
+                parsed = v
+            _set_dot_path(config, k.strip(), parsed)
+
     if args.lora_r is not None:
         config.setdefault("lora", {})["r"] = args.lora_r
     if args.num_clients is not None:
@@ -127,7 +164,7 @@ def main() -> None:
         config.setdefault("federated", {})["num_clients"] = nc
         config.setdefault("federated", {})["clients_per_round"] = nc
     if args.switch_threshold is not None:
-        config.setdefault("fedlora_adaptive", {})["switch_threshold"] = float(
+        config.setdefault("reverse_adaptive", {})["switch_threshold"] = float(
             args.switch_threshold
         )
 
@@ -156,6 +193,7 @@ def main() -> None:
     run_folder = None
     if args.run_index is not None:
         run_folder = f"run_{args.run_index:02d}_of_{args.run_total:02d}"
+    tag_folder = args.tag.strip() if isinstance(args.tag, str) and args.tag.strip() else None
     output_dir = os.path.join(
         "results",
         "raw",
@@ -163,6 +201,7 @@ def main() -> None:
         method,
         seed_dir,
         *( [run_folder] if run_folder else [] ),
+        *( [tag_folder] if tag_folder else [] ),
         timestamp,
     )
     os.makedirs(output_dir, exist_ok=True)
@@ -414,30 +453,8 @@ def main() -> None:
 
     # Create server
     fed_cfg = config.get("federated", {})
-    adaptive_cfg = config.get("fedlora_adaptive", {})
-    adaptive_v2_cfg = config.get("fedlora_adaptive_v2", {})
     two_phase_cfg = config.get("two_phase", {}) or {}
     reverse_adaptive_cfg = config.get("reverse_adaptive", {}) or {}
-    budget_adaptive_cfg = dict(config.get("budget_adaptive", {}) or {})
-    curriculum_rank_cfg = config.get("curriculum_rank", {}) or {}
-    if budget_adaptive_cfg and "num_rounds" not in budget_adaptive_cfg:
-        budget_adaptive_cfg["num_rounds"] = fed_cfg.get("num_rounds", 15)
-
-    # v2 uses its own config block; fall back to v1 keys for backwards compat.
-    if method == "fedlora_adaptive_v2":
-        switch_threshold = adaptive_v2_cfg.get(
-            "switch_threshold", adaptive_cfg.get("switch_threshold", 0.01)
-        )
-        warmup_rounds = adaptive_v2_cfg.get(
-            "warmup_rounds", adaptive_cfg.get("warmup_rounds", 3)
-        )
-        fixed_switch_round = adaptive_v2_cfg.get(
-            "fixed_switch_round", adaptive_cfg.get("fixed_switch_round", None)
-        )
-    else:
-        switch_threshold = adaptive_cfg.get("switch_threshold", 0.01)
-        warmup_rounds = adaptive_cfg.get("warmup_rounds", 3)
-        fixed_switch_round = adaptive_cfg.get("fixed_switch_round", None)
 
     server = FederatedServer(
         aggregation_method=method,
@@ -445,19 +462,12 @@ def main() -> None:
         eval_every=eval_cfg.get("eval_every", 5),
         output_dir=output_dir,
         lora_r=config.get("lora", {}).get("r", 16),
-        switch_threshold=switch_threshold,
-        warmup_rounds=warmup_rounds,
-        fixed_switch_round=fixed_switch_round,
-        transition_rounds=adaptive_v2_cfg.get("transition_rounds", 3),
-        stability_threshold=adaptive_v2_cfg.get("stability_threshold", 1.1),
-        per_layer_enabled=adaptive_v2_cfg.get("per_layer_enabled", True),
-        layer_names=adaptive_v2_cfg.get(
-            "layer_names", ["q_proj", "k_proj", "v_proj", "o_proj"]
-        ),
+        switch_threshold=reverse_adaptive_cfg.get("switch_threshold", 0.01),
+        warmup_rounds=reverse_adaptive_cfg.get("warmup_rounds", 3),
+        transition_rounds=reverse_adaptive_cfg.get("transition_rounds", 3),
+        stability_threshold=reverse_adaptive_cfg.get("stability_threshold", 1.1),
         two_phase=two_phase_cfg,
         reverse_adaptive=reverse_adaptive_cfg,
-        budget_adaptive=budget_adaptive_cfg,
-        curriculum_rank=curriculum_rank_cfg,
     )
     server.set_clients(clients)
 

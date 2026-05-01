@@ -22,14 +22,10 @@ from typing import Any, Dict, List, Optional
 import torch
 from tqdm import tqdm
 
-from .aggregators.budget_adaptive import BudgetAdaptiveAggregator
 from .aggregators.fedit import FedITAggregator
 from .aggregators.ffa_lora import FFALoRAAggregator
-from .aggregators.fedlora_adaptive import FedLoRAAdaptiveAggregator
-from .aggregators.fedlora_adaptive_v2 import FedLoRAAdaptiveV2Aggregator
 from .aggregators.flora import FLoRAAggregator
 from .aggregators.flexlora import FlexLoRAAggregator
-from .aggregators.curriculum_rank import CurriculumRankAggregator
 from .aggregators.reverse_adaptive import ReverseAdaptiveAggregator
 from .aggregators.two_phase import TwoPhaseAggregator
 
@@ -44,12 +40,8 @@ class FederatedServer:
         "ffa_lora": FFALoRAAggregator,
         "flora": FLoRAAggregator,
         "flexlora": FlexLoRAAggregator,
-        "fedlora_adaptive": FedLoRAAdaptiveAggregator,
-        "fedlora_adaptive_v2": FedLoRAAdaptiveV2Aggregator,
-        "curriculum_rank": CurriculumRankAggregator,
         "two_phase": TwoPhaseAggregator,
         "reverse_adaptive": ReverseAdaptiveAggregator,
-        "budget_adaptive": BudgetAdaptiveAggregator,
     }
 
     def __init__(
@@ -61,15 +53,10 @@ class FederatedServer:
         lora_r: int = 16,
         switch_threshold: float = 0.01,
         warmup_rounds: int = 3,
-        fixed_switch_round: Optional[int] = None,
         transition_rounds: int = 3,
         stability_threshold: float = 1.1,
-        per_layer_enabled: bool = True,
-        layer_names: Optional[List[str]] = None,
         two_phase: Optional[Dict[str, Any]] = None,
         reverse_adaptive: Optional[Dict[str, Any]] = None,
-        budget_adaptive: Optional[Dict[str, Any]] = None,
-        curriculum_rank: Optional[Dict[str, Any]] = None,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
@@ -85,23 +72,6 @@ class FederatedServer:
             self.aggregator = agg_cls(max_rank=lora_r)
         elif aggregation_method == "flexlora":
             self.aggregator = agg_cls(global_rank=lora_r)
-        elif aggregation_method == "fedlora_adaptive":
-            self.aggregator = agg_cls(
-                max_rank=lora_r,
-                switch_threshold=switch_threshold,
-                warmup_rounds=warmup_rounds,
-                fixed_switch_round=fixed_switch_round,
-            )
-        elif aggregation_method == "fedlora_adaptive_v2":
-            self.aggregator = agg_cls(
-                layer_names=layer_names or ["q_proj", "k_proj", "v_proj", "o_proj"],
-                max_rank=lora_r,
-                switch_threshold=switch_threshold,
-                warmup_rounds=warmup_rounds,
-                transition_rounds=transition_rounds,
-                stability_threshold=stability_threshold,
-                per_layer_enabled=per_layer_enabled,
-            )
         elif aggregation_method == "two_phase":
             tp = two_phase or {}
             self.aggregator = TwoPhaseAggregator(
@@ -116,23 +86,6 @@ class FederatedServer:
                 transition_rounds=int(ra.get("transition_rounds", 2)),
                 stability_threshold=float(ra.get("stability_threshold", 1.1)),
                 max_rank=lora_r,
-            )
-        elif aggregation_method == "budget_adaptive":
-            ba = budget_adaptive or {}
-            self.aggregator = BudgetAdaptiveAggregator(
-                total_budget_mb=float(
-                    ba.get("total_budget_mb", 1_000_000.0)
-                ),
-                num_rounds=int(ba.get("num_rounds", num_rounds)),
-                priority=str(ba.get("priority", "quality")),
-                max_rank=lora_r,
-            )
-        elif aggregation_method == "curriculum_rank":
-            cr = curriculum_rank or {}
-            self.aggregator = CurriculumRankAggregator(
-                rank_schedule=cr.get("rank_schedule"),
-                final_rank=int(cr.get("final_rank", lora_r)),
-                full_rank=lora_r,
             )
         else:
             self.aggregator = agg_cls()
@@ -191,23 +144,8 @@ class FederatedServer:
             losses = []
             all_layer_metrics: List[Dict[str, float]] = []
 
-            if self.aggregation_method == "budget_adaptive" and hasattr(
-                self.aggregator, "plan_round"
-            ):
-                self.aggregator.plan_round(round_num + 1)
-
-            current_rank = None
-            if self.aggregation_method == "curriculum_rank" and hasattr(
-                self.aggregator, "get_current_rank"
-            ):
-                current_rank = int(self.aggregator.get_current_rank(round_num + 1))
-
             if hasattr(self.aggregator, "get_freeze_a"):
                 freeze_a = bool(self.aggregator.get_freeze_a())
-            elif self.aggregation_method == "fedlora_adaptive" and hasattr(
-                self.aggregator, "get_mode"
-            ):
-                freeze_a = self.aggregator.get_mode() == "FFA-LoRA"
             else:
                 freeze_a = self.aggregation_method == "ffa_lora"
 
@@ -240,7 +178,6 @@ class FederatedServer:
                     result = client.train(
                         self.global_state,
                         freeze_a=freeze_a,
-                        current_rank=current_rank,
                         b_only_upload=b_only_upload,
                     )
                 client_states.append(result["state_dict"])
@@ -268,7 +205,7 @@ class FederatedServer:
                             if a_key not in state:
                                 state[a_key] = a_tensor.clone()
 
-            # Aggregate (FedLoRA-Adaptive needs current_loss for switching)
+            # Aggregate (some aggregators accept extra signals like current_loss)
             avg_loss = sum(losses) / len(losses) if losses else 0.0
             aggregated_layer_metrics = self._aggregate_layer_metrics(all_layer_metrics)
             sig = inspect.signature(self.aggregator.aggregate)
