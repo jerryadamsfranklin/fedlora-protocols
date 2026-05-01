@@ -106,3 +106,14 @@ class FFALoRAAggregator:
         initialized frozen A on the server side.
         """
         return bool(self.initialized)
+
+    def should_broadcast_b_only(self) -> bool:
+        """
+        Whether the server should broadcast B-only state to clients for the
+        upcoming round.
+
+        Mirrors should_upload_b_only(). We can broadcast B-only only after
+        frozen A has been initialized on the server (i.e., after at least one
+        aggregate() call). Before that, clients have no A to retain.
+        """
+        return bool(self.initialized)

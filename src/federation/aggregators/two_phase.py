@@ -121,6 +121,15 @@ class TwoPhaseAggregator:
         # round (phase_boundary+2), self.round_count == phase_boundary+1.
         return self.round_count > self.phase_boundary
 
+    def should_broadcast_b_only(self) -> bool:
+        """
+        Whether the server should broadcast B-only state for the upcoming round.
+
+        Symmetric to should_upload_b_only: True only after the first FFA round
+        has completed (frozen A is cached and clients have it locally).
+        """
+        return self.round_count > self.phase_boundary
+
     def reset(self) -> None:
         self.ffa_lora.reset()
         self.round_count = 0
