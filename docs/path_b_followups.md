@@ -28,9 +28,9 @@ Stage 1–2 work on Path B.
 
 ## Known numerical caveat (do not misinterpret results)
 
-- Upload switches to B-only and download switches to B-one-round-offset **one round
-  apart** by design: download at end-of-round *R* accounts for what is broadcast **to
-  round R+1* (look-ahead tracking).
+- The upload path and the download path switch to B-only **one round apart** by design:
+  download at end-of-round *R* counts what is broadcast to round *R+1* (look-ahead
+  tracking).
 - Example trajectory for Two-Phase K=8 (IID, per reviewer table): round 9 still has a
   **full** upload delta while download delta for that round can already reflect **B-only**
   (broadcast staged for round 10).
