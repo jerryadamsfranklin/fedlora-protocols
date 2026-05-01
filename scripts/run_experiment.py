@@ -69,6 +69,40 @@ def load_config(path: str) -> Dict[str, Any]:
     return config
 
 
+def apply_overrides(config: Dict[str, Any], overrides: list[str] | None) -> Dict[str, Any]:
+    """
+    Apply dotted-key overrides (KEY=VALUE) to a nested config dict.
+
+    Values are parsed with YAML for type inference (e.g. "2" -> int, "true" -> bool).
+    """
+    if not overrides:
+        return config
+
+    def _set_dot_path(d: Dict[str, Any], path: str, value: Any) -> None:
+        parts = [p for p in path.split(".") if p]
+        if not parts:
+            return
+        cur: Dict[str, Any] = d
+        for p in parts[:-1]:
+            nxt = cur.get(p)
+            if not isinstance(nxt, dict):
+                nxt = {}
+                cur[p] = nxt
+            cur = nxt
+        cur[parts[-1]] = value
+
+    for item in overrides:
+        if "=" not in item:
+            raise ValueError(f"override must be KEY=VALUE, got: {item!r}")
+        k, v = item.split("=", 1)
+        try:
+            parsed = yaml.safe_load(v)
+        except Exception:
+            parsed = v
+        _set_dot_path(config, k.strip(), parsed)
+    return config
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, help="Config YAML path")
@@ -131,31 +165,10 @@ def main() -> None:
 
     # Load config (recursive _inherit merge)
     config = load_config(args.config)
-
-    def _set_dot_path(d: Dict[str, Any], path: str, value: Any) -> None:
-        parts = [p for p in path.split(".") if p]
-        if not parts:
-            return
-        cur: Dict[str, Any] = d
-        for p in parts[:-1]:
-            nxt = cur.get(p)
-            if not isinstance(nxt, dict):
-                nxt = {}
-                cur[p] = nxt
-            cur = nxt
-        cur[parts[-1]] = value
-
-    if args.override:
-        for item in args.override:
-            if "=" not in item:
-                parser.error(f"--override must be KEY=VALUE, got: {item!r}")
-            k, v = item.split("=", 1)
-            # YAML parse lets users write ints/bools/null/lists naturally.
-            try:
-                parsed = yaml.safe_load(v)
-            except Exception:
-                parsed = v
-            _set_dot_path(config, k.strip(), parsed)
+    try:
+        config = apply_overrides(config, args.override)
+    except ValueError as e:
+        parser.error(str(e))
 
     if args.lora_r is not None:
         config.setdefault("lora", {})["r"] = args.lora_r
