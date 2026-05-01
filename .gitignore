@@ -66,6 +66,9 @@ docs/HANDOFF*.md
 exports/**
 !exports/.gitkeep
 
+# TMLR Path B implementation guide (keep local, do not track)
+docs/TMLR_PATH_B_IMPLEMENTATION_GUIDE.md
+
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed
 figures/**/*.tif
 figures/**/*.psd
