@@ -95,7 +95,7 @@ SEED=42 ./scripts/run_novel_methods.sh
 
 This runs:
 - Two-Phase sweep (`exp_two_phase_k5`, `k8`, `k10`, `k12`)
-- Reverse-Adaptive (`exp_reverse_adaptive`)
+- Reverse-Adaptive (`exp_reverse_adaptive_iid`; Stage 2 sweep configs under `config/exp_reverse_adaptive_*.yaml`)
 - Budget-Adaptive sweep (`exp_budget_800`, `1200`, `1600`, `2000`)
 - Baselines on the same 4-layer setup (`flora`, `ffa_lora`, `fedit`)
 
