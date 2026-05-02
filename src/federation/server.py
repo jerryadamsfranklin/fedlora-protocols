@@ -91,6 +91,8 @@ class FederatedServer:
             self.aggregator = agg_cls()
 
         self.global_state = None
+        self._next_broadcast_state = None
+        self._b_only_broadcast_announced = False
         self.clients: List = []
         self.metrics_history = []
 
@@ -138,6 +140,10 @@ class FederatedServer:
             round_start = time.time()
             print(f"\n--- Round {round_num + 1}/{self.num_rounds} ---")
 
+            broadcast_for_clients = self._next_broadcast_state
+            if broadcast_for_clients is None:
+                broadcast_for_clients = self.global_state
+
             # Collect client updates
             client_states = []
             client_weights = []
@@ -170,13 +176,13 @@ class FederatedServer:
             for client in tqdm(self.clients, desc="Training"):
                 if freeze_ratios is not None:
                     result = client.train(
-                        self.global_state,
+                        broadcast_for_clients,
                         freeze_ratios=freeze_ratios,
                         collect_layer_metrics=True,
                     )
                 else:
                     result = client.train(
-                        self.global_state,
+                        broadcast_for_clients,
                         freeze_a=freeze_a,
                         b_only_upload=b_only_upload,
                     )
@@ -220,11 +226,41 @@ class FederatedServer:
                 call_kw["layer_metrics"] = aggregated_layer_metrics
             self.global_state = self.aggregator.aggregate(**call_kw)
 
-            # Add download communication (server -> each client)
-            bytes_per_client = sum(
-                p.numel() * p.element_size() for p in self.global_state.values()
+            # Decide whether the next round should broadcast B-only.
+            broadcast_b_only = False
+            if hasattr(self.aggregator, "should_broadcast_b_only"):
+                try:
+                    broadcast_b_only = bool(self.aggregator.should_broadcast_b_only())
+                except Exception:
+                    broadcast_b_only = False
+
+            # Build the broadcast state for the *next* round. If B-only, filter
+            # to B keys; otherwise full. Keep self.global_state full for server-side
+            # reconstruction and aggregator logic.
+            if broadcast_b_only and self.global_state is not None:
+                broadcast_state = {
+                    k: v
+                    for k, v in self.global_state.items()
+                    if ("lora_B" in k or "lora_b" in k)
+                }
+            else:
+                broadcast_state = self.global_state
+
+            # Track download bytes based on what is actually sent.
+            bytes_per_client = (
+                sum(p.numel() * p.element_size() for p in broadcast_state.values())
+                if broadcast_state is not None
+                else 0
             )
             total_download_bytes += bytes_per_client * len(self.clients)
+
+            # Stash broadcast state for the next round's client.train() call.
+            self._next_broadcast_state = broadcast_state
+
+            # One-time log for when B-only broadcast first activates.
+            if broadcast_b_only and not self._b_only_broadcast_announced:
+                print("  [B-only broadcast active starting next round]")
+                self._b_only_broadcast_announced = True
 
             round_time = time.time() - round_start
 
@@ -240,6 +276,8 @@ class FederatedServer:
                 "upload_mb": total_upload_bytes / (1024 * 1024),
                 "download_mb": total_download_bytes / (1024 * 1024),
             }
+            metrics["broadcast_b_only"] = broadcast_b_only
+            metrics["broadcast_bytes_per_client"] = bytes_per_client
             if hasattr(self.aggregator, "get_mode"):
                 metrics["agg_mode"] = self.aggregator.get_mode()
             if hasattr(self.aggregator, "get_switch_round"):

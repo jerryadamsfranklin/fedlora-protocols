@@ -176,6 +176,29 @@ class ReverseAdaptiveAggregator:
             "comm_savings_vs_flora": savings,
         }
 
+    def get_frozen_a(self) -> Dict[str, torch.Tensor]:
+        """
+        Return the frozen A matrices currently held by the internal FFA-LoRA
+        aggregator. Returns an empty dict if FFA-LoRA has not been initialized
+        (i.e., we are still in FLoRA phase).
+        """
+        return self.ffa_lora.get_frozen_a()
+
+    def should_upload_b_only(self) -> bool:
+        """
+        Clients should upload B-only when the next round will be in freeze-A
+        mode AND the FFA-LoRA aggregator has already cached frozen A.
+        """
+        nxt = self.round_count + 1
+        next_freeze = self._get_freeze_ratio(nxt) >= 0.5
+        return next_freeze and bool(self.ffa_lora.initialized)
+
+    def should_broadcast_b_only(self) -> bool:
+        """
+        Server broadcasts B-only under the same condition as upload.
+        """
+        return self.should_upload_b_only()
+
     def reset(self) -> None:
         self.ffa_lora.reset()
         self.round_count = 0
