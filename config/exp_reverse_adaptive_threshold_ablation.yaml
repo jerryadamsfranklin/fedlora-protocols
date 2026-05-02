@@ -1,0 +1,5 @@
+_inherit: exp_reverse_adaptive_iid.yaml
+
+experiment:
+  name: "exp_reverse_adaptive_threshold_ablation"
+  description: "Sweep switch_threshold to characterize switching sensitivity"

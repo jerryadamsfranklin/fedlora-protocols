@@ -38,6 +38,7 @@ class ReverseAdaptiveAggregator:
         self.flora_comm_per_round: Optional[float] = None
         self.ffa_comm_per_round: Optional[float] = None
         self._last_fr = 0.0  # after last aggregate; <0.5 means FLoRA-like
+        self.events: List[Dict[str, Any]] = []
 
     def _track_comm(self, is_flora: bool, client_states: List[Dict[str, torch.Tensor]]) -> None:
         if not client_states:
@@ -86,6 +87,11 @@ class ReverseAdaptiveAggregator:
         improvement = (prev_loss - curr_loss) / prev_loss
         return bool(improvement < self.switch_threshold)
 
+    def _loss_history_tail(self) -> List[float]:
+        if len(self.loss_history) >= 3:
+            return self.loss_history[-3:]
+        return list(self.loss_history)
+
     def _start_transition(self, round_num: int) -> None:
         self.switch_round = round_num
         if self.transition_rounds > 0:
@@ -93,12 +99,26 @@ class ReverseAdaptiveAggregator:
         else:
             self.ffa_lora.reset()
             self.current_mode = "FFA-LoRA"
+        self.events.append(
+            {
+                "round": self.round_count,
+                "event": "switch_to_ffa",
+                "loss_history_tail": self._loss_history_tail(),
+            }
+        )
 
     def _revert_to_flora(self) -> None:
         self.ffa_lora.reset()
         self.current_mode = "FLoRA"
         self.switch_round = None
         self.revert_count += 1
+        self.events.append(
+            {
+                "round": self.round_count,
+                "event": "revert_to_flora",
+                "loss_history_tail": self._loss_history_tail(),
+            }
+        )
 
     def _detect_instability(self, current_loss: float) -> bool:
         if self.current_mode == "FLoRA" or len(self.loss_history) < 2:
@@ -174,6 +194,7 @@ class ReverseAdaptiveAggregator:
             "warmup_rounds": self.warmup_rounds,
             "total_comm_mb": self.total_comm_mb,
             "comm_savings_vs_flora": savings,
+            "events": list(self.events),
         }
 
     def get_frozen_a(self) -> Dict[str, torch.Tensor]:
@@ -212,3 +233,4 @@ class ReverseAdaptiveAggregator:
         self.flora_comm_per_round = None
         self.ffa_comm_per_round = None
         self._last_fr = 0.0
+        self.events.clear()

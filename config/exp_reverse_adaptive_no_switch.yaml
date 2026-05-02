@@ -1,0 +1,11 @@
+_inherit: exp_reverse_adaptive_iid.yaml
+
+experiment:
+  name: "exp_reverse_adaptive_no_switch"
+  description: "Sanity: never switch -> equivalent to FLoRA"
+
+reverse_adaptive:
+  switch_threshold: -1.0
+  warmup_rounds: 999
+  transition_rounds: 0
+  stability_threshold: 1.1
