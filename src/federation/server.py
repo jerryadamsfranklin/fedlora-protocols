@@ -307,7 +307,7 @@ class FederatedServer:
         }
 
     def _save_results(self) -> None:
-        """Save results to JSON."""
+        """Save results to JSON and persist the final adapter state."""
         path = os.path.join(self.output_dir, "results.json")
         # Make metrics JSON-serializable (e.g. numpy floats)
         serializable = []
@@ -322,3 +322,9 @@ class FederatedServer:
         with open(path, "w") as f:
             json.dump(serializable, f, indent=2)
         print(f"\nResults saved to {path}")
+
+        # Persist the final adapter state for downstream evaluation.
+        if self.global_state is not None:
+            state_path = os.path.join(self.output_dir, "final_adapter_state.pt")
+            torch.save(self.global_state, state_path)
+            print(f"Final adapter state saved to {state_path}")

@@ -1,0 +1,20 @@
+# Configuration for downstream benchmark evaluation.
+# Used by scripts/evaluate_checkpoint.py via Hydra/OmegaConf if integrated;
+# otherwise referenced manually.
+
+evaluation:
+  benchmarks:
+    - "mmlu"
+    - "arc_easy"
+    - "boolq"
+  num_examples: 500
+  seed: 42
+
+# Sanity baselines (zero-shot accuracy on the base model with NO adapter).
+# Run once and record; used as a floor in tables.
+baselines:
+  tinyllama_1b_chat:
+    mmlu: ~  # to be filled after first run
+    arc_easy: ~
+    boolq: ~
+
