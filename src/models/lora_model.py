@@ -85,13 +85,23 @@ class FederatedLoRAModel:
         if self._tokenizer.pad_token is None:
             self._tokenizer.pad_token = self._tokenizer.eos_token
 
-        # Load base model
+        # Load base model.
+        #
+        # On MPS, loading large sharded checkpoints directly to device via
+        # device_map can hit dtype edge cases during shard materialization.
+        # We load on CPU first, then move to MPS after weights are instantiated.
+        load_device_map = {"": self.device}
+        if self.device == "mps":
+            load_device_map = {"": "cpu"}
+
         base_model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
             torch_dtype=dtype,
-            device_map={"": self.device},
+            device_map=load_device_map,
             trust_remote_code=True,
         )
+        if self.device == "mps":
+            base_model = base_model.to(self.device)
         # Training-friendly defaults
         if getattr(base_model.config, "use_cache", None) is not None:
             base_model.config.use_cache = False
