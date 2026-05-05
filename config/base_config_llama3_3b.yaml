@@ -25,6 +25,9 @@ training:
   gradient_accumulation_steps: 8
   learning_rate: 0.0001
   max_seq_length: 256
+  # Train LoRA adapters in fp32 while the frozen base stays fp16 (MPS-friendly).
+  # Uploads are still cast back to model.torch_dtype for aggregation.
+  lora_param_dtype: "float32"
 
 federated:
   num_rounds: 15

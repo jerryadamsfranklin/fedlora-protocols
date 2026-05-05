@@ -260,6 +260,8 @@ def main() -> None:
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"Device: {device}")
 
+    train_cfg = config.get("training", {})
+
     # Load model
     print("\n[1/4] Loading model...")
     model_cfg = config.get("model", {})
@@ -272,13 +274,13 @@ def main() -> None:
         lora_alpha=config.get("lora", {}).get("lora_alpha", 32),
         device=device,
         torch_dtype=torch_dtype,
+        lora_param_dtype=train_cfg.get("lora_param_dtype"),
     )
     model.load_model()
 
     # Load data
     print("\n[2/4] Loading data...")
     data_cfg = config.get("data", {})
-    train_cfg = config.get("training", {})
     eval_cfg = config.get("evaluation", {})
     dataset = load_dataset(
         data_cfg["dataset_name"],

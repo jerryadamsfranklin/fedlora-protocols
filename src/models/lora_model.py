@@ -47,6 +47,7 @@ class FederatedLoRAModel:
         target_modules: Optional[List[str]] = None,
         device: str = "mps",
         torch_dtype: Union[str, torch.dtype] = "float32",
+        lora_param_dtype: Optional[Union[str, torch.dtype]] = None,
     ):
         """
         Initialize model wrapper (does not load model yet).
@@ -66,6 +67,7 @@ class FederatedLoRAModel:
         self.target_modules = target_modules or ["q_proj", "v_proj"]
         self.device = device
         self.torch_dtype = torch_dtype
+        self.lora_param_dtype = lora_param_dtype
 
         self._model = None
         self._tokenizer = None
@@ -120,6 +122,11 @@ class FederatedLoRAModel:
         self._model = get_peft_model(base_model, lora_config)
         self._model.print_trainable_parameters()
 
+        if self.lora_param_dtype is not None:
+            lp_dtype = self._resolve_dtype(self.lora_param_dtype)
+            self._cast_trainable_lora_params(lp_dtype)
+            print(f"lora_param_dtype (train): {lp_dtype}")
+
     @staticmethod
     def _resolve_dtype(torch_dtype: Union[str, torch.dtype]) -> torch.dtype:
         if isinstance(torch_dtype, torch.dtype):
@@ -138,6 +145,17 @@ class FederatedLoRAModel:
                 f"Supported: {sorted(mapping.keys())}"
             )
         return mapping[torch_dtype]
+
+    def _cast_trainable_lora_params(self, dtype: torch.dtype) -> None:
+        """Cast trainable LoRA adapter weights to dtype (e.g. fp32 on fp16 base)."""
+        with torch.no_grad():
+            for name, param in self.model.named_parameters():
+                if "lora_" in name and param.requires_grad:
+                    param.data = param.data.to(dtype=dtype)
+
+    def _upload_dtype(self) -> torch.dtype:
+        """Dtype used when exporting LoRA tensors for aggregation (matches base model)."""
+        return self._resolve_dtype(self.torch_dtype)
 
     @property
     def model(self):
@@ -160,10 +178,12 @@ class FederatedLoRAModel:
         Returns dict of {param_name: tensor} for all LoRA params.
         Tensors are on CPU for transmission.
         """
+        upload_dtype = self._upload_dtype()
         state = {}
         for name, param in self.model.named_parameters():
             if "lora_" in name and param.requires_grad:
-                state[name] = param.detach().cpu().clone()
+                t = param.detach().to(dtype=upload_dtype)
+                state[name] = t.cpu().clone()
         return state
 
     def set_lora_state_dict(self, state_dict: Dict[str, torch.Tensor]) -> None:
@@ -176,7 +196,9 @@ class FederatedLoRAModel:
         current_state = self.model.state_dict()
         for name, param in state_dict.items():
             if name in current_state:
-                current_state[name].copy_(param.to(self.device))
+                dst = current_state[name]
+                src = param.to(device=self.device, dtype=dst.dtype)
+                dst.copy_(src)
 
     def get_lora_param_count(self) -> int:
         """Count trainable LoRA parameters."""
