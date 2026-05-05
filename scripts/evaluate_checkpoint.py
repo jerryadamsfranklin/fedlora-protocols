@@ -27,7 +27,13 @@ from src.models.lora_model import FederatedLoRAModel
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--checkpoint", required=True, help="Path to final_adapter_state.pt"
+        "--checkpoint",
+        help="Path to final_adapter_state.pt (omit when using --no-adapter)",
+    )
+    parser.add_argument(
+        "--no-adapter",
+        action="store_true",
+        help="Evaluate the base model without applying any adapter (baseline).",
     )
     parser.add_argument(
         "--base-model", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -47,6 +53,11 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
+    if bool(args.no_adapter) == bool(args.checkpoint):
+        raise SystemExit(
+            "Specify exactly one of --checkpoint or --no-adapter."
+        )
+
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"Device: {device}")
     print(f"Loading base model: {args.base_model}")
@@ -60,9 +71,14 @@ def main() -> None:
     )
     fed_model.load_model()
 
-    print(f"Loading adapter state: {args.checkpoint}")
-    state = torch.load(args.checkpoint, map_location="cpu")
-    fed_model.set_lora_state_dict(state)
+    if args.no_adapter:
+        print("No adapter: evaluating base model only.")
+        checkpoint_label = None
+    else:
+        print(f"Loading adapter state: {args.checkpoint}")
+        state = torch.load(args.checkpoint, map_location="cpu")
+        fed_model.set_lora_state_dict(state)
+        checkpoint_label = args.checkpoint
 
     print(f"Running benchmarks: {args.benchmarks}")
     results = evaluate_downstream(
@@ -75,7 +91,8 @@ def main() -> None:
     )
 
     out = {
-        "checkpoint": args.checkpoint,
+        "checkpoint": checkpoint_label,
+        "no_adapter": bool(args.no_adapter),
         "base_model": args.base_model,
         "num_examples": args.num_examples,
         "benchmarks": results,
