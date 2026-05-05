@@ -59,14 +59,13 @@ results/**/*.bin
 results/**/*.safetensors
 results/**/checkpoint*/
 
-# Handoffs / Claude or external analysis exports (generate locally; do not commit)
-docs/HANDOFF*.md
-**/*handoff*.txt
-**/*handoff*.md
+# Local exports: handoffs, Stage 0 summaries, Claude bundles (do not commit)
 exports/**
 !exports/.gitkeep
+**/*handoff*.txt
+**/*handoff*.md
 
-# TMLR Path B implementation guide (keep local, do not track)
+# TMLR Path B implementation guide (optional local copy in docs/; do not track)
 docs/TMLR_PATH_B_IMPLEMENTATION_GUIDE.md
 
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed

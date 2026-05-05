@@ -1,0 +1,18 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_reverse_adaptive_noniid_alpha01"
+  description: "Adaptive switching, severe Non-IID Dirichlet alpha=0.1"
+
+data:
+  partition_method: "label_skew"
+  partition_alpha: 0.1
+
+federated:
+  aggregation_method: "reverse_adaptive"
+
+reverse_adaptive:
+  switch_threshold: 0.01
+  warmup_rounds: 5
+  transition_rounds: 0
+  stability_threshold: 1.1

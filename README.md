@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 Optional: add a **`.env`** with Hugging Face or Weights & Biases tokens if you use gated models or logging.
 
-Local handoff bundles for external tools (e.g. Claude) belong under **`exports/`** or **`docs/HANDOFF_*.md`**; those paths are listed in **`.gitignore`** and will not be committed.
+Local handoff bundles and run summaries (e.g. Claude exports, Stage 0 smoke notes) belong under **`exports/`**. That folder is gitignored except **`exports/.gitkeep`** so nothing bulky or scratch gets committed. Tracked documentation lives under **`docs/`** (e.g. Path B notes); the full TMLR implementation guide is optional local-only copy — see **`.gitignore`**.
 
 ## Quick start — one run
 
@@ -95,7 +95,7 @@ SEED=42 ./scripts/run_novel_methods.sh
 
 This runs:
 - Two-Phase sweep (`exp_two_phase_k5`, `k8`, `k10`, `k12`)
-- Reverse-Adaptive (`exp_reverse_adaptive`)
+- Reverse-Adaptive (`exp_reverse_adaptive_iid`; Stage 2 sweep configs under `config/exp_reverse_adaptive_*.yaml`)
 - Budget-Adaptive sweep (`exp_budget_800`, `1200`, `1600`, `2000`)
 - Baselines on the same 4-layer setup (`flora`, `ffa_lora`, `fedit`)
 

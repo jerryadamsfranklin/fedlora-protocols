@@ -1,8 +1,8 @@
 _inherit: base_config_4layers.yaml
 
 experiment:
-  name: "exp_reverse_adaptive"
-  description: "Reverse adaptive: FLoRA then FFA-LoRA when loss improvement slows"
+  name: "exp_reverse_adaptive_iid"
+  description: "Adaptive FLoRA -> FFA-LoRA with loss-plateau switching, IID Alpaca-3k"
 
 federated:
   aggregation_method: "reverse_adaptive"
@@ -10,5 +10,5 @@ federated:
 reverse_adaptive:
   switch_threshold: 0.01
   warmup_rounds: 5
-  transition_rounds: 2
+  transition_rounds: 0
   stability_threshold: 1.1
