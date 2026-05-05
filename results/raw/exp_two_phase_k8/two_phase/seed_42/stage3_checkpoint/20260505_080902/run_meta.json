@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_two_phase_k8",
+  "method": "two_phase",
+  "seed": 42,
+  "timestamp": "20260505_080902",
+  "device": "mps",
+  "output_dir": "results/raw/exp_two_phase_k8/two_phase/seed_42/stage3_checkpoint/20260505_080902",
+  "git_commit": "7c0e26a6d788d4ae6a2c75fdc1f6a0c2c9e05bec",
+  "git_branch": "arch/downstream-eval-suite",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}
