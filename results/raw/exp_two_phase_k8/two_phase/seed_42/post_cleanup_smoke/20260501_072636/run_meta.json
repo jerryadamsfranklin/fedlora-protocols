@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_two_phase_k8",
+  "method": "two_phase",
+  "seed": 42,
+  "timestamp": "20260501_072636",
+  "device": "mps",
+  "output_dir": "results/raw/exp_two_phase_k8/two_phase/seed_42/post_cleanup_smoke/20260501_072636",
+  "git_commit": "f915051b58a9c7ccdce30bd8e8e26b0a9b11c358",
+  "git_branch": "cleanup-2026-05",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}
