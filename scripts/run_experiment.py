@@ -16,6 +16,7 @@ import sys
 from copy import deepcopy
 from datetime import datetime
 import math
+import re
 from typing import Any, Dict
 
 # Silence HF tokenizers fork-parallelism warning by default.
@@ -78,6 +79,32 @@ def apply_overrides(config: Dict[str, Any], overrides: list[str] | None) -> Dict
     if not overrides:
         return config
 
+    _NUM_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$")
+
+    def _coerce_scalar(value: Any) -> Any:
+        """
+        yaml.safe_load is great for '2', '0.01', 'true', '[1,2]'.
+        But it treats scientific notation like '5e-05' as a string.
+        Coerce numeric-looking strings (incl. sci-notation) into numbers.
+        """
+        if not isinstance(value, str):
+            return value
+        s = value.strip()
+        if not s:
+            return value
+        if _NUM_RE.match(s):
+            # Prefer int when it is clearly an int literal (no dot, no exponent).
+            if ("." not in s) and ("e" not in s.lower()):
+                try:
+                    return int(s)
+                except Exception:
+                    pass
+            try:
+                return float(s)
+            except Exception:
+                return value
+        return value
+
     def _set_dot_path(d: Dict[str, Any], path: str, value: Any) -> None:
         parts = [p for p in path.split(".") if p]
         if not parts:
@@ -99,7 +126,7 @@ def apply_overrides(config: Dict[str, Any], overrides: list[str] | None) -> Dict
             parsed = yaml.safe_load(v)
         except Exception:
             parsed = v
-        _set_dot_path(config, k.strip(), parsed)
+        _set_dot_path(config, k.strip(), _coerce_scalar(parsed))
     return config
 
 
