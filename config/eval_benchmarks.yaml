@@ -14,7 +14,9 @@ evaluation:
 # Run once and record; used as a floor in tables.
 baselines:
   tinyllama_1b_chat:
-    mmlu: ~  # to be filled after first run
-    arc_easy: ~
-    boolq: ~
+    # Baseline (no adapter), num_examples=500, seed=42:
+    # results/downstream/baseline_no_adapter_500.json
+    mmlu: 0.25
+    arc_easy: 0.274
+    boolq: 0.626
 

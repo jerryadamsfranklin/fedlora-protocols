@@ -1,0 +1,23 @@
+{
+  "checkpoint": null,
+  "no_adapter": true,
+  "base_model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "num_examples": 20,
+  "benchmarks": {
+    "mmlu": {
+      "accuracy": 0.25,
+      "num_examples": 20,
+      "num_correct": 5
+    },
+    "arc_easy": {
+      "accuracy": 0.15,
+      "num_examples": 20,
+      "num_correct": 3
+    },
+    "boolq": {
+      "accuracy": 0.75,
+      "num_examples": 20,
+      "num_correct": 15
+    }
+  }
+}
