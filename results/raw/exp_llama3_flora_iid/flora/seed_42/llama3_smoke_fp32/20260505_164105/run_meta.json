@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_llama3_flora_iid",
+  "method": "flora",
+  "seed": 42,
+  "timestamp": "20260505_164105",
+  "device": "mps",
+  "output_dir": "results/raw/exp_llama3_flora_iid/flora/seed_42/llama3_smoke_fp32/20260505_164105",
+  "git_commit": "d664cc038846c52ad641016dd558643f87931961",
+  "git_branch": "arch/llama-3.2-3b-scale-val",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}
