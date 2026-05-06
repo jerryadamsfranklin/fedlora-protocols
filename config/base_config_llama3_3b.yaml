@@ -1,0 +1,39 @@
+# LLaMA-3.2-3B base configuration. Inherits from base_config_4layers.yaml but
+# overrides model and a few memory-relevant knobs.
+
+_inherit: base_config_4layers.yaml
+
+model:
+  name: "meta-llama/Llama-3.2-3B"
+  torch_dtype: "float16"
+  device: "mps"
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.1
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+  bias: "none"
+
+training:
+  local_epochs: 1
+  batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 0.0001
+  max_seq_length: 256
+  # Train LoRA adapters in fp32 while the frozen base stays fp16 (MPS-friendly).
+  # Uploads are still cast back to model.torch_dtype for aggregation.
+  lora_param_dtype: "float32"
+
+federated:
+  num_rounds: 15
+  num_clients: 10
+  clients_per_round: 10
+
+evaluation:
+  eval_every: 5
+

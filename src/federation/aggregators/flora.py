@@ -81,6 +81,20 @@ class FLoRAAggregator:
             ba_product = ba_product / max(1, num_clients)
 
             # STEP 4: SVD compression
+            if not torch.isfinite(ba_product).all():
+                n_bad = int((~torch.isfinite(ba_product)).sum().item())
+                total = int(ba_product.numel())
+                print(
+                    f"[warn] FLoRA non-finite BA product for {a_key}: "
+                    f"{n_bad}/{total} entries non-finite. "
+                    "Sanitizing to enable SVD; consider lowering learning_rate for stability."
+                )
+                ba_product = torch.nan_to_num(
+                    ba_product,
+                    nan=0.0,
+                    posinf=0.0,
+                    neginf=0.0,
+                )
             U, S, Vh = torch.linalg.svd(ba_product, full_matrices=False)
 
             # Keep adapter rank compatible with PEFT (default: original_rank),

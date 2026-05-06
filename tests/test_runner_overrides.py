@@ -15,9 +15,10 @@ def test_apply_overrides_creates_path():
 
 def test_apply_overrides_yaml_typing():
     cfg = {}
-    out = apply_overrides(cfg, ["a=2", "b=true", "c=0.01", "d=foo"])
+    out = apply_overrides(cfg, ["a=2", "b=true", "c=0.01", "d=foo", "e=5e-05"])
     assert out["a"] == 2 and isinstance(out["a"], int)
     assert out["b"] is True
     assert out["c"] == 0.01 and isinstance(out["c"], float)
     assert out["d"] == "foo"
+    assert out["e"] == 5e-05 and isinstance(out["e"], float)
 

@@ -1,0 +1,12 @@
+_inherit: base_config_llama3_3b.yaml
+
+experiment:
+  name: "exp_llama3_two_phase_k8_iid"
+  description: "Two-Phase K=8 at LLaMA-3.2-3B scale, IID"
+
+federated:
+  aggregation_method: "two_phase"
+
+two_phase:
+  phase_boundary: 8
+

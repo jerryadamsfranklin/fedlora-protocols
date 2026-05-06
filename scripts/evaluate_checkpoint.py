@@ -97,6 +97,9 @@ def main() -> None:
         "num_examples": args.num_examples,
         "benchmarks": results,
     }
+    out_dir = os.path.dirname(os.path.abspath(args.output))
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
     with open(args.output, "w") as f:
         json.dump(out, f, indent=2)
     print(f"\nResults written to {args.output}")

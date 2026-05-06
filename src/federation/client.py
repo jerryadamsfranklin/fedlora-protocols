@@ -140,6 +140,12 @@ class FederatedClient:
             collate_fn=collator,
         )
 
+        sample = next(iter(self.dataloader))
+        seq_len = sample["input_ids"].shape[1]
+        assert (
+            seq_len == self.max_seq_length
+        ), f"Expected seq_len {self.max_seq_length}, got {seq_len}"
+
     def train(
         self,
         global_state: Optional[Dict[str, torch.Tensor]] = None,

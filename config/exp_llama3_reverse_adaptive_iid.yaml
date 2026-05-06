@@ -1,0 +1,15 @@
+_inherit: base_config_llama3_3b.yaml
+
+experiment:
+  name: "exp_llama3_reverse_adaptive_iid"
+  description: "Adaptive switching at LLaMA-3.2-3B scale, IID"
+
+federated:
+  aggregation_method: "reverse_adaptive"
+
+reverse_adaptive:
+  switch_threshold: 0.01
+  warmup_rounds: 5
+  transition_rounds: 0
+  stability_threshold: 1.1
+
