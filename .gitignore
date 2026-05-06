@@ -68,6 +68,11 @@ exports/**
 # TMLR Path B implementation guide (optional local copy in docs/; do not track)
 docs/TMLR_PATH_B_IMPLEMENTATION_GUIDE.md
 
+# Stage 5 brief and stage-specific docs can be kept local-only.
+docs/stage5.md
+docs/stage1_pathB.md
+docs/stage4_setup.md
+
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed
 figures/**/*.tif
 figures/**/*.psd
