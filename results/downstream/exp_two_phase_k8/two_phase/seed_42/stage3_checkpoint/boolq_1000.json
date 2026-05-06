@@ -1,0 +1,13 @@
+{
+  "checkpoint": "results/raw/exp_two_phase_k8/two_phase/seed_42/stage3_checkpoint/20260505_080902/final_adapter_state.pt",
+  "no_adapter": false,
+  "base_model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "num_examples": 1000,
+  "benchmarks": {
+    "boolq": {
+      "accuracy": 0.563,
+      "num_examples": 1000,
+      "num_correct": 563
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "checkpoint": "results/raw/exp_flora_iid/flora/seed_42/stage3_checkpoint/20260506_065929/final_adapter_state.pt",
+  "no_adapter": false,
+  "base_model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "num_examples": 500,
+  "benchmarks": {
+    "mmlu": {
+      "accuracy": 0.258,
+      "num_examples": 500,
+      "num_correct": 129
+    },
+    "arc_easy": {
+      "accuracy": 0.246,
+      "num_examples": 500,
+      "num_correct": 123
+    },
+    "boolq": {
+      "accuracy": 0.562,
+      "num_examples": 500,
+      "num_correct": 281
+    }
+  }
+}
