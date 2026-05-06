@@ -1,0 +1,13 @@
+{
+  "checkpoint": "results/raw/exp_reverse_adaptive_iid/reverse_adaptive/seed_42/stage3_checkpoint/20260506_130343/final_adapter_state.pt",
+  "no_adapter": false,
+  "base_model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "num_examples": 500,
+  "benchmarks": {
+    "hellaswag": {
+      "accuracy": 0.42,
+      "num_examples": 500,
+      "num_correct": 210
+    }
+  }
+}

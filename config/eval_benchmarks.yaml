@@ -20,5 +20,5 @@ baselines:
     mmlu: 0.25
     arc_easy: 0.274
     boolq: 0.626
-    hellaswag: null  # to be filled by Stage 5 Task 2
+    hellaswag: 0.448  # baseline_no_adapter_hellaswag.json, num_examples=500, seed=42
 
