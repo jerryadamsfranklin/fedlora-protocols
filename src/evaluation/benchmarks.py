@@ -85,9 +85,41 @@ def load_boolq(num_examples: int = 500, seed: int = 42) -> List[Dict]:
     return items
 
 
+def load_hellaswag(num_examples: int = 500, seed: int = 42) -> List[Dict]:
+    """
+    Load a deterministic subset of HellaSwag (validation split).
+
+    HellaSwag is 4-way sentence-completion. Each item has a context
+    and 4 candidate endings; the task is to pick the most plausible.
+    """
+    ds = load_dataset("Rowan/hellaswag", split="validation")
+    ds = ds.shuffle(seed=seed).select(range(min(num_examples, len(ds))))
+    items: List[Dict] = []
+    for row in ds:
+        ctx = row.get("ctx", "") or row.get("ctx_a", "")
+        endings = row["endings"]
+        if len(endings) != 4:
+            continue
+        ans_str = row["label"]
+        try:
+            ans_idx = int(ans_str)
+        except (TypeError, ValueError):
+            continue
+        prompt = f"{ctx}"
+        items.append(
+            {
+                "prompt": prompt,
+                "choices": [f" {e}" for e in endings],
+                "answer": ans_idx,
+            }
+        )
+    return items
+
+
 BENCHMARKS = {
     "mmlu": load_mmlu_subset,
     "arc_easy": load_arc_easy,
     "boolq": load_boolq,
+    "hellaswag": load_hellaswag,
 }
 
