@@ -40,6 +40,11 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
+# Editors
+.idea/
+.vscode/
+*.swp
+
 # macOS
 .DS_Store
 
