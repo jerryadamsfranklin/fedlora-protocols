@@ -1,0 +1,13 @@
+{
+  "checkpoint": "results/raw/exp_llama3_flora_iid/flora/seed_42/stage5_llama3_full/20260506_172045/final_adapter_state.pt",
+  "no_adapter": false,
+  "base_model": "meta-llama/Llama-3.2-3B",
+  "num_examples": 500,
+  "benchmarks": {
+    "hellaswag": {
+      "accuracy": 0.534,
+      "num_examples": 500,
+      "num_correct": 267
+    }
+  }
+}

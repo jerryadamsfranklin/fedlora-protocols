@@ -1,0 +1,23 @@
+{
+  "checkpoint": null,
+  "no_adapter": true,
+  "base_model": "meta-llama/Llama-3.2-3B",
+  "num_examples": 500,
+  "benchmarks": {
+    "mmlu": {
+      "accuracy": 0.544,
+      "num_examples": 500,
+      "num_correct": 272
+    },
+    "arc_easy": {
+      "accuracy": 0.832,
+      "num_examples": 500,
+      "num_correct": 416
+    },
+    "boolq": {
+      "accuracy": 0.706,
+      "num_examples": 500,
+      "num_correct": 353
+    }
+  }
+}
