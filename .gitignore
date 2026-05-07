@@ -64,6 +64,7 @@ exports/**
 !exports/.gitkeep
 **/*handoff*.txt
 **/*handoff*.md
+!docs/HANDOFF_stage5_for_claude.md
 
 # TMLR Path B implementation guide (optional local copy in docs/; do not track)
 docs/TMLR_PATH_B_IMPLEMENTATION_GUIDE.md
