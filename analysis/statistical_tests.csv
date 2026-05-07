@@ -1,19 +1,4 @@
-experiment,comparison,t_statistic,p_value,significant,note
-IID,fedit vs ffa_lora,,,,need multiple seeds/runs per cell
-IID,fedit vs flexlora,,,,need multiple seeds/runs per cell
-IID,fedit vs flora,,,,need multiple seeds/runs per cell
-IID,ffa_lora vs flexlora,,,,need multiple seeds/runs per cell
-IID,ffa_lora vs flora,,,,need multiple seeds/runs per cell
-IID,flexlora vs flora,,,,need multiple seeds/runs per cell
-NonIID-Label,fedit vs ffa_lora,,,,need multiple seeds/runs per cell
-NonIID-Label,fedit vs flexlora,,,,need multiple seeds/runs per cell
-NonIID-Label,fedit vs flora,,,,need multiple seeds/runs per cell
-NonIID-Label,ffa_lora vs flexlora,,,,need multiple seeds/runs per cell
-NonIID-Label,ffa_lora vs flora,,,,need multiple seeds/runs per cell
-NonIID-Label,flexlora vs flora,,,,need multiple seeds/runs per cell
-NonIID-Qty,fedit vs ffa_lora,,,,need multiple seeds/runs per cell
-NonIID-Qty,fedit vs flexlora,,,,need multiple seeds/runs per cell
-NonIID-Qty,fedit vs flora,,,,need multiple seeds/runs per cell
-NonIID-Qty,ffa_lora vs flexlora,,,,need multiple seeds/runs per cell
-NonIID-Qty,ffa_lora vs flora,,,,need multiple seeds/runs per cell
-NonIID-Qty,flexlora vs flora,,,,need multiple seeds/runs per cell
+comparison,n,mean_a,mean_b,diff,p_value,cohens_d,note
+Two-Phase K=8 vs FLoRA (loss),3,1.2702833422554864,1.260503841029273,0.009779501226213258,2.462906643511891e-05,116.33419130943399,
+ReverseAdaptive vs FLoRA (loss),3,1.2746328268051148,1.260503841029273,0.01412898577584154,6.1191223135066345e-06,233.39567950969945,
+ReverseAdaptive vs Two-Phase K=8 (loss),3,1.2746328268051148,1.2702833422554864,0.004349484549628284,1.4571727088297593e-05,151.24433331519205,
