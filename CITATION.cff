@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying paper."
+authors:
+  - family-names: Franklin
+    given-names: Jerry Adams
+title: "fedlora-protocols: Communication-efficient federated LoRA fine-tuning"
+date-released: 2026-05-08
+url: "https://github.com/jerryadamsfranklin/fedlora-protocols"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Franklin
+      given-names: Jerry Adams
+  title: "Adaptive Phase-Switching for Communication-Efficient Federated LoRA"
+  year: 2026
+  journal: "Transactions on Machine Learning Research"
+  abstract: "Manuscript in preparation."
