@@ -1,150 +1,99 @@
-# Federated LoRA experiments
+# fedlora-protocols
 
-Comparison of federated fine-tuning approaches that aggregate client-side LoRA adapters. Training is simulated with a central orchestrator (single-process prototype): clients hold partitioned data; each round updates LoRA weights locally; the server applies the chosen aggregator.
+Communication-efficient federated fine-tuning for large language models, with measured (not theoretical) communication accounting and an adaptive phase-switching aggregator.
 
-Implemented aggregators:
-- **Baselines**: **FedIT**, **FFA-LoRA**, **FLoRA**, **FlexLoRA**
-- **Adaptive**: **FedLoRA-Adaptive v1** (`fedlora_adaptive`), **FedLoRA-Adaptive v2** (`fedlora_adaptive_v2`)
-- **Novel methods (week plan)**: **Two-Phase** (`two_phase`), **Reverse-Adaptive** (`reverse_adaptive`), **Budget-Adaptive** (`budget_adaptive`), **Curriculum-Rank** (`curriculum_rank`)
+## Overview
 
-Full methodology, research questions (RQ1–RQ5), experiment matrix, and publication checklist are in **`Federated_LoRA_Complete_Guide.md`** at the repo root.
+This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA*. It implements four federated LoRA aggregation methods, evaluates them on Alpaca-3k instruction-tuning at two model scales (TinyLlama-1.1B and LLaMA-3.2-3B), and reports per-round byte-tracked communication costs and downstream zero-shot benchmark accuracy.
 
-## Research questions (summary)
+### Headline results
 
-| RQ | Topic |
-|----|--------|
-| **RQ1** | IID baseline — how do methods compare when data is evenly split? |
-| **RQ2** | Non-IID — label skew vs quantity skew partitions |
-| **RQ3** | Communication cost vs final loss |
-| **RQ4** | LoRA rank sensitivity |
-| **RQ5** | Scaling with number of clients |
+- **Two-Phase K=8** achieves 27.7 percent measured round-trip communication savings versus full-rank federated LoRA on TinyLlama-1.1B.
+- **ReverseAdaptive** achieves 40.5 percent measured savings via single-parameter threshold tuning, recovering the entire fixed-K Pareto frontier.
+- All federated methods cluster within 1.0 percentage point on LLaMA-3.2-3B downstream accuracy across MMLU, ARC-Easy, BoolQ, and HellaSwag.
+- A no-switch sanity baseline produces bit-identical results to plain FLoRA, confirming the adaptive wrapper introduces zero observable perturbation when its switching logic is disabled.
 
-Publication-style figures **`figures/fig1_convergence_comparison.pdf`** through **`fig5_client_scaling.pdf`** are generated from saved runs; see **Figures** below.
+## Aggregators implemented
 
-## Requirements
+| Aggregator | Description | Reference |
+|------------|-------------|-----------|
+| FedIT | LoRA aggregation via FedAvg over A and B | Zhang et al., 2024 |
+| FFA-LoRA | Frozen A, aggregate only B | Sun et al., 2024 |
+| FLoRA | Stack-and-SVD aggregation of BA products | Wang et al., 2024 |
+| FlexLoRA | Heterogeneous-rank LoRA aggregation | Bai et al., 2024 |
+| Two-Phase | FLoRA for K rounds, then FFA-LoRA | this paper |
+| ReverseAdaptive | Loss-plateau-triggered switch from FLoRA to FFA-LoRA | this paper |
 
-- **Python 3.10+** recommended  
-- **PyTorch** — default device is **Apple MPS** when available, otherwise **CPU** (`scripts/run_experiment.py`)
+## Repository layout
 
-Install dependencies:
+```
+fedlora-protocols/
+├── src/
+│   ├── federation/         # Server, client, aggregators
+│   ├── models/             # LoRA model wrapper (PEFT-based)
+│   ├── data/               # Alpaca loader, partitioners (IID, Dirichlet)
+│   └── evaluation/         # Benchmarks, scorers, metrics
+├── config/                 # YAML experiment configs (with _inherit)
+├── scripts/                # Runners, analysis, figure generation
+├── tests/                  # 20 unit tests covering aggregators and runner
+├── results/                # Per-run JSONs (raw/) and downstream eval (downstream/)
+├── analysis/               # Master CSVs and statistical tests
+├── figures/                # Paper-ready PDFs
+└── docs/                   # Method notes and paper outline
+```
+
+## Quick start
 
 ```bash
+git clone https://github.com/jerryadamsfranklin/fedlora-protocols.git
+cd fedlora-protocols
 pip install -r requirements.txt
+
+# Run a single experiment
+python3 scripts/run_experiment.py \
+    --config config/exp_two_phase_k8.yaml \
+    --seed 42 \
+    --tag my_run
+
+# Evaluate a saved checkpoint on downstream benchmarks
+python3 scripts/evaluate_checkpoint.py \
+    --checkpoint results/raw/.../final_adapter_state.pt \
+    --num-examples 500 \
+    --output results/downstream/my_eval.json
 ```
 
-Optional: add a **`.env`** with Hugging Face or Weights & Biases tokens if you use gated models or logging.
-
-Local handoff bundles and run summaries (e.g. Claude exports, Stage 0 smoke notes) belong under **`exports/`**. That folder is gitignored except **`exports/.gitkeep`** so nothing bulky or scratch gets committed. Tracked documentation lives under **`docs/`** (e.g. Path B notes); the full TMLR implementation guide is optional local-only copy — see **`.gitignore`**.
-
-## Quick start — one run
-
-From the repository root:
+## Reproducing paper figures
 
 ```bash
-python scripts/run_experiment.py --config config/revised_exp1_iid.yaml --method fedit
+python3 scripts/build_results_table.py
+python3 scripts/statistical_analysis.py
+python3 scripts/generate_paper_figures.py
+ls figures/  # six PDFs corresponding to paper figures
 ```
 
-Aggregation methods (most common): `fedit`, `ffa_lora`, `flora`, `flexlora`, `fedlora_adaptive`, `fedlora_adaptive_v2`, `two_phase`, `reverse_adaptive`, `budget_adaptive`, `curriculum_rank`.
+## Hardware
 
-Sweeps (used in EXP4 / EXP5):
+The codebase was developed and tested on Apple M4 Pro (48 GB unified memory) with the MPS backend. CUDA is supported via PyTorch's standard device selection but has not been validated by the maintainer. LLaMA-3.2-3B requires float16 base weights with float32 LoRA parameters on MPS for numerical stability; this is configured automatically by `config/base_config_llama3_3b.yaml`.
 
-```bash
-python scripts/run_experiment.py --config config/revised_exp4_rank.yaml --method fedit --lora_r 16
-python scripts/run_experiment.py --config config/revised_exp5_scaling.yaml --method flora --num_clients 10
+## Citation
+
+If you use this codebase, please cite the paper:
+
+```
+@article{franklin2026fedlora,
+  title  = {Adaptive Phase-Switching for Communication-Efficient Federated LoRA},
+  author = {Franklin, Jerry Adams},
+  year   = {2026},
+  note   = {Manuscript in preparation, Transactions on Machine Learning Research}
+}
 ```
 
-Configs use YAML `_inherit` merging (e.g. `revised_exp1_iid.yaml` → `revised_base.yaml` → `base_config.yaml`).
+(Update with the actual citation once the paper is published.)
 
-## Full revised protocol (all experiments)
+## License
 
-To run the full **revised** suite sequentially (EXP1–EXP5 as defined in `run_all_experiments.sh`):
+MIT (see LICENSE file). Reuse for research and production is welcome; please cite the paper if the work informs published results.
 
-```bash
-bash scripts/run_all_experiments.sh
-```
+## Acknowledgments
 
-Optional: set `CONDA_ENV` (default `fedlora`) and `LOG_DIR` (default `logs`). Logs are written under `logs/` as one file per job.
-
-Runtime is long; runs are intended for overnight or cluster-style execution.
-
-## Results layout
-
-Each run writes a timestamped directory under **`results/raw/`**:
-
-```text
-results/raw/<experiment>/<method>/seed_<seed>[_r<rank>][_c<clients>]/[run_NN_of_MM/]<YYYYMMDD_HHMMSS>/
-  results.json
-  config_merged.yaml
-  run_meta.json
-```
-
-`results.json` is a list of per-round records (`round`, `avg_loss`, `communication_mb`, `round_time`, …) used by analysis and plotting.
-
-The optional `run_NN_of_MM/` folder is used by batch scripts to make it easy to locate “run 7/12” etc.
-
-## Novel methods (Two-Phase / Reverse-Adaptive / Budget-Adaptive / Curriculum-Rank)
-
-The novel-method protocol and rationale are described in `NOVEL_METHODS_IMPLEMENTATION.md` (local notes). The key config for meaningful per-layer / 4-projection LoRA experiments is:
-- `config/base_config_4layers.yaml` (LoRA targets: `q_proj`, `k_proj`, `v_proj`, `o_proj`)
-
-### Run the 12-run novel-method batch (seed 42)
-
-```bash
-SEED=42 ./scripts/run_novel_methods.sh
-```
-
-This runs:
-- Two-Phase sweep (`exp_two_phase_k5`, `k8`, `k10`, `k12`)
-- Reverse-Adaptive (`exp_reverse_adaptive_iid`; Stage 2 sweep configs under `config/exp_reverse_adaptive_*.yaml`)
-- Budget-Adaptive sweep (`exp_budget_800`, `1200`, `1600`, `2000`)
-- Baselines on the same 4-layer setup (`flora`, `ffa_lora`, `fedit`)
-
-### Run curriculum-rank schedule sweep (seed 42)
-
-```bash
-python3 scripts/run_experiment.py --config config/exp_curriculum_default.yaml --method curriculum_rank --seed 42
-python3 scripts/run_experiment.py --config config/exp_curriculum_2stage.yaml  --method curriculum_rank --seed 42
-python3 scripts/run_experiment.py --config config/exp_curriculum_r8start.yaml --method curriculum_rank --seed 42
-python3 scripts/run_experiment.py --config config/exp_curriculum_gradual.yaml --method curriculum_rank --seed 42
-```
-
-Curriculum-rank uses **client-side** gradient masking at the scheduled rank and **sliced LoRA uploads**; the server aggregates and pads back to full rank for compatibility.
-
-### Final experiments (Two-Phase paper — multi-seed + non-IID)
-
-18 runs (3 seeds × 6 configs): IID Two-Phase K=8/K=10, FLoRA IID baseline, then the same three methods with **label_skew** Dirichlet **partition_alpha=0.5** (Alpaca uses instruction-length proxy labels when no `label` column exists).
-
-```bash
-./scripts/run_final_experiments.sh
-```
-
-Summarize all runs under `results/raw/`:
-
-```bash
-python3 scripts/analyze_final_results.py
-```
-
-## Analysis and figures
-
-After you have **`results/*/results.json`** files:
-
-```bash
-python scripts/analyze_results.py
-python scripts/generate_figures.py
-```
-
-- **`analysis/`** — aggregated tables (`all_results*.csv`, `comparison_table.csv`, `statistical_tests.csv`) and **`RESEARCH_SUMMARY.md`** (narrative aligned with RQ1–RQ5). When both legacy and `revised_*` runs exist, summaries prefer **revised** protocol rows.
-- **`figures/`** — `fig1`–`fig5` (PDF + PNG), plus legacy aliases `convergence_exp1`–`exp3`.
-
-Regenerate figures whenever you add new result directories or change plotting code.
-
-## Repository layout (high level)
-
-| Path | Purpose |
-|------|---------|
-| `config/` | YAML configs (`revised_*` = paper protocol; `exp*` without prefix = older / exploratory) |
-| `src/` | Model (`lora_model`), data partitioning, federation client/server, aggregators |
-| `scripts/` | `run_experiment.py`, `run_all_experiments.sh`, `analyze_results.py`, `generate_figures.py` |
-| `results/` | Run outputs (git may omit large runs; regenerate locally) |
-| `analysis/` | Generated tables and research summary |
-| `figures/` | Generated figures |
+The author used Claude (Anthropic) as a development and writing assistant. All technical content, methodology, and results are the author's own.
