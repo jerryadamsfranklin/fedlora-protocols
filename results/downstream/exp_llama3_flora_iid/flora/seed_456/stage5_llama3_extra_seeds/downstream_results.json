@@ -1,0 +1,28 @@
+{
+  "checkpoint": "results/raw/exp_llama3_flora_iid/flora/seed_456/stage5_llama3_extra_seeds/20260514_193332/final_adapter_state.pt",
+  "no_adapter": false,
+  "base_model": "meta-llama/Llama-3.2-3B",
+  "num_examples": 500,
+  "benchmarks": {
+    "mmlu": {
+      "accuracy": 0.55,
+      "num_examples": 500,
+      "num_correct": 275
+    },
+    "arc_easy": {
+      "accuracy": 0.83,
+      "num_examples": 500,
+      "num_correct": 415
+    },
+    "boolq": {
+      "accuracy": 0.744,
+      "num_examples": 500,
+      "num_correct": 372
+    },
+    "hellaswag": {
+      "accuracy": 0.532,
+      "num_examples": 500,
+      "num_correct": 266
+    }
+  }
+}

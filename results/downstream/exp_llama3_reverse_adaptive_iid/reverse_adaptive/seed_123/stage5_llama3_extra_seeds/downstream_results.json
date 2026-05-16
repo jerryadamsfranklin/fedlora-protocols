@@ -1,0 +1,28 @@
+{
+  "checkpoint": "results/raw/exp_llama3_reverse_adaptive_iid/reverse_adaptive/seed_123/stage5_llama3_extra_seeds/20260514_115918/final_adapter_state.pt",
+  "no_adapter": false,
+  "base_model": "meta-llama/Llama-3.2-3B",
+  "num_examples": 500,
+  "benchmarks": {
+    "mmlu": {
+      "accuracy": 0.554,
+      "num_examples": 500,
+      "num_correct": 277
+    },
+    "arc_easy": {
+      "accuracy": 0.848,
+      "num_examples": 500,
+      "num_correct": 424
+    },
+    "boolq": {
+      "accuracy": 0.736,
+      "num_examples": 500,
+      "num_correct": 368
+    },
+    "hellaswag": {
+      "accuracy": 0.534,
+      "num_examples": 500,
+      "num_correct": 267
+    }
+  }
+}
