@@ -449,24 +449,37 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
     mb_8, eb_8, l8, el8 = agg("exp_two_phase_k8", "stage1_bidirectional")
     mb_ra, eb_ra, l_ra, el_ra = agg("exp_reverse_adaptive_iid", "stage2_adaptive")
 
-    def pt(exp: str) -> Tuple[float, float]:
+    def agg_llama(exp: str) -> Tuple[float, float, float, float]:
+        """Mean ± std over seeds for LLaMA IID; latest timestamp per seed if multiple tags."""
         rs = [
             r
             for r in rows
             if r.get("exp_name") == exp
             and r.get("setting") == "iid"
             and r.get("scale") == "llama3_3b"
-            and r.get("tag") == "stage5_llama3_full"
+            and str(r.get("tag", "")).startswith("stage5_llama3")
             and _f(r.get("total_mb", "") or "") is not None
+            and _f(r.get("final_loss", "") or "") is not None
         ]
-        if not rs:
-            return float("nan"), float("nan")
-        r = max(rs, key=lambda x: x.get("timestamp", ""))
-        return float(r["total_mb"]), float(r["final_loss"])
+        by_seed: Dict[str, Dict[str, str]] = {}
+        for r in rs:
+            sk = r.get("seed", "")
+            ts = r.get("timestamp", "")
+            prev = by_seed.get(sk)
+            if prev is None or ts > prev.get("timestamp", ""):
+                by_seed[sk] = r
+        rs2 = list(by_seed.values())
+        if not rs2:
+            return (float("nan"),) * 4
+        losses = [float(r["final_loss"]) for r in rs2]
+        mbs = [float(r["total_mb"]) for r in rs2]
+        lm, ls = _mean_std(losses)
+        mm, ms = _mean_std(mbs)
+        return mm, ms, lm, ls
 
-    lf_l, los_l = pt("exp_llama3_flora_iid")
-    l8_mb, l8_ls = pt("exp_llama3_two_phase_k8_iid")
-    lr_mb, lr_ls = pt("exp_llama3_reverse_adaptive_iid")
+    lf_mb, lf_eb, los_l, el_l = agg_llama("exp_llama3_flora_iid")
+    l8_mb, l8_eb, l8_ls, el_8 = agg_llama("exp_llama3_two_phase_k8_iid")
+    lr_mb, lr_eb, lr_ls, el_r = agg_llama("exp_llama3_reverse_adaptive_iid")
 
     fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10.5, 4.0))
 
@@ -480,13 +493,40 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
     ax0.grid(True, alpha=0.25)
     ax0.legend(fontsize=8)
 
-    if not (np.isnan(lf_l) or np.isnan(l8_mb)):
-        ax1.scatter([lf_l], [los_l], color=_COLORS[0], s=55, label="FLoRA")
-        ax1.scatter([l8_mb], [l8_ls], color=_COLORS[2], s=55, marker="^", label="Two-Phase K=8")
-        ax1.scatter([lr_mb], [lr_ls], color=_COLORS[3], s=55, marker="D", label="ReverseAdaptive")
-        ax1.plot([lf_l, l8_mb, lr_mb], [los_l, l8_ls, lr_ls], color="gray", linestyle=":", alpha=0.6)
+    if not (np.isnan(lf_mb) or np.isnan(l8_mb)):
+        ax1.errorbar(
+            [lf_mb],
+            [los_l],
+            xerr=[lf_eb],
+            yerr=[el_l],
+            fmt="o",
+            color=_COLORS[0],
+            capsize=3,
+            label="FLoRA",
+        )
+        ax1.errorbar(
+            [l8_mb],
+            [l8_ls],
+            xerr=[l8_eb],
+            yerr=[el_8],
+            fmt="^",
+            color=_COLORS[2],
+            capsize=3,
+            label="Two-Phase K=8",
+        )
+        ax1.errorbar(
+            [lr_mb],
+            [lr_ls],
+            xerr=[lr_eb],
+            yerr=[el_r],
+            fmt="D",
+            color=_COLORS[3],
+            capsize=3,
+            label="ReverseAdaptive",
+        )
+        ax1.plot([lf_mb, l8_mb, lr_mb], [los_l, l8_ls, lr_ls], color="gray", linestyle=":", alpha=0.6)
 
-    ax1.set_title("LLaMA-3.2-3B (single seed)")
+    ax1.set_title("LLaMA-3.2-3B (mean ± 1 std, 3 seeds)")
     ax1.set_xlabel("Total round-trip MB")
     ax1.set_ylabel("Final loss")
     ax1.grid(True, alpha=0.25)
