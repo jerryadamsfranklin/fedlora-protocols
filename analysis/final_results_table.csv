@@ -6,6 +6,7 @@ exp_flora_iid,flora,iid,tinyllama_1b,456,run_09_of_18,20260428_215113,1.26091456
 exp_flora_noniid_alpha05,flora,noniid_alpha05,tinyllama_1b,123,run_17_of_18,20260429_223147,1.2720238860615845,2578.125,1289.0625,1289.0625,,,,,
 exp_flora_noniid_alpha05,flora,noniid_alpha05,tinyllama_1b,42,run_16_of_18,20260429_192712,1.2745444993684871,2578.125,1289.0625,1289.0625,,,,,
 exp_flora_noniid_alpha05,flora,noniid_alpha05,tinyllama_1b,456,run_18_of_18,20260430_013838,1.239670210884628,2578.125,1289.0625,1289.0625,,,,,
+exp_llama3_flora_iid,flora,iid,llama3_3b,123,stage5_llama3_extra_seeds,20260513_205442,1.37340240530173,2625.0,1312.5,1312.5,,0.562,0.844,0.732,0.538
 exp_llama3_flora_iid,flora,iid,llama3_3b,42,llama3_smoke,20260505_152953,1.0757838934659958,35.0,17.5,17.5,,,,,
 exp_llama3_flora_iid,flora,iid,llama3_3b,42,llama3_smoke,20260505_172024,1.6189914691050848,35.0,17.5,17.5,,,,,
 exp_llama3_flora_iid,flora,iid,llama3_3b,42,llama3_smoke,20260506_164739,1.6189914691050848,35.0,17.5,17.5,,,,,
@@ -13,8 +14,13 @@ exp_llama3_flora_iid,flora,iid,llama3_3b,42,llama3_smoke_fp32,20260505_164105,1.
 exp_llama3_flora_iid,flora,iid,llama3_3b,42,llama3_smoke_lr1e-5,20260505_162420,1.0757838934659958,35.0,17.5,17.5,,,,,
 exp_llama3_flora_iid,flora,iid,llama3_3b,42,llama3_smoke_lr5e-5,20260505_154952,1.0757838934659958,35.0,17.5,17.5,,,,,
 exp_llama3_flora_iid,flora,iid,llama3_3b,42,stage5_llama3_full,20260506_172045,1.371683085779349,2625.0,1312.5,1312.5,,0.562,0.834,0.732,0.534
+exp_llama3_flora_iid,flora,iid,llama3_3b,456,stage5_llama3_extra_seeds,20260514_193332,1.37199816040198,2625.0,1312.5,1312.5,,0.55,0.83,0.744,0.532
+exp_llama3_reverse_adaptive_iid,reverse_adaptive,iid,llama3_3b,123,stage5_llama3_extra_seeds,20260514_115918,1.3902651987671852,1942.5,997.5,945.0,9,0.554,0.848,0.736,0.534
 exp_llama3_reverse_adaptive_iid,reverse_adaptive,iid,llama3_3b,42,stage5_llama3_full,20260507_082356,1.3938311262925467,1837.5,945.0,892.5,8,0.56,0.832,0.738,0.542
+exp_llama3_reverse_adaptive_iid,reverse_adaptive,iid,llama3_3b,456,stage5_llama3_extra_seeds,20260515_104256,1.3973662387728691,1732.5,892.5,840.0,7,0.556,0.836,0.744,0.538
+exp_llama3_two_phase_k8_iid,two_phase,iid,llama3_3b,123,stage5_llama3_extra_seeds,20260514_043315,1.3948771262963613,1942.5,997.5,945.0,,0.558,0.846,0.738,0.538
 exp_llama3_two_phase_k8_iid,two_phase,iid,llama3_3b,42,stage5_llama3_full,20260507_005718,1.393775810380777,1942.5,997.5,945.0,,0.556,0.832,0.728,0.544
+exp_llama3_two_phase_k8_iid,two_phase,iid,llama3_3b,456,stage5_llama3_extra_seeds,20260515_031432,1.3927721588214237,1942.5,997.5,945.0,,0.56,0.834,0.748,0.536
 exp_reverse_adaptive,reverse_adaptive,iid,tinyllama_1b,42,run_05_of_12,20260425_140923,1.2735087777773537,1289.0625,,,6,,,,
 exp_reverse_adaptive_iid,reverse_adaptive,iid,tinyllama_1b,123,stage2_adaptive,20260502_171633,1.2752344407240548,1533.125,794.0625,739.0625,6,,,,
 exp_reverse_adaptive_iid,reverse_adaptive,iid,tinyllama_1b,42,stage2_adaptive,20260502_141513,1.2735571080048878,1533.125,794.0625,739.0625,6,,,,

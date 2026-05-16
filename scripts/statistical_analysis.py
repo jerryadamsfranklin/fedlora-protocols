@@ -111,6 +111,29 @@ def main() -> None:
         rows.append(paired_test(ra, flora, "ReverseAdaptive vs FLoRA (loss)"))
         rows.append(paired_test(ra, tp_k8, "ReverseAdaptive vs Two-Phase K=8 (loss)"))
 
+    llama_flora_pat = "results/raw/exp_llama3_flora_iid/flora/seed_*/stage5_llama3*/*/results.json"
+    llama_tp8_pat = "results/raw/exp_llama3_two_phase_k8_iid/two_phase/seed_*/stage5_llama3*/*/results.json"
+    llama_ra_pat = "results/raw/exp_llama3_reverse_adaptive_iid/reverse_adaptive/seed_*/stage5_llama3*/*/results.json"
+
+    lf_s = set(_latest_path_per_seed(llama_flora_pat).keys())
+    lt_s = set(_latest_path_per_seed(llama_tp8_pat).keys())
+    lr_s = set(_latest_path_per_seed(llama_ra_pat).keys())
+    llama_common = sorted(lf_s & lt_s & lr_s)
+
+    print(f"\n[LLaMA-3.2-3B IID]")
+    print(f"FLoRA seeds: {sorted(lf_s)}")
+    print(f"Two-Phase K=8 seeds: {sorted(lt_s)}")
+    print(f"ReverseAdaptive seeds: {sorted(lr_s)}")
+    print(f"Paired seeds (intersection): {llama_common}")
+
+    if len(llama_common) >= 2:
+        llama_flora = collect_losses_aligned(llama_flora_pat, llama_common)
+        llama_tp8 = collect_losses_aligned(llama_tp8_pat, llama_common)
+        llama_ra = collect_losses_aligned(llama_ra_pat, llama_common)
+        rows.append(paired_test(llama_tp8, llama_flora, "[LLaMA-3B] Two-Phase K=8 vs FLoRA (loss)"))
+        rows.append(paired_test(llama_ra, llama_flora, "[LLaMA-3B] ReverseAdaptive vs FLoRA (loss)"))
+        rows.append(paired_test(llama_ra, llama_tp8, "[LLaMA-3B] ReverseAdaptive vs Two-Phase K=8 (loss)"))
+
     repo_root = Path(__file__).resolve().parents[1]
     out_path = repo_root / "analysis" / "statistical_tests.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
