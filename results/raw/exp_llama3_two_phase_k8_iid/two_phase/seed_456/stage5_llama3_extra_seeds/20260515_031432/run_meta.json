@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_llama3_two_phase_k8_iid",
+  "method": "two_phase",
+  "seed": 456,
+  "timestamp": "20260515_031432",
+  "device": "mps",
+  "output_dir": "results/raw/exp_llama3_two_phase_k8_iid/two_phase/seed_456/stage5_llama3_extra_seeds/20260515_031432",
+  "git_commit": "6de806bb0cf0faaaa520c7145b24a94d0c680dc2",
+  "git_branch": "experiments/path-b-revision",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}
