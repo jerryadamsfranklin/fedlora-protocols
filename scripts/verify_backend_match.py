@@ -38,36 +38,35 @@ def _resolve_results(path: Path) -> Path:
     raise FileNotFoundError(f"No results.json at {path}")
 
 
-def _load(path: Path) -> Dict[str, Any]:
+def _load(path: Path) -> Any:
     with open(_resolve_results(path), encoding="utf-8") as f:
         return json.load(f)
 
 
-def _rounds(data: Dict[str, Any]) -> List[Dict[str, Any]]:
-    if isinstance(data.get("rounds"), list):
-        return data["rounds"]
-    # Some older dumps are a bare list of round dicts
+def _rounds(data: Any) -> List[Dict[str, Any]]:
+    # Older dumps are a bare list of round dicts
     if isinstance(data, list):
-        return data  # type: ignore[return-value]
+        return data
+    if isinstance(data, dict) and isinstance(data.get("rounds"), list):
+        return data["rounds"]
     return []
 
 
-def _final_loss(data: Dict[str, Any]) -> Optional[float]:
+def _final_loss(data: Any) -> Optional[float]:
     rounds = _rounds(data)
     if rounds:
         last = rounds[-1]
         for key in ("avg_loss", "loss", "train_loss"):
             if key in last and last[key] is not None:
                 return float(last[key])
-    for key in ("final_loss", "avg_loss"):
-        if key in data and data[key] is not None:
-            return float(data[key])
+    if isinstance(data, dict):
+        for key in ("final_loss", "avg_loss"):
+            if key in data and data[key] is not None:
+                return float(data[key])
     return None
 
 
-def _metric_pairs(
-    mps: Dict[str, Any], cuda: Dict[str, Any]
-) -> List[Tuple[str, float, float]]:
+def _metric_pairs(mps: Any, cuda: Any) -> List[Tuple[str, float, float]]:
     pairs: List[Tuple[str, float, float]] = []
     m_loss = _final_loss(mps)
     c_loss = _final_loss(cuda)

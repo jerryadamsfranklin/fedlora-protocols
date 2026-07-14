@@ -7,10 +7,9 @@ Coordinates training:
    a. Send global state to clients
    b. Clients train locally
    c. Aggregate client updates
-   d. Evaluate if needed
+   d. Optionally checkpoint
+   e. Evaluate if needed
 3. Save results
-
-CURSOR AI: Implement this file as specified.
 """
 
 import json
@@ -28,6 +27,12 @@ from .aggregators.flora import FLoRAAggregator
 from .aggregators.flexlora import FlexLoRAAggregator
 from .aggregators.reverse_adaptive import ReverseAdaptiveAggregator
 from .aggregators.two_phase import TwoPhaseAggregator
+from .checkpoint import (
+    capture_rng_state,
+    load_checkpoint,
+    restore_rng_state,
+    write_round_checkpoint,
+)
 
 
 class FederatedServer:
@@ -57,10 +62,16 @@ class FederatedServer:
         stability_threshold: float = 1.1,
         two_phase: Optional[Dict[str, Any]] = None,
         reverse_adaptive: Optional[Dict[str, Any]] = None,
+        save_every: int = 0,
+        keep_last_n: int = 3,
+        seed: Optional[int] = None,
     ):
         self.num_rounds = num_rounds
         self.eval_every = eval_every
         self.output_dir = output_dir
+        self.save_every = int(save_every or 0)
+        self.keep_last_n = int(keep_last_n or 3)
+        self.seed = seed
 
         # Initialize aggregator
         if aggregation_method not in self.AGGREGATORS:
@@ -95,12 +106,92 @@ class FederatedServer:
         self._b_only_broadcast_announced = False
         self.clients: List = []
         self.metrics_history = []
+        self._resume_start_round = 0  # 0-based index into training loop
+        self._total_upload_bytes = 0
+        self._total_download_bytes = 0
 
         os.makedirs(output_dir, exist_ok=True)
 
     def set_clients(self, clients: List) -> None:
         """Set the list of clients."""
         self.clients = clients
+
+    def _aggregator_state_dict(self) -> Dict[str, Any]:
+        if hasattr(self.aggregator, "state_dict"):
+            return self.aggregator.state_dict()
+        return {}
+
+    def _load_aggregator_state(self, state: Dict[str, Any]) -> None:
+        if state and hasattr(self.aggregator, "load_state_dict"):
+            self.aggregator.load_state_dict(state)
+
+    def load_checkpoint(self, path: str) -> Dict[str, Any]:
+        """
+        Restore server federated state from a checkpoint file / run dir.
+
+        Returns the loaded payload. Training will continue at
+        ``completed_rounds`` (1-based) + 1.
+        """
+        ckpt = load_checkpoint(path, map_location="cpu")
+        completed = int(ckpt["completed_rounds"])
+        if completed < 0 or completed > self.num_rounds:
+            raise ValueError(
+                f"Checkpoint completed_rounds={completed} incompatible with "
+                f"num_rounds={self.num_rounds}"
+            )
+        method = ckpt.get("aggregation_method")
+        if method is not None and method != self.aggregation_method:
+            raise ValueError(
+                f"Checkpoint method {method!r} != server method "
+                f"{self.aggregation_method!r}"
+            )
+
+        self.global_state = ckpt.get("global_state")
+        self._next_broadcast_state = ckpt.get("next_broadcast_state")
+        self._b_only_broadcast_announced = bool(
+            ckpt.get("b_only_broadcast_announced", False)
+        )
+        self.metrics_history = list(ckpt.get("metrics_history") or [])
+        self._total_upload_bytes = int(ckpt.get("total_upload_bytes", 0))
+        self._total_download_bytes = int(ckpt.get("total_download_bytes", 0))
+        self._load_aggregator_state(ckpt.get("aggregator") or {})
+        restore_rng_state(ckpt.get("rng"))
+        self._resume_start_round = completed  # next 0-based loop index
+        print(
+            f"Resumed from checkpoint after round {completed} "
+            f"(next round {completed + 1}/{self.num_rounds})"
+        )
+        return ckpt
+
+    def save_checkpoint(self, completed_rounds: int) -> str:
+        """Persist a round checkpoint under ``output_dir/checkpoints/``."""
+        path = write_round_checkpoint(
+            self.output_dir,
+            completed_rounds=completed_rounds,
+            keep_last_n=self.keep_last_n,
+            aggregation_method=self.aggregation_method,
+            num_rounds=self.num_rounds,
+            seed=self.seed,
+            global_state=self.global_state,
+            next_broadcast_state=self._next_broadcast_state,
+            b_only_broadcast_announced=self._b_only_broadcast_announced,
+            metrics_history=self.metrics_history,
+            total_upload_bytes=self._total_upload_bytes,
+            total_download_bytes=self._total_download_bytes,
+            aggregator=self._aggregator_state_dict(),
+            # Clients rebuild AdamW each local round — no durable optimizer.
+            optimizer_state={
+                "scope": "federated_round",
+                "note": (
+                    "FederatedClient creates a fresh AdamW each local training "
+                    "round; cross-round resume relies on adapter + aggregator + RNG."
+                ),
+                "state": {},
+            },
+            rng=capture_rng_state(),
+        )
+        print(f"  Checkpoint saved: {path} (completed_rounds={completed_rounds})")
+        return str(path)
 
     @staticmethod
     def _aggregate_layer_metrics(
@@ -131,12 +222,14 @@ class FederatedServer:
         print(f"\n{'='*60}")
         print(f"Federated Training: {self.aggregator.name}")
         print(f"Clients: {len(self.clients)}, Rounds: {self.num_rounds}")
+        if self._resume_start_round > 0:
+            print(f"Resuming at round {self._resume_start_round + 1}")
         print(f"{'='*60}\n")
 
-        total_upload_bytes = 0
-        total_download_bytes = 0
+        total_upload_bytes = self._total_upload_bytes
+        total_download_bytes = self._total_download_bytes
 
-        for round_num in range(self.num_rounds):
+        for round_num in range(self._resume_start_round, self.num_rounds):
             round_start = time.time()
             print(f"\n--- Round {round_num + 1}/{self.num_rounds} ---")
 
@@ -292,7 +385,14 @@ class FederatedServer:
                 print(f"  Eval: {eval_metrics}")
 
             self.metrics_history.append(metrics)
+            self._total_upload_bytes = total_upload_bytes
+            self._total_download_bytes = total_download_bytes
             print(f"  Loss: {avg_loss:.4f}, Time: {round_time:.1f}s")
+
+            # Mid-run checkpoint (Neurocomputing Phase 0 / C.8)
+            completed = round_num + 1
+            if self.save_every > 0 and completed % self.save_every == 0:
+                self.save_checkpoint(completed)
 
         # Save results
         self._save_results()
