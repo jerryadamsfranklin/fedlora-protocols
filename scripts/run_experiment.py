@@ -3,6 +3,8 @@ Run a single federated LoRA experiment.
 
 Usage:
     python scripts/run_experiment.py --config config/exp1_iid.yaml --method fedit
+    python scripts/run_experiment.py --config config/exp_reverse_adaptive_iid.yaml \\
+        --seed 42 --device cuda --tag phase0_cuda_validation
 
 CURSOR AI: Implement this script as specified.
 """
@@ -68,6 +70,37 @@ def load_config(path: str) -> Dict[str, Any]:
         config = _deep_merge(base, config)
 
     return config
+
+
+def resolve_device(requested: str | None) -> str:
+    """
+    Resolve training device for Neurocomputing Phase 0+.
+
+    --device cuda|mps|cpu selects explicitly (validated).
+    --device omit/"auto" keeps the historical default: MPS if available else CPU
+    (does not auto-pick CUDA, so Mac behavior stays unchanged).
+    """
+    choice = (requested or "auto").strip().lower()
+    if choice in ("", "auto"):
+        return "mps" if torch.backends.mps.is_available() else "cpu"
+    if choice == "cuda":
+        if not torch.cuda.is_available():
+            raise SystemExit(
+                "ERROR: --device cuda requested but torch.cuda.is_available() is False. "
+                "Check the GPU instance / PyTorch CUDA build before training."
+            )
+        return "cuda"
+    if choice == "mps":
+        if not torch.backends.mps.is_available():
+            raise SystemExit(
+                "ERROR: --device mps requested but torch.backends.mps.is_available() is False."
+            )
+        return "mps"
+    if choice == "cpu":
+        return "cpu"
+    raise SystemExit(
+        f"ERROR: unknown --device '{requested}'. Use one of: auto, cuda, mps, cpu."
+    )
 
 
 def apply_overrides(config: Dict[str, Any], overrides: list[str] | None) -> Dict[str, Any]:
@@ -181,6 +214,15 @@ def main() -> None:
         metavar="M",
         help="Total runs in the batch; adds run_N_of_M to the output path",
     )
+    parser.add_argument(
+        "--device",
+        default="auto",
+        choices=["auto", "cuda", "mps", "cpu"],
+        help=(
+            "Compute device. 'auto' = MPS if available else CPU (legacy default). "
+            "Use 'cuda' on NVIDIA hosts for Neurocomputing Phase 0 validation."
+        ),
+    )
     args = parser.parse_args()
     if (args.run_index is None) ^ (args.run_total is None):
         parser.error("--run-index and --run-total must be used together")
@@ -256,9 +298,9 @@ def main() -> None:
     print(f"Method: {method}")
     print(f"Output: {output_dir}")
 
-    # Device: MPS on Mac, else CPU
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
-    print(f"Device: {device}")
+    device = resolve_device(args.device)
+    config.setdefault("model", {})["device"] = device
+    print(f"Device: {device}  (requested={args.device})")
 
     train_cfg = config.get("training", {})
 
@@ -546,6 +588,7 @@ def main() -> None:
             "lora_r": args.lora_r,
             "num_clients": args.num_clients,
             "switch_threshold": args.switch_threshold,
+            "device": args.device,
         },
     }
     if args.run_index is not None:
