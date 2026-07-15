@@ -3,6 +3,8 @@ Run a single federated LoRA experiment.
 
 Usage:
     python scripts/run_experiment.py --config config/exp1_iid.yaml --method fedit
+    python scripts/run_experiment.py --config config/exp_reverse_adaptive_iid.yaml \\
+        --seed 42 --device cuda --tag phase0_cuda_validation
 
 CURSOR AI: Implement this script as specified.
 """
@@ -32,6 +34,7 @@ from transformers import DataCollatorForLanguageModeling
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.data.data_partitioner import DataPartitioner
+from src.federation.checkpoint import resolve_checkpoint_path, run_dir_from_checkpoint
 from src.federation.client import FederatedClient
 from src.federation.server import FederatedServer
 from src.models.lora_model import FederatedLoRAModel
@@ -68,6 +71,37 @@ def load_config(path: str) -> Dict[str, Any]:
         config = _deep_merge(base, config)
 
     return config
+
+
+def resolve_device(requested: str | None) -> str:
+    """
+    Resolve training device for Neurocomputing Phase 0+.
+
+    --device cuda|mps|cpu selects explicitly (validated).
+    --device omit/"auto" keeps the historical default: MPS if available else CPU
+    (does not auto-pick CUDA, so Mac behavior stays unchanged).
+    """
+    choice = (requested or "auto").strip().lower()
+    if choice in ("", "auto"):
+        return "mps" if torch.backends.mps.is_available() else "cpu"
+    if choice == "cuda":
+        if not torch.cuda.is_available():
+            raise SystemExit(
+                "ERROR: --device cuda requested but torch.cuda.is_available() is False. "
+                "Check the GPU instance / PyTorch CUDA build before training."
+            )
+        return "cuda"
+    if choice == "mps":
+        if not torch.backends.mps.is_available():
+            raise SystemExit(
+                "ERROR: --device mps requested but torch.backends.mps.is_available() is False."
+            )
+        return "mps"
+    if choice == "cpu":
+        return "cpu"
+    raise SystemExit(
+        f"ERROR: unknown --device '{requested}'. Use one of: auto, cuda, mps, cpu."
+    )
 
 
 def apply_overrides(config: Dict[str, Any], overrides: list[str] | None) -> Dict[str, Any]:
@@ -181,6 +215,31 @@ def main() -> None:
         metavar="M",
         help="Total runs in the batch; adds run_N_of_M to the output path",
     )
+    parser.add_argument(
+        "--device",
+        default="auto",
+        choices=["auto", "cuda", "mps", "cpu"],
+        help=(
+            "Compute device. 'auto' = MPS if available else CPU (legacy default). "
+            "Use 'cuda' on NVIDIA hosts for Neurocomputing Phase 0 validation."
+        ),
+    )
+    parser.add_argument(
+        "--resume",
+        default=None,
+        metavar="PATH",
+        help=(
+            "Resume from a checkpoint .pt, a checkpoints/ dir, or a run output dir "
+            "(uses checkpoints/latest.pt). Continues writing into that run directory."
+        ),
+    )
+    parser.add_argument(
+        "--save-every",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Override checkpointing.save_every (0 disables mid-run checkpoints).",
+    )
     args = parser.parse_args()
     if (args.run_index is None) ^ (args.run_total is None):
         parser.error("--run-index and --run-total must be used together")
@@ -216,34 +275,49 @@ def main() -> None:
             (config.get("methods") or ["fedit"])[0],
         )
 
-    # Set seed
+    # Set seed (numpy/random also, for partitioner + dataloaders)
+    import random as _random
+    import numpy as _np
+
+    _random.seed(args.seed)
+    _np.random.seed(args.seed)
     torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
 
     # Output directory (suffix for sweeps so names stay readable)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     exp_name = config.get("experiment", {}).get("name", "exp")
-    suffix = ""
-    if args.lora_r is not None:
-        suffix += f"_r{args.lora_r}"
-    if args.num_clients is not None:
-        suffix += f"_c{args.num_clients}"
-    # Organize runs under results/raw/<exp>/<method>/seed_<seed>/[run_NN_of_MM/]<timestamp>/
-    # Keep sweep context in the seed directory name for easy browsing.
-    seed_dir = f"seed_{args.seed}{suffix}" if suffix else f"seed_{args.seed}"
-    run_folder = None
-    if args.run_index is not None:
-        run_folder = f"run_{args.run_index:02d}_of_{args.run_total:02d}"
-    tag_folder = args.tag.strip() if isinstance(args.tag, str) and args.tag.strip() else None
-    output_dir = os.path.join(
-        "results",
-        "raw",
-        exp_name,
-        method,
-        seed_dir,
-        *( [run_folder] if run_folder else [] ),
-        *( [tag_folder] if tag_folder else [] ),
-        timestamp,
-    )
+    resume_ckpt_path = None
+    if args.resume:
+        resume_ckpt_path = resolve_checkpoint_path(args.resume)
+        output_dir = str(run_dir_from_checkpoint(resume_ckpt_path))
+        print(f"Resume: {resume_ckpt_path}")
+    else:
+        suffix = ""
+        if args.lora_r is not None:
+            suffix += f"_r{args.lora_r}"
+        if args.num_clients is not None:
+            suffix += f"_c{args.num_clients}"
+        # Organize runs under results/raw/<exp>/<method>/seed_<seed>/[run_NN_of_MM/]<timestamp>/
+        # Keep sweep context in the seed directory name for easy browsing.
+        seed_dir = f"seed_{args.seed}{suffix}" if suffix else f"seed_{args.seed}"
+        run_folder = None
+        if args.run_index is not None:
+            run_folder = f"run_{args.run_index:02d}_of_{args.run_total:02d}"
+        tag_folder = (
+            args.tag.strip() if isinstance(args.tag, str) and args.tag.strip() else None
+        )
+        output_dir = os.path.join(
+            "results",
+            "raw",
+            exp_name,
+            method,
+            seed_dir,
+            *([run_folder] if run_folder else []),
+            *([tag_folder] if tag_folder else []),
+            timestamp,
+        )
     os.makedirs(output_dir, exist_ok=True)
 
     if args.run_index is not None:
@@ -256,9 +330,9 @@ def main() -> None:
     print(f"Method: {method}")
     print(f"Output: {output_dir}")
 
-    # Device: MPS on Mac, else CPU
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
-    print(f"Device: {device}")
+    device = resolve_device(args.device)
+    config.setdefault("model", {})["device"] = device
+    print(f"Device: {device}  (requested={args.device})")
 
     train_cfg = config.get("training", {})
 
@@ -497,6 +571,13 @@ def main() -> None:
     fed_cfg = config.get("federated", {})
     two_phase_cfg = config.get("two_phase", {}) or {}
     reverse_adaptive_cfg = config.get("reverse_adaptive", {}) or {}
+    ckpt_cfg = config.get("checkpointing", {}) or {}
+    save_every = (
+        args.save_every
+        if args.save_every is not None
+        else int(ckpt_cfg.get("save_every", 0) or 0)
+    )
+    keep_last_n = int(ckpt_cfg.get("keep_last_n", 3) or 3)
 
     server = FederatedServer(
         aggregation_method=method,
@@ -510,11 +591,18 @@ def main() -> None:
         stability_threshold=reverse_adaptive_cfg.get("stability_threshold", 1.1),
         two_phase=two_phase_cfg,
         reverse_adaptive=reverse_adaptive_cfg,
+        save_every=save_every,
+        keep_last_n=keep_last_n,
+        seed=args.seed,
     )
     server.set_clients(clients)
 
     # Run training
     print("\n[4/4] Training...")
+    if save_every > 0:
+        print(f"Checkpointing: every {save_every} round(s), keep_last_n={keep_last_n}")
+    if resume_ckpt_path is not None:
+        server.load_checkpoint(str(resume_ckpt_path))
     results = server.train(eval_fn=eval_fn)
 
     # Persist merged config + run metadata for reproducibility
@@ -546,6 +634,9 @@ def main() -> None:
             "lora_r": args.lora_r,
             "num_clients": args.num_clients,
             "switch_threshold": args.switch_threshold,
+            "device": args.device,
+            "save_every": save_every,
+            "resume": str(resume_ckpt_path) if resume_ckpt_path else None,
         },
     }
     if args.run_index is not None:

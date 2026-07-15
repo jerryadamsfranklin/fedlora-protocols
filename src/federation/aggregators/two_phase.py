@@ -139,3 +139,28 @@ class TwoPhaseAggregator:
         self.flora_comm_per_round = None
         self.ffa_comm_per_round = None
         self.total_comm_mb = 0.0
+
+    def state_dict(self) -> Dict[str, Any]:
+        return {
+            "round_count": self.round_count,
+            "current_phase": self.current_phase,
+            "phase1_rounds": self.phase1_rounds,
+            "phase2_rounds": self.phase2_rounds,
+            "flora_comm_per_round": self.flora_comm_per_round,
+            "ffa_comm_per_round": self.ffa_comm_per_round,
+            "total_comm_mb": self.total_comm_mb,
+            "phase_boundary": self.phase_boundary,
+            "max_rank": self.max_rank,
+            "ffa_lora": self.ffa_lora.state_dict(),
+        }
+
+    def load_state_dict(self, state: Dict[str, Any]) -> None:
+        self.round_count = int(state.get("round_count", 0))
+        self.current_phase = int(state.get("current_phase", 1))
+        self.phase1_rounds = int(state.get("phase1_rounds", 0))
+        self.phase2_rounds = int(state.get("phase2_rounds", 0))
+        self.flora_comm_per_round = state.get("flora_comm_per_round")
+        self.ffa_comm_per_round = state.get("ffa_comm_per_round")
+        self.total_comm_mb = float(state.get("total_comm_mb", 0.0))
+        if "ffa_lora" in state:
+            self.ffa_lora.load_state_dict(state["ffa_lora"])

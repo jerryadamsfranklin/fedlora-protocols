@@ -234,3 +234,42 @@ class ReverseAdaptiveAggregator:
         self.ffa_comm_per_round = None
         self._last_fr = 0.0
         self.events.clear()
+
+    def state_dict(self) -> Dict[str, Any]:
+        return {
+            "round_count": self.round_count,
+            "current_mode": self.current_mode,
+            "switch_round": self.switch_round,
+            "loss_history": list(self.loss_history),
+            "revert_count": self.revert_count,
+            "flora_rounds": self.flora_rounds,
+            "ffa_lora_rounds": self.ffa_lora_rounds,
+            "total_comm_mb": self.total_comm_mb,
+            "flora_comm_per_round": self.flora_comm_per_round,
+            "ffa_comm_per_round": self.ffa_comm_per_round,
+            "_last_fr": self._last_fr,
+            "events": list(self.events),
+            "ffa_lora": self.ffa_lora.state_dict(),
+            # Hyperparameters kept for sanity checks on resume
+            "switch_threshold": self.switch_threshold,
+            "warmup_rounds": self.warmup_rounds,
+            "transition_rounds": self.transition_rounds,
+            "stability_threshold": self.stability_threshold,
+            "max_rank": self.max_rank,
+        }
+
+    def load_state_dict(self, state: Dict[str, Any]) -> None:
+        self.round_count = int(state.get("round_count", 0))
+        self.current_mode = state.get("current_mode", "FLoRA")
+        self.switch_round = state.get("switch_round")
+        self.loss_history = list(state.get("loss_history") or [])
+        self.revert_count = int(state.get("revert_count", 0))
+        self.flora_rounds = int(state.get("flora_rounds", 0))
+        self.ffa_lora_rounds = int(state.get("ffa_lora_rounds", 0))
+        self.total_comm_mb = float(state.get("total_comm_mb", 0.0))
+        self.flora_comm_per_round = state.get("flora_comm_per_round")
+        self.ffa_comm_per_round = state.get("ffa_comm_per_round")
+        self._last_fr = float(state.get("_last_fr", 0.0))
+        self.events = list(state.get("events") or [])
+        if "ffa_lora" in state:
+            self.ffa_lora.load_state_dict(state["ffa_lora"])

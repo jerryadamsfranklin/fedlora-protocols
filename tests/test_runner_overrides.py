@@ -1,4 +1,25 @@
-from scripts.run_experiment import apply_overrides
+import pytest
+import torch
+
+from scripts.run_experiment import apply_overrides, resolve_device
+
+
+def test_resolve_device_auto_matches_legacy():
+    expected = "mps" if torch.backends.mps.is_available() else "cpu"
+    assert resolve_device(None) == expected
+    assert resolve_device("auto") == expected
+
+
+def test_resolve_device_cpu():
+    assert resolve_device("cpu") == "cpu"
+
+
+def test_resolve_device_cuda_without_gpu_exits():
+    if torch.cuda.is_available():
+        assert resolve_device("cuda") == "cuda"
+    else:
+        with pytest.raises(SystemExit):
+            resolve_device("cuda")
 
 
 def test_apply_overrides_simple():

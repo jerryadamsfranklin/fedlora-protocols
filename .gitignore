@@ -78,6 +78,9 @@ docs/stage5.md
 docs/stage1_pathB.md
 docs/stage4_setup.md
 
+# Neurocomputing implementation guides (local maintainer copies; do not track)
+docs/neurocomputing/
+
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed
 figures/**/*.tif
 figures/**/*.psd

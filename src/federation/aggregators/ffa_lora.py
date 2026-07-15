@@ -98,6 +98,25 @@ class FFALoRAAggregator:
             return {}
         return {k: v.clone() for k, v in self.frozen_a.items()}
 
+    def state_dict(self) -> Dict:
+        """Serialize frozen-A cache for federated checkpoints."""
+        frozen = {}
+        if self.frozen_a is not None:
+            frozen = {k: v.detach().cpu().clone() for k, v in self.frozen_a.items()}
+        return {
+            "initialized": bool(self.initialized),
+            "frozen_a": frozen,
+        }
+
+    def load_state_dict(self, state: Dict) -> None:
+        self.initialized = bool(state.get("initialized", False))
+        frozen = state.get("frozen_a") or {}
+        if self.initialized and frozen:
+            self.frozen_a = {k: v.clone() for k, v in frozen.items()}
+        else:
+            self.frozen_a = None
+            self.initialized = False
+
     def should_upload_b_only(self) -> bool:
         """
         Whether clients should upload B-only tensors for this round.
