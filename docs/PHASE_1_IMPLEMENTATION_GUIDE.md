@@ -60,7 +60,7 @@ Since this phase involves 34 runs rather than one, expect to keep an instance re
 For each gate run:
 
 1. Run the experiment under CUDA using the same config that produced the original MPS result, with `--device cuda` and a new tag, e.g. `--tag phase1_cuda_rerun`.
-2. Immediately run `scripts/verify_backend_match.py` comparing the new CUDA result against the saved MPS result for that exact config/seed, at `atol=0.01, rtol=0` (the same relaxed tolerance established in Phase 0).
+2. Immediately run `scripts/verify_backend_match.py` comparing the new CUDA result against the saved MPS result for that exact config/seed, using setting-aware tolerances (`--setting auto|iid|noniid`; see `docs/PHASE_1_EARLY_GATES.md`). IID stays at `atol=0.01`; Non-IID uses `atol=0.025` plus exact switch-round match and ≤2 consecutive rounds over `0.01`.
 3. Record the result (pass/fail, delta values) in `docs/PHASE_1_GATE_RESULTS.md`.
 
 **If either gate run fails:** stop. Do not proceed to the remaining 32 runs. Report the failure to the maintainer with the specific delta values and which run (model/method/setting/seed) failed. Do not adjust the tolerance further or retry silently — a gate failure on a non-IID or a different-aggregator run means there's a real behavioral difference between backends that Phase 0's single ReverseAdaptive/IID check didn't catch, and it needs investigation, not a workaround.

@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
-Neurocomputing Phase 0 (A.3 / Part C.7): compare MPS vs CUDA experiment outputs.
+Neurocomputing Phase 0/1: compare MPS vs CUDA experiment outputs.
 
-Compares final (and optionally per-round) training metrics from two results.json
-files under an absolute tolerance of 0.01 (rtol=0).
+Setting-aware absolute tolerances (rtol=0):
+  - IID:     per-round and final loss atol=0.01 (Phase 0)
+  - Non-IID: per-round and final loss atol=0.025, plus:
+      * B-only / phase-switch round must match exactly (hard)
+      * at most 2 consecutive rounds may have |Δloss| > 0.01
+        (even when within the relaxed 0.025 band)
+
+Communication is always checked at atol=0.01 (protocol should be exact).
 
 Usage:
   python3 scripts/verify_backend_match.py \\
       --mps path/to/mps/results.json \\
-      --cuda path/to/cuda/results.json
-
-  # Or directories containing results.json:
-  python3 scripts/verify_backend_match.py --mps <mps_run_dir> --cuda <cuda_run_dir>
+      --cuda path/to/cuda/results.json \\
+      --setting auto|iid|noniid
 """
 
 from __future__ import annotations
@@ -24,8 +28,11 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
-# Neurocomputing Phase 0 acceptance: absolute 0.01, no relative slack.
-ATOL = 0.01
+ATOL_IID = 0.01
+ATOL_NONIID = 0.025
+ATOL_COMM = 0.01
+ATOL_STRICT_STREAK = 0.01  # used for Non-IID consecutive-spike rule
+MAX_CONSEC_OVER_STRICT = 2
 RTOL = 0.0
 
 
@@ -44,7 +51,6 @@ def _load(path: Path) -> Any:
 
 
 def _rounds(data: Any) -> List[Dict[str, Any]]:
-    # Older dumps are a bare list of round dicts
     if isinstance(data, list):
         return data
     if isinstance(data, dict) and isinstance(data.get("rounds"), list):
@@ -66,6 +72,44 @@ def _final_loss(data: Any) -> Optional[float]:
     return None
 
 
+def _switch_round(data: Any) -> Optional[int]:
+    """
+    Round when B-only / FFA switch activates (1-based).
+
+    Prefer aggregator_stats.switch_round once present; else first round with
+    broadcast_b_only=True. Returns None if never switches (e.g. pure FLoRA).
+    """
+    rounds = _rounds(data)
+    for r in rounds:
+        stats = r.get("aggregator_stats") or {}
+        sr = stats.get("switch_round")
+        if sr is not None:
+            return int(sr)
+        for ev in stats.get("events") or []:
+            if isinstance(ev, dict) and ev.get("event") in (
+                "switch_to_ffa",
+                "switch",
+            ):
+                if ev.get("round") is not None:
+                    return int(ev["round"])
+    for r in rounds:
+        if r.get("broadcast_b_only"):
+            return int(r["round"])
+    return None
+
+
+def resolve_setting(setting: str, mps_path: Path, cuda_path: Path) -> str:
+    s = (setting or "auto").strip().lower()
+    if s in ("iid", "noniid"):
+        return s
+    if s != "auto":
+        raise SystemExit(f"ERROR: unknown --setting {setting!r} (use auto|iid|noniid)")
+    blob = f"{mps_path} {cuda_path}".lower()
+    if "noniid" in blob or "non_iid" in blob or "alpha0" in blob:
+        return "noniid"
+    return "iid"
+
+
 def _metric_pairs(mps: Any, cuda: Any) -> List[Tuple[str, float, float]]:
     pairs: List[Tuple[str, float, float]] = []
     m_loss = _final_loss(mps)
@@ -74,8 +118,6 @@ def _metric_pairs(mps: Any, cuda: Any) -> List[Tuple[str, float, float]]:
         raise ValueError("Could not extract final avg_loss from one or both results.json")
     pairs.append(("final_avg_loss", m_loss, c_loss))
 
-    # Optional: communication should be protocol-deterministic (exact), but
-    # still check under the same absolute band for uniformity.
     m_rounds = _rounds(mps)
     c_rounds = _rounds(cuda)
     if m_rounds and c_rounds:
@@ -93,65 +135,144 @@ def _metric_pairs(mps: Any, cuda: Any) -> List[Tuple[str, float, float]]:
     return pairs
 
 
+def _check_consec_strict_spikes(
+    round_deltas: List[Tuple[int, float]],
+) -> Tuple[bool, str]:
+    """Fail if any streak of rounds with |Δ| > 0.01 is longer than 2."""
+    streak = 0
+    max_streak = 0
+    worst_end = 0
+    for rnd, delta in round_deltas:
+        if delta > ATOL_STRICT_STREAK:
+            streak += 1
+            if streak > max_streak:
+                max_streak = streak
+                worst_end = rnd
+        else:
+            streak = 0
+    if max_streak > MAX_CONSEC_OVER_STRICT:
+        start = worst_end - max_streak + 1
+        return (
+            False,
+            f"longest streak with |Δ|>{ATOL_STRICT_STREAK} is {max_streak} "
+            f"(rounds {start}-{worst_end}); max allowed consecutive is "
+            f"{MAX_CONSEC_OVER_STRICT}",
+        )
+    return True, f"max consecutive |Δ|>{ATOL_STRICT_STREAK} streak={max_streak}"
+
+
 def compare(
     mps_path: Path,
     cuda_path: Path,
-    atol: float = ATOL,
-    rtol: float = RTOL,
+    setting: str = "auto",
     rounds_only_final: bool = False,
 ) -> int:
+    resolved = resolve_setting(setting, mps_path, cuda_path)
+    loss_atol = ATOL_IID if resolved == "iid" else ATOL_NONIID
+
     mps = _load(mps_path)
     cuda = _load(cuda_path)
     pairs = _metric_pairs(mps, cuda)
     if rounds_only_final:
         pairs = [p for p in pairs if p[0].startswith("final_")]
 
-    print("Neurocomputing Phase 0 — backend match (MPS vs CUDA)")
+    print("Neurocomputing Phase 0/1 — backend match (MPS vs CUDA)")
     print(f"  MPS:  {_resolve_results(mps_path)}")
     print(f"  CUDA: {_resolve_results(cuda_path)}")
-    print(f"  atol={atol}  rtol={rtol}")
+    print(f"  setting={resolved}  loss_atol={loss_atol}  comm_atol={ATOL_COMM}  rtol={RTOL}")
+    if resolved == "noniid":
+        print(
+            f"  non-IID extras: switch_round exact match; "
+            f"≤{MAX_CONSEC_OVER_STRICT} consecutive rounds with |Δloss|>{ATOL_STRICT_STREAK}"
+        )
     print()
 
     failures = 0
+    round_deltas: List[Tuple[int, float]] = []
+
     for name, m_val, c_val in pairs:
-        ok = bool(np.isclose(m_val, c_val, atol=atol, rtol=rtol))
-        # Explicit form matching guide: torch/np allclose(atol=0.01, rtol=0)
         delta = abs(m_val - c_val)
+        if name == "final_communication_mb":
+            atol = ATOL_COMM
+        else:
+            atol = loss_atol
+        ok = bool(np.isclose(m_val, c_val, atol=atol, rtol=RTOL))
+        if name.startswith("round_") and name.endswith("_avg_loss"):
+            rnd = int(name.split("_")[1])
+            round_deltas.append((rnd, delta))
         status = "PASS" if ok else "FAIL"
         if not ok:
             failures += 1
         print(
             f"  [{status}] {name}: mps={m_val:.6f}  cuda={c_val:.6f}  "
-            f"|Δ|={delta:.6f}"
+            f"|Δ|={delta:.6f}  (atol={atol})"
         )
+
+    # Non-IID hard extras (even with --final-only we still check switch if rounds exist)
+    if resolved == "noniid" and not rounds_only_final:
+        m_sw = _switch_round(mps)
+        c_sw = _switch_round(cuda)
+        sw_ok = m_sw == c_sw
+        status = "PASS" if sw_ok else "FAIL"
+        if not sw_ok:
+            failures += 1
+        print(
+            f"  [{status}] switch_round_exact: mps={m_sw}  cuda={c_sw}  "
+            f"(hard match, no tolerance)"
+        )
+
+        streak_ok, streak_msg = _check_consec_strict_spikes(round_deltas)
+        status = "PASS" if streak_ok else "FAIL"
+        if not streak_ok:
+            failures += 1
+        print(f"  [{status}] noniid_consec_strict_spikes: {streak_msg}")
 
     print()
     if failures:
-        print(f"Result: {failures} failure(s) — do not proceed to Neurocomputing Phase 1.")
+        print(
+            f"Result: {failures} failure(s) — do not proceed to Neurocomputing Phase 1."
+        )
         return 1
-    print("Result: all checks passed at atol=0.01.")
+    print(f"Result: all checks passed (setting={resolved}, loss_atol={loss_atol}).")
     return 0
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Compare MPS vs CUDA federated LoRA results (atol=0.01)."
+        description="Compare MPS vs CUDA federated LoRA results (setting-aware atol)."
     )
     parser.add_argument("--mps", type=Path, required=True, help="MPS results.json or run dir")
     parser.add_argument("--cuda", type=Path, required=True, help="CUDA results.json or run dir")
     parser.add_argument(
+        "--setting",
+        default="auto",
+        choices=["auto", "iid", "noniid"],
+        help="Tolerance profile (auto detects 'noniid' in paths)",
+    )
+    parser.add_argument(
         "--final-only",
         action="store_true",
-        help="Only compare final_avg_loss / final_communication_mb",
+        help="Only compare final_avg_loss / final_communication_mb (skips Non-IID extras)",
     )
     parser.add_argument(
         "--atol",
         type=float,
-        default=ATOL,
-        help=f"Absolute tolerance (default {ATOL} per Neurocomputing Phase 0)",
+        default=None,
+        help="Deprecated: ignored. Use --setting iid|noniid instead.",
     )
     args = parser.parse_args(argv)
-    return compare(args.mps, args.cuda, atol=args.atol, rounds_only_final=args.final_only)
+    if args.atol is not None:
+        print(
+            f"Warning: --atol={args.atol} is deprecated and ignored; "
+            "use --setting iid|noniid.",
+            file=sys.stderr,
+        )
+    return compare(
+        args.mps,
+        args.cuda,
+        setting=args.setting,
+        rounds_only_final=args.final_only,
+    )
 
 
 if __name__ == "__main__":

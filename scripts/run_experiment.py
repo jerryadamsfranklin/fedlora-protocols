@@ -170,7 +170,36 @@ def main() -> None:
     parser.add_argument(
         "--method", default=None, help="Override aggregation method"
     )
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help=(
+            "Legacy single seed: used for both data partitioning and training RNG "
+            "unless --data-seed / --run-seed are set."
+        ),
+    )
+    parser.add_argument(
+        "--data-seed",
+        type=int,
+        default=None,
+        metavar="N",
+        help=(
+            "Seed for data partitioning only (Dirichlet / IID splits). "
+            "Defaults to --seed. Keep fixed across diagnostics that vary --run-seed."
+        ),
+    )
+    parser.add_argument(
+        "--run-seed",
+        type=int,
+        default=None,
+        metavar="N",
+        help=(
+            "Seed for training / init RNG (torch, numpy, python random). "
+            "Defaults to --seed. Vary this while holding --data-seed fixed "
+            "to test switch-round stability (Phase 1 #17 diagnostic)."
+        ),
+    )
     parser.add_argument(
         "--tag",
         default=None,
@@ -275,15 +304,18 @@ def main() -> None:
             (config.get("methods") or ["fedit"])[0],
         )
 
-    # Set seed (numpy/random also, for partitioner + dataloaders)
+    # Separate data-partition seed from training RNG (Phase 1 #17 / Phase 2 Part 0).
+    data_seed = int(args.data_seed if args.data_seed is not None else args.seed)
+    run_seed = int(args.run_seed if args.run_seed is not None else args.seed)
     import random as _random
     import numpy as _np
 
-    _random.seed(args.seed)
-    _np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
+    # Seed RNGs for partitioning / any pre-train randomness with data_seed first.
+    _random.seed(data_seed)
+    _np.random.seed(data_seed)
+    torch.manual_seed(data_seed)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+        torch.cuda.manual_seed_all(data_seed)
 
     # Output directory (suffix for sweeps so names stay readable)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -299,9 +331,10 @@ def main() -> None:
             suffix += f"_r{args.lora_r}"
         if args.num_clients is not None:
             suffix += f"_c{args.num_clients}"
-        # Organize runs under results/raw/<exp>/<method>/seed_<seed>/[run_NN_of_MM/]<timestamp>/
-        # Keep sweep context in the seed directory name for easy browsing.
-        seed_dir = f"seed_{args.seed}{suffix}" if suffix else f"seed_{args.seed}"
+        if args.run_seed is not None and run_seed != data_seed:
+            suffix += f"_run{run_seed}"
+        # Organize under seed_<data_seed>/… so partition identity stays browsable.
+        seed_dir = f"seed_{data_seed}{suffix}" if suffix else f"seed_{data_seed}"
         run_folder = None
         if args.run_index is not None:
             run_folder = f"run_{args.run_index:02d}_of_{args.run_total:02d}"
@@ -519,7 +552,7 @@ def main() -> None:
         )
 
     partitioner = DataPartitioner(
-        dataset_for_partition, num_clients=num_clients, seed=args.seed
+        dataset_for_partition, num_clients=num_clients, seed=data_seed
     )
 
     if partition_method == "iid":
@@ -542,6 +575,14 @@ def main() -> None:
         )
 
     print(f"Partition stats: {partitioner.get_stats(client_datasets)}")
+    print(f"Seeds: data_seed={data_seed}  run_seed={run_seed}")
+
+    # Re-seed for training / client init so --run-seed can vary independently.
+    _random.seed(run_seed)
+    _np.random.seed(run_seed)
+    torch.manual_seed(run_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(run_seed)
 
     # Create clients
     print("\n[3/4] Creating clients...")
@@ -593,7 +634,7 @@ def main() -> None:
         reverse_adaptive=reverse_adaptive_cfg,
         save_every=save_every,
         keep_last_n=keep_last_n,
-        seed=args.seed,
+        seed=run_seed,
     )
     server.set_clients(clients)
 
@@ -621,7 +662,9 @@ def main() -> None:
     run_meta = {
         "experiment": exp_name,
         "method": method,
-        "seed": args.seed,
+        "seed": data_seed,  # partition identity (legacy field)
+        "data_seed": data_seed,
+        "run_seed": run_seed,
         "timestamp": timestamp,
         "device": device,
         "output_dir": output_dir,
@@ -634,6 +677,8 @@ def main() -> None:
             "lora_r": args.lora_r,
             "num_clients": args.num_clients,
             "switch_threshold": args.switch_threshold,
+            "data_seed": data_seed,
+            "run_seed": run_seed,
             "device": args.device,
             "save_every": save_every,
             "resume": str(resume_ckpt_path) if resume_ckpt_path else None,
