@@ -5,8 +5,9 @@ Usage:
     python scripts/evaluate_checkpoint.py \
         --checkpoint results/raw/exp_two_phase_k8/two_phase/seed_42/<run_id>/final_adapter_state.pt \
         --base-model TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
-        --benchmarks mmlu arc_easy boolq \
+        --benchmarks mmlu arc_easy boolq hellaswag \
         --num-examples 500 \
+        --device cuda \
         --output downstream_results.json
 """
 
@@ -50,6 +51,12 @@ def main() -> None:
         nargs="+",
         default=["q_proj", "k_proj", "v_proj", "o_proj"],
     )
+    parser.add_argument(
+        "--device",
+        default="auto",
+        choices=["auto", "cuda", "mps", "cpu"],
+        help="Inference device. 'auto' prefers CUDA, then MPS, else CPU.",
+    )
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
@@ -58,7 +65,23 @@ def main() -> None:
             "Specify exactly one of --checkpoint or --no-adapter."
         )
 
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
+    if args.device == "cuda":
+        if not torch.cuda.is_available():
+            raise SystemExit("ERROR: --device cuda requested but CUDA is unavailable.")
+        device = "cuda"
+    elif args.device == "mps":
+        if not torch.backends.mps.is_available():
+            raise SystemExit("ERROR: --device mps requested but MPS is unavailable.")
+        device = "mps"
+    elif args.device == "cpu":
+        device = "cpu"
+    else:
+        if torch.cuda.is_available():
+            device = "cuda"
+        elif torch.backends.mps.is_available():
+            device = "mps"
+        else:
+            device = "cpu"
     print(f"Device: {device}")
     print(f"Loading base model: {args.base_model}")
 

@@ -1,0 +1,17 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_flora_noniid_alpha01"
+  description: "FLoRA baseline with Dirichlet non-IID (alpha=0.1)"
+
+federated:
+  aggregation_method: "flora"
+
+data:
+  dataset_name: "tatsu-lab/alpaca"
+  dataset_split: "train"
+  max_samples: 3000
+  partition_method: "label_skew"
+  partition_alpha: 0.1
+  eval_split: null
+  eval_samples: 300

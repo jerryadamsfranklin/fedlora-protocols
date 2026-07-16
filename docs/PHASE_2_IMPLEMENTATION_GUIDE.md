@@ -103,11 +103,22 @@ Run downstream evaluation (MMLU, ARC-Easy, BoolQ, HellaSwag) on all resulting ch
 | ReverseAdaptive | Non-IID alpha=0.5 | 42, 123, 456 | A100 40GB |
 | ReverseAdaptive | Non-IID alpha=0.1 | 42, 123, 456 | A100 40GB |
 
-### 3.3 A note on the baseline non-IID coverage gap (raised at manifest review)
+### 3.3 Baseline non-IID coverage gap — DECIDED: option (b)
 
-The existing suite tests FLoRA and Two-Phase at Non-IID alpha=0.5 only (never alpha=0.1), and never at all for LLaMA-3.2-3B. This phase, as planned, adds Non-IID only for ReverseAdaptive at 8B. That means the "ReverseAdaptive is more robust under non-IID" claim still has no baseline comparison at the severe alpha=0.1 setting, at any scale.
+**Maintainer decision (2026-07-16): option (b).**
 
-This is a decision point flagged for the maintainer, NOT something to silently proceed past: either (a) accept the asymmetry and explicitly scope the robustness claim to "ReverseAdaptive maintains quality under severe heterogeneity" without a comparative "more than baselines" framing, or (b) add FLoRA and Two-Phase alpha=0.1 runs at TinyLlama scale (cheap, ~6 runs, ~$1-2) to enable a fair comparison. Do not run 3.2 until the maintainer has decided (a) or (b), because the answer determines whether baseline alpha=0.1 runs need to be added to this phase's matrix.
+Add **6** TinyLlama-1.1B baseline runs — FLoRA and Two-Phase K=8 × Non-IID
+**α=0.1** × seeds **42 / 123 / 456**. Scope is strict: TinyLlama only, α=0.1 only,
+no other scales. Full downstream eval (MMLU, ARC-Easy, BoolQ, HellaSwag) is
+**required** on all 6 — not training loss alone. Run on RTX 4090; fold into the
+master CSV as a Phase 1 TinyLlama-tier extension. Does **not** block 8B setup
+(parallel OK). Report the 6 results (downstream + final communication MB) before
+drafting the non-IID robustness section.
+
+Operational docs: `docs/PHASE_2_PART33B_BASELINES.md`,
+`docs/phase2_part33b_manifest.csv`, `scripts/run_part33b_alpha01_baselines.sh`.
+Configs: `config/exp_flora_noniid_alpha01.yaml`,
+`config/exp_two_phase_k8_noniid_alpha01.yaml`.
 
 ---
 
@@ -137,6 +148,6 @@ Do not proceed to Phase 3 (Dolly-15k second dataset) until the maintainer review
 
 - Do not start 8B GPU runs before confirming HuggingFace access (Part 2.1) and the LoRA target-module consistency check (Part 1).
 - Do not silently switch precision to bf16 to fit VRAM without disclosing it — it introduces a cross-scale confound.
-- Do not run the baseline non-IID alpha=0.1 additions (Part 3.3) until the maintainer picks option (a) or (b).
+- Do not expand Part 3.3(b) beyond the 6 TinyLlama α=0.1 FLoRA/Two-Phase runs without a new maintainer decision.
 - Do not skip the #17 diagnostic (Part 0) before writing the non-IID robustness section — its outcome determines what that section can claim.
 - Do not add Dolly-15k, FFA-LoRA, or FedIT here — those are Phases 3 and 4.
