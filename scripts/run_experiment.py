@@ -379,6 +379,7 @@ def main() -> None:
         ),
         lora_r=config.get("lora", {}).get("r", 16),
         lora_alpha=config.get("lora", {}).get("lora_alpha", 32),
+        target_modules=config.get("lora", {}).get("target_modules"),
         device=device,
         torch_dtype=torch_dtype,
         lora_param_dtype=train_cfg.get("lora_param_dtype"),

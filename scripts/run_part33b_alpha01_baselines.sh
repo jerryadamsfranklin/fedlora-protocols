@@ -103,17 +103,18 @@ for exp, method in [
         rounds = r if isinstance(r, list) else r["rounds"]
         last = rounds[-1]
         sw = (last.get("aggregator_stats") or {}).get("switch_round")
+        first_b_only = next((r["round"] for r in rounds if r.get("broadcast_b_only")), None)
         ds_path = Path("results/downstream") / exp / method / f"seed_{seed}" / tag / "downstream_results.json"
         ds = {}
         if ds_path.is_file():
             bms = json.loads(ds_path.read_text()).get("benchmarks", {})
             ds = {k: bms[k]["accuracy"] for k in ("mmlu", "arc_easy", "boolq", "hellaswag") if k in bms}
-        rows.append((exp, method, seed, last["communication_mb"], last["avg_loss"], sw, ds, runs[-1]))
+        rows.append((exp, method, seed, last["communication_mb"], last["avg_loss"], sw, first_b_only, ds, runs[-1]))
 
-print(f"{'exp':40} {'seed':4} {'comm_mb':>10} {'loss':>8} {'sw':>4}  mmlu  arc  boolq  hella")
-for exp, method, seed, comm, loss, sw, ds, path in rows:
+print(f"{'exp':40} {'seed':4} {'comm_mb':>10} {'loss':>8} {'sw':>4} {'bstart':>6}  mmlu  arc  boolq  hella")
+for exp, method, seed, comm, loss, sw, bstart, ds, path in rows:
     print(
-        f"{exp:40} {seed:4d} {comm:10.3f} {loss:8.4f} {str(sw):>4}  "
+        f"{exp:40} {seed:4d} {comm:10.3f} {loss:8.4f} {str(sw):>4} {str(bstart):>6}  "
         f"{ds.get('mmlu', float('nan')):5.3f} {ds.get('arc_easy', float('nan')):5.3f} "
         f"{ds.get('boolq', float('nan')):5.3f} {ds.get('hellaswag', float('nan')):5.3f}"
     )
