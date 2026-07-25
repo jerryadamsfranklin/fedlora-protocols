@@ -1,0 +1,39 @@
+# LLaMA-3.1-8B base configuration. Same LoRA targets/rank as TinyLlama and
+# LLaMA-3.2-3B so the cross-scale B-only fraction (38.46%) stays valid.
+# Phase 2 Part 1 clearance: q/k/v/o only, r=16, no MLP.
+
+_inherit: base_config_4layers.yaml
+
+model:
+  name: "meta-llama/Meta-Llama-3.1-8B"
+  torch_dtype: "float16"
+  device: "cuda"
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.1
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+  bias: "none"
+
+training:
+  local_epochs: 1
+  batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 0.0001
+  max_seq_length: 256
+  # Train LoRA adapters in fp32 while the frozen base stays fp16.
+  # Prefer float32 for cross-scale consistency with 1.1B / 3.2B; revisit if VRAM forces bf16.
+  lora_param_dtype: "float32"
+
+federated:
+  num_rounds: 15
+  num_clients: 10
+  clients_per_round: 10
+
+evaluation:
+  eval_every: 5

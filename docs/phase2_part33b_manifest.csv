@@ -1,0 +1,7 @@
+exec_order,model,method,data_setting,seed,experiment,config,tag,device,notes
+1,TinyLlama-1.1B,flora,noniid_alpha0.1,42,exp_flora_noniid_alpha01,config/exp_flora_noniid_alpha01.yaml,phase1b_alpha01_baselines,cuda,Part 3.3(b) baseline; full downstream required
+2,TinyLlama-1.1B,flora,noniid_alpha0.1,123,exp_flora_noniid_alpha01,config/exp_flora_noniid_alpha01.yaml,phase1b_alpha01_baselines,cuda,Part 3.3(b) baseline; full downstream required
+3,TinyLlama-1.1B,flora,noniid_alpha0.1,456,exp_flora_noniid_alpha01,config/exp_flora_noniid_alpha01.yaml,phase1b_alpha01_baselines,cuda,Part 3.3(b) baseline; full downstream required
+4,TinyLlama-1.1B,two_phase,noniid_alpha0.1,42,exp_two_phase_k8_noniid_alpha01,config/exp_two_phase_k8_noniid_alpha01.yaml,phase1b_alpha01_baselines,cuda,Part 3.3(b) baseline; full downstream required
+5,TinyLlama-1.1B,two_phase,noniid_alpha0.1,123,exp_two_phase_k8_noniid_alpha01,config/exp_two_phase_k8_noniid_alpha01.yaml,phase1b_alpha01_baselines,cuda,Part 3.3(b) baseline; full downstream required
+6,TinyLlama-1.1B,two_phase,noniid_alpha0.1,456,exp_two_phase_k8_noniid_alpha01,config/exp_two_phase_k8_noniid_alpha01.yaml,phase1b_alpha01_baselines,cuda,Part 3.3(b) baseline; full downstream required

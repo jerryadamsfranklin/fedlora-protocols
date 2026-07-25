@@ -1,7 +1,8 @@
 torch==2.2.0
 torchvision
 torchaudio
-transformers==4.40.0
+# Llama-3.x rope_scaling needs >=4.43; keep <5 (5.x requires torch>=2.4)
+transformers==4.45.2
 accelerate==0.29.0
 peft==0.10.0
 datasets==2.18.0
