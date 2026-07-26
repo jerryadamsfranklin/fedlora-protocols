@@ -4,6 +4,11 @@ experiment:
   name: "exp_fedit_iid"
   description: "FedIT baseline on Alpaca-3k, IID"
 
+lora:
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+
 federated:
   aggregation_method: "fedit"
 

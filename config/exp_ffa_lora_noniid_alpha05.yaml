@@ -4,6 +4,11 @@ experiment:
   name: "exp_ffa_lora_noniid_alpha05"
   description: "FFA-LoRA baseline on Alpaca-3k, non-IID alpha=0.5"
 
+lora:
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+
 federated:
   aggregation_method: "ffa_lora"
 

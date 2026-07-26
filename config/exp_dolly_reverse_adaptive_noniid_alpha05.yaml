@@ -4,6 +4,11 @@ experiment:
   name: "exp_dolly_reverse_adaptive_noniid_alpha05"
   description: "ReverseAdaptive on Dolly-15k subset (3k), non-IID alpha=0.5"
 
+lora:
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+
 federated:
   aggregation_method: "reverse_adaptive"
 

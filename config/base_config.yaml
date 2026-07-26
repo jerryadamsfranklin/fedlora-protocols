@@ -28,7 +28,6 @@ training:
   learning_rate: 0.0002          # 2e-4
   weight_decay: 0.01
   max_seq_length: 512
-  warmup_ratio: 0.03
 
 # Federated Learning Configuration
 federated:
