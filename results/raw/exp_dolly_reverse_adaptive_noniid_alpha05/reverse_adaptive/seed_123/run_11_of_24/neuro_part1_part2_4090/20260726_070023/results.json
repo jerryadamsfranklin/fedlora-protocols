@@ -1,0 +1,462 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.7227932928100729,
+    "round_time": 135.0242359638214,
+    "communication_mb": 343.75,
+    "upload_mb": 171.875,
+    "download_mb": 171.875,
+    "broadcast_b_only": false,
+    "broadcast_bytes_per_client": 18022400,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FLoRA",
+      "switch_round": null,
+      "round_count": 1,
+      "flora_rounds": 1,
+      "ffa_lora_rounds": 0,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 171.875,
+      "comm_savings_vs_flora": 0.0,
+      "events": []
+    }
+  },
+  {
+    "round": 2,
+    "avg_loss": 1.6629118902596662,
+    "round_time": 155.25019097328186,
+    "communication_mb": 687.5,
+    "upload_mb": 343.75,
+    "download_mb": 343.75,
+    "broadcast_b_only": false,
+    "broadcast_bytes_per_client": 18022400,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FLoRA",
+      "switch_round": null,
+      "round_count": 2,
+      "flora_rounds": 2,
+      "ffa_lora_rounds": 0,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 343.75,
+      "comm_savings_vs_flora": 0.0,
+      "events": []
+    }
+  },
+  {
+    "round": 3,
+    "avg_loss": 1.6592913464189738,
+    "round_time": 144.10070514678955,
+    "communication_mb": 1031.25,
+    "upload_mb": 515.625,
+    "download_mb": 515.625,
+    "broadcast_b_only": false,
+    "broadcast_bytes_per_client": 18022400,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FLoRA",
+      "switch_round": null,
+      "round_count": 3,
+      "flora_rounds": 3,
+      "ffa_lora_rounds": 0,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 515.625,
+      "comm_savings_vs_flora": 0.0,
+      "events": []
+    }
+  },
+  {
+    "round": 4,
+    "avg_loss": 1.6539537279223757,
+    "round_time": 138.9601993560791,
+    "communication_mb": 1375.0,
+    "upload_mb": 687.5,
+    "download_mb": 687.5,
+    "broadcast_b_only": false,
+    "broadcast_bytes_per_client": 18022400,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FLoRA",
+      "switch_round": null,
+      "round_count": 4,
+      "flora_rounds": 4,
+      "ffa_lora_rounds": 0,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 687.5,
+      "comm_savings_vs_flora": 0.0,
+      "events": []
+    }
+  },
+  {
+    "round": 5,
+    "avg_loss": 1.6499857987719664,
+    "round_time": 140.37354135513306,
+    "communication_mb": 1718.75,
+    "upload_mb": 859.375,
+    "download_mb": 859.375,
+    "broadcast_b_only": false,
+    "broadcast_bytes_per_client": 18022400,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FLoRA",
+      "switch_round": null,
+      "round_count": 5,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 0,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 859.375,
+      "comm_savings_vs_flora": 0.0,
+      "events": []
+    }
+  },
+  {
+    "round": 6,
+    "avg_loss": 1.6433931422470376,
+    "round_time": 107.67651295661926,
+    "communication_mb": 1952.5,
+    "upload_mb": 1031.25,
+    "download_mb": 921.25,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 6,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 1,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 921.25,
+      "comm_savings_vs_flora": 0.10666666666666669,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 7,
+    "avg_loss": 1.6321960360552972,
+    "round_time": 102.67340159416199,
+    "communication_mb": 2076.25,
+    "upload_mb": 1093.125,
+    "download_mb": 983.125,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 7,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 2,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 983.125,
+      "comm_savings_vs_flora": 0.18285714285714283,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 8,
+    "avg_loss": 1.6336091104135602,
+    "round_time": 104.08470940589905,
+    "communication_mb": 2200.0,
+    "upload_mb": 1155.0,
+    "download_mb": 1045.0,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 8,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 3,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1045.0,
+      "comm_savings_vs_flora": 0.24,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 9,
+    "avg_loss": 1.63891964247155,
+    "round_time": 111.84627604484558,
+    "communication_mb": 2323.75,
+    "upload_mb": 1216.875,
+    "download_mb": 1106.875,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 9,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 4,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1106.875,
+      "comm_savings_vs_flora": 0.2844444444444445,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 10,
+    "avg_loss": 1.6367291863170148,
+    "round_time": 118.31307101249695,
+    "communication_mb": 2447.5,
+    "upload_mb": 1278.75,
+    "download_mb": 1168.75,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 10,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 5,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1168.75,
+      "comm_savings_vs_flora": 0.31999999999999995,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 11,
+    "avg_loss": 1.6307102816159076,
+    "round_time": 102.47323369979858,
+    "communication_mb": 2571.25,
+    "upload_mb": 1340.625,
+    "download_mb": 1230.625,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 11,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 6,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1230.625,
+      "comm_savings_vs_flora": 0.3490909090909091,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 12,
+    "avg_loss": 1.6315493060579835,
+    "round_time": 102.4410252571106,
+    "communication_mb": 2695.0,
+    "upload_mb": 1402.5,
+    "download_mb": 1292.5,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 12,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 7,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1292.5,
+      "comm_savings_vs_flora": 0.3733333333333333,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 13,
+    "avg_loss": 1.6252126487774536,
+    "round_time": 102.86898446083069,
+    "communication_mb": 2818.75,
+    "upload_mb": 1464.375,
+    "download_mb": 1354.375,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 13,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 8,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1354.375,
+      "comm_savings_vs_flora": 0.39384615384615385,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 14,
+    "avg_loss": 1.6305477545389426,
+    "round_time": 102.31272768974304,
+    "communication_mb": 2942.5,
+    "upload_mb": 1526.25,
+    "download_mb": 1416.25,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 14,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 9,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1416.25,
+      "comm_savings_vs_flora": 0.4114285714285715,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "round": 15,
+    "avg_loss": 1.6359545521517493,
+    "round_time": 102.30011653900146,
+    "communication_mb": 3066.25,
+    "upload_mb": 1588.125,
+    "download_mb": 1478.125,
+    "broadcast_b_only": true,
+    "broadcast_bytes_per_client": 6488064,
+    "aggregator_stats": {
+      "name": "Reverse-Adaptive",
+      "current_mode": "FFA-LoRA",
+      "switch_round": 6,
+      "round_count": 15,
+      "flora_rounds": 5,
+      "ffa_lora_rounds": 10,
+      "revert_count": 0,
+      "switch_threshold": 0.01,
+      "warmup_rounds": 5,
+      "total_comm_mb": 1478.125,
+      "comm_savings_vs_flora": 0.42666666666666664,
+      "events": [
+        {
+          "round": 6,
+          "event": "switch_to_ffa",
+          "loss_history_tail": [
+            1.6539537279223757,
+            1.6499857987719664,
+            1.6433931422470376
+          ]
+        }
+      ]
+    }
+  }
+]
