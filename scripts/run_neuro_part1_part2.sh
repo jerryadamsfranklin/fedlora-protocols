@@ -32,6 +32,15 @@ PART2_EXPS=(
   "exp_fedit_noniid_alpha05"
 )
 
+EXISTING_ALPACA_EXPS=(
+  "exp_flora_iid"
+  "exp_two_phase_k8"
+  "exp_reverse_adaptive_iid"
+  "exp_flora_noniid_alpha05"
+  "exp_two_phase_k8_noniid_alpha05"
+  "exp_reverse_adaptive_noniid_alpha05"
+)
+
 run_train_manifest() {
   python3 - <<'PY'
 import csv
@@ -144,6 +153,23 @@ run_holdout() {
     --skip-existing
 }
 
+run_holdout_existing_alpaca() {
+  python3 scripts/evaluate_instruction_holdout.py \
+    --discover-root results/raw \
+    --include-exp "${EXISTING_ALPACA_EXPS[0]}" \
+    --include-exp "${EXISTING_ALPACA_EXPS[1]}" \
+    --include-exp "${EXISTING_ALPACA_EXPS[2]}" \
+    --include-exp "${EXISTING_ALPACA_EXPS[3]}" \
+    --include-exp "${EXISTING_ALPACA_EXPS[4]}" \
+    --include-exp "${EXISTING_ALPACA_EXPS[5]}" \
+    --device "${DEVICE}" \
+    --start-index 3000 \
+    --num-examples 500 \
+    --eval-batch-size 4 \
+    --summary-csv analysis/neuro_existing_alpaca_holdout.csv \
+    --skip-existing
+}
+
 summarize() {
   python3 - <<'PY'
 import csv
@@ -155,14 +181,24 @@ manifest = Path(os.environ.get("MANIFEST", "docs/neuro_part12_run_manifest.csv")
 tag = os.environ.get("TAG", "neuro_part1_part2_4090")
 rows = list(csv.DictReader(manifest.open(newline="", encoding="utf-8")))
 rows.sort(key=lambda r: int(r["exec_order"]))
+run_total = len(rows)
 
 print(f"{'exec':>4} {'experiment':38} {'seed':>4} {'comm_mb':>10} {'loss':>8} {'switch':>6} {'b_only':>6}")
 for r in rows:
     exp = r["experiment"]
     method = r["method"]
     seed = r["seed"]
-    base = Path("results/raw") / exp / method / f"seed_{seed}" / tag
-    result_files = sorted(base.glob("*/results.json"))
+    exec_order = int(r["exec_order"])
+
+    # Primary layout for this script: seed/run_XX_of_YY/tag/timestamp/results.json
+    run_dir = f"run_{exec_order:02d}_of_{run_total:02d}"
+    base_primary = Path("results/raw") / exp / method / f"seed_{seed}" / run_dir / tag
+    result_files = sorted(base_primary.glob("*/results.json"))
+
+    # Backward-compatible fallback (older layout): seed/tag/timestamp/results.json
+    if not result_files:
+        base_fallback = Path("results/raw") / exp / method / f"seed_{seed}" / tag
+        result_files = sorted(base_fallback.glob("*/results.json"))
     if not result_files:
         print(f"{int(r['exec_order']):4d} {exp:38} {seed:>4} {'MISSING':>10} {'-':>8} {'-':>6} {'-':>6}")
         continue
@@ -198,6 +234,9 @@ case "${cmd}" in
   holdout)
     run_holdout
     ;;
+  holdout_existing_alpaca)
+    run_holdout_existing_alpaca
+    ;;
   mc_eval)
     run_mc_eval_manifest
     ;;
@@ -213,7 +252,7 @@ case "${cmd}" in
     summarize
     ;;
   *)
-    echo "Usage: $0 {train|holdout|mc_eval|summarize|all}"
+    echo "Usage: $0 {train|holdout|holdout_existing_alpaca|mc_eval|summarize|all}"
     exit 2
     ;;
 esac
