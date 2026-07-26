@@ -1,0 +1,16 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_fedit_iid"
+  description: "FedIT baseline on Alpaca-3k, IID"
+
+federated:
+  aggregation_method: "fedit"
+
+data:
+  dataset_name: "tatsu-lab/alpaca"
+  dataset_split: "train"
+  max_samples: 3000
+  partition_method: "iid"
+  eval_split: null
+  eval_samples: 300
