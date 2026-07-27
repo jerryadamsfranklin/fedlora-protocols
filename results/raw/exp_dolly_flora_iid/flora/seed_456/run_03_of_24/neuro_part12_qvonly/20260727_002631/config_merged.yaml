@@ -1,0 +1,44 @@
+model:
+  name: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+  torch_dtype: float32
+  device: cuda
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.1
+  target_modules:
+  - q_proj
+  - v_proj
+  bias: none
+training:
+  local_epochs: 1
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  max_seq_length: 256
+federated:
+  num_rounds: 15
+  num_clients: 10
+  clients_per_round: 10
+  aggregation_method: flora
+evaluation:
+  eval_every: 1
+  eval_batch_size: 4
+  metrics:
+  - loss
+  - perplexity
+checkpointing:
+  save_every: 10
+  keep_last_n: 3
+seed: 42
+data:
+  dataset_name: databricks/databricks-dolly-15k
+  dataset_split: train
+  max_samples: 3000
+  partition_method: iid
+  eval_split: null
+  eval_samples: 300
+experiment:
+  name: exp_dolly_flora_iid
+  description: FLoRA on Dolly-15k subset (3k), IID
