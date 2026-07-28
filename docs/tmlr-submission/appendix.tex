@@ -1,0 +1,91 @@
+\appendix
+\section{Hyperparameter Details}
+\label{app:hyper}
+All experiments use AdamW \citep{loshchilov2019decoupled} with learning rate $10^{-4}$, $\beta_1{=}0.9$, $\beta_2{=}0.999$. No learning rate schedule or gradient clipping applied. Maximum sequence length is 256 tokens. See Table~\ref{tab:setup} for the complete configuration including ReverseAdaptive defaults.
+
+\section{Per-Seed Full Results}
+\label{app:perseed}
+
+\begin{table}[H]
+\caption{Per-seed TinyLlama-1.1B IID results. Communication is deterministic across seeds. $\dagger$ For Two-Phase methods, the column shows the predetermined phase boundary $K$, not an adaptive switch event. For ReverseAdaptive, it shows the round at which the plateau signal triggered.}
+\label{tab:b1}
+\begin{center}
+\small
+\begin{tabular}{llccc}
+\toprule
+Method & Seed & Final loss & Total MB & Switch / boundary$^\dagger$ \\
+\midrule
+FLoRA & 42 & 1.259434 & 2578.13 & -- \\
+FLoRA & 123 & 1.261163 & 2578.13 & -- \\
+FLoRA & 456 & 1.260915 & 2578.13 & -- \\
+Two-Phase $K{=}8$ & 42 & 1.269228 & 1863.13 & $K{=}8^\dagger$ \\
+Two-Phase $K{=}8$ & 123 & 1.270852 & 1863.13 & $K{=}8^\dagger$ \\
+Two-Phase $K{=}8$ & 456 & 1.270770 & 1863.13 & $K{=}8^\dagger$ \\
+Two-Phase $K{=}10$ & 42 & 1.265454 & 2083.13 & $K{=}10^\dagger$ \\
+Two-Phase $K{=}10$ & 123 & 1.267048 & 2083.13 & $K{=}10^\dagger$ \\
+Two-Phase $K{=}10$ & 456 & 1.266976 & 2083.13 & $K{=}10^\dagger$ \\
+ReverseAdaptive ($\tau{=}0.01$) & 42 & 1.273557 & 1533.13 & 6 \\
+ReverseAdaptive ($\tau{=}0.01$) & 123 & 1.275234 & 1533.13 & 6 \\
+ReverseAdaptive ($\tau{=}0.01$) & 456 & 1.275107 & 1533.13 & 6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\caption{Non-IID results. Seeds 42 and 1000 at $\alpha{=}0.1$ had 9 and 8 active clients due to empty Dirichlet partitions.}
+\label{tab:b2}
+\begin{center}
+\small
+\begin{tabular}{llcccc}
+\toprule
+Setting & Seed & Final loss & Total MB & Switch round & Active clients \\
+\midrule
+ReverseAdaptive, $\alpha{=}0.5$ & 42 & 1.285933 & 1533.13 & 6 & 10 \\
+ReverseAdaptive, $\alpha{=}0.5$ & 123 & 1.282625 & 1533.13 & 6 & 10 \\
+ReverseAdaptive, $\alpha{=}0.5$ & 456 & 1.252133 & 1533.13 & 6 & 10 \\
+ReverseAdaptive, $\alpha{=}0.1$ & 42 & 1.268353 & 1379.81 & 6 & 9 \\
+ReverseAdaptive, $\alpha{=}0.1$ & 123 & 1.288985 & 1533.13 & 6 & 10 \\
+ReverseAdaptive, $\alpha{=}0.1$ & 456 & 1.348083 & 1533.13 & 6 & 10 \\
+ReverseAdaptive, $\alpha{=}0.1$ & 789 & 1.259200 & 1533.13 & 6 & 10 \\
+ReverseAdaptive, $\alpha{=}0.1$ & 1000 & 1.273046 & 1226.50 & 6 & 8 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Statistical Tests}
+\label{app:stats}
+Paired $t$-tests on final-round training losses across three seeds, for both model scales. Absolute loss differences with 95\% confidence intervals are the primary effect-size metric. The LLaMA-3.2-3B ReverseAdaptive vs.\ Two-Phase $K{=}8$ test ($p = 0.997$, Cohen's $d = 0.003$) is the key scale-validation result.
+
+\begin{table}[H]
+\caption{Paired $t$-tests, 3 seeds each. Top rows: TinyLlama-1.1B IID. Bottom rows: LLaMA-3.2-3B IID.}
+\label{tab:d1}
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\toprule
+Comparison & Absolute $\Delta$ loss & $p$-value & 95\% CI \\
+\midrule
+TinyLlama: Two-Phase $K{=}8$ vs.\ FLoRA & $+0.0098$ & $2.5 \times 10^{-5}$ & $[0.0090, 0.0106]$ \\
+TinyLlama: ReverseAdaptive vs.\ FLoRA & $+0.0141$ & $6.1 \times 10^{-6}$ & $[0.0131, 0.0151]$ \\
+TinyLlama: ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.0043$ & $1.5 \times 10^{-5}$ & $[0.0038, 0.0048]$ \\
+LLaMA-3B: Two-Phase $K{=}8$ vs.\ FLoRA & $+0.0214$ & $3.2 \times 10^{-4}$ & $[0.0186, 0.0243]$ \\
+LLaMA-3B: ReverseAdaptive vs.\ FLoRA & $+0.0215$ & $1.3 \times 10^{-2}$ & $[0.0046, 0.0383]$ \\
+LLaMA-3B: ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+1.25 \times 10^{-5}$ & $0.997$ & $[-0.0061, 0.0061]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Reproducibility Checklist}
+\label{app:repro}
+\textbf{Code:} Full source code is released in the public repository, including all configuration YAML files, training scripts, evaluation scripts, and scripts to reproduce figures and tables.
+
+\textbf{Results manifest:} \texttt{results/MANIFEST.csv} is the authoritative mapping from reported numbers to exact run directories (with commit IDs, tags, and final communication/loss values). Only runs listed in this manifest back reported results.
+
+\textbf{Seeds:} All seeds listed in Table~\ref{tab:setup}. Per-seed results are in Appendix~\ref{app:perseed}.
+
+\textbf{Hardware:} Apple M4 Pro, 48\,GB unified memory, MPS backend. Total compute approximately 285 hours. No external GPU was used.
+
+\textbf{Data:} Alpaca \citep{taori2023alpaca} via \texttt{tatsu-lab/alpaca} and Dolly-15k via \texttt{databricks/databricks-dolly-15k} on HuggingFace (3000-sample subsets per experimental condition). Adapter checkpoints not released; reproduction scripts are sufficient.
