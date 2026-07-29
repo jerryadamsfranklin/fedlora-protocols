@@ -14,6 +14,7 @@ At $\alpha{=}0.5$, mean final loss is statistically indistinguishable from IID f
 \label{tab:b1}
 \begin{center}
 \small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{llccc}
 \toprule
 Method & Seed & Final loss & Total MB & Switch / boundary$^\dagger$ \\
@@ -43,6 +44,7 @@ FFA-LoRA & 456 & 1.303628 & \phantom{0}983.13 & init$^\dagger$ \\
 \label{tab:b2}
 \begin{center}
 \small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{llcccc}
 \toprule
 Setting & Seed & Final loss & Total MB & Switch round & Active clients \\
@@ -73,6 +75,7 @@ The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 
 \label{tab:d1}
 \begin{center}
 \small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lcccc}
 \toprule
 Comparison & $\Delta$ final loss & $p$ & $\Delta$ held-out & $p$ \\
@@ -130,6 +133,8 @@ The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all 
 \caption{Cross-backend verification summary, MPS against CUDA, 34 run pairs.}
 \label{tab:n3a}
 \begin{center}
+\small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lc}
 \toprule
 Category & Runs \\
@@ -151,6 +156,7 @@ Total & 34 \\
 \label{tab:n3b}
 \begin{center}
 \small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{llccl}
 \toprule
 Run & Configuration & MPS (MB) & CUDA (MB) & Failing check \\

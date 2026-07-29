@@ -131,7 +131,7 @@ Per-round upload and download megabytes are recorded in \texttt{results.json}. B
 For TinyLlama-1.1B with rank $r{=}16$ targeting $\{\texttt{q\_proj}, \texttt{v\_proj}\}$, the projections adapted in the original LoRA formulation \citep{hu2022lora}, accounting for GQA in the value projection, the B-only fraction of the full state is exactly 36\% rather than the 50\% a naive parameter count would suggest. This fraction is invariant to the size of the target set, since \texttt{q\_proj} and \texttt{o\_proj} share a shape and \texttt{k\_proj} and \texttt{v\_proj} share a shape under GQA; the ratio is fixed by the GQA configuration, not by how many projections are adapted.
 
 \textbf{Partition mechanics.}
-Non-IID partitions use Dirichlet concentration $\alpha \in \{0.5, 0.1\}$ over client sampling probabilities, without label conditioning. Under severe skew ($\alpha{=}0.1$), some clients may receive empty partitions and therefore contribute no updates; per-seed active client counts are in Appendix~\ref{app:perseed}.
+Alpaca and Dolly-15k carry no class labels, so non-IID partitions apply Dirichlet skew over a task-diversity proxy: each instruction $s$ is assigned to one of ten buckets by character length, $\min(\lfloor |s| / 50 \rfloor, 9)$, and a Dirichlet distribution with concentration $\alpha \in \{0.5, 0.1\}$ is applied over those buckets. This induces heterogeneity in task form rather than task semantics; Section~\ref{sec:limitations} notes that semantic heterogeneity is untested.
 
 \section{Experiments and Results}
 \label{sec:experiments}
@@ -153,7 +153,7 @@ Parameter & Value \\
 \midrule
 Base models & TinyLlama-1.1B-Chat-v1.0 \citep{zhang2024tinyllama}; \\
             & LLaMA-3.2-3B \citep{dubey2024llama3} \\
-Dataset & Alpaca \citep{taori2023alpaca}, 3000 samples \\
+Datasets & Alpaca \citep{taori2023alpaca}; Dolly-15k \citep{dolly2023}; 3000 samples each \\
 Data partitions & IID; Dirichlet $\alpha{=}0.5$; Dirichlet $\alpha{=}0.1$ \\
 Clients / round & 10 / 10 (full participation) \\
 Rounds & 15 \\
@@ -213,18 +213,20 @@ FedIT lands on FLoRA's communication volume exactly, to the byte, and within 0.0
 Loss differences between methods are small in absolute terms, 0.0141 between FLoRA and ReverseAdaptive at $\tau{=}0.01$, but are resolved across three seeds because the per-seed spread is roughly twenty-five times smaller. Paired $t$-tests on final loss give $p < 10^{-4}$ for every comparison against FLoRA except FedIT, which is correctly indistinguishable. With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values, and no multiplicity correction is applied in Table~\ref{tab:frontier}; Appendix~\ref{app:stats} reports the full matrix on both metrics with the correction stated.
 
 \begin{table}[t]
-\caption{Measured communication-quality frontier. TinyLlama-1.1B, Alpaca-3k, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Communication is protocol-deterministic and identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice of Section~\ref{sec:heldout}; more negative is better. $p$-values are paired $t$-tests against FLoRA on final loss; the full matrix on both metrics is in Appendix~\ref{app:stats}.}
+\caption{Measured communication-quality frontier. TinyLlama-1.1B, Alpaca-3k, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Communication is protocol-deterministic and identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice of Section~\ref{sec:heldout}; more negative is better. $p$-values are paired $t$-tests against FLoRA on final loss; the full matrix on both metrics is in Appendix~\ref{app:stats}. Methods: FLoRA \citep{wang2024flora}, FedIT \citep{zhang2024federatedgpt}, FFA-LoRA \citep{sun2024ffalora}.}
 \label{tab:frontier}
 \begin{center}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccc}
 \toprule
 Method & Total comm.\ (MB) & Savings & Final loss & Held-out $\Delta$loss & $p$ vs.\ FLoRA \\
 \midrule
-FLoRA \citep{wang2024flora}         & 2578.13 & --      & $1.2608 \pm 0.0005$ & $-0.5992 \pm 0.0001$ & -- \\
-FedIT \citep{zhang2024federatedgpt} & 2578.13 & 0.00\%  & $1.2602 \pm 0.0016$ & $-0.5990 \pm 0.0002$ & $0.588$ \\
+FLoRA                                 & 2578.13 & --      & $1.2608 \pm 0.0005$ & $-0.5992 \pm 0.0001$ & -- \\
+FedIT                                 & 2578.13 & 0.00\%  & $1.2602 \pm 0.0016$ & $-0.5990 \pm 0.0002$ & $0.588$ \\
 Two-Phase $K{=}8$                   & 1863.13 & 27.73\% & $1.2705 \pm 0.0006$ & $-0.5958 \pm {<}0.0001$ & $4.2 \times 10^{-5}$ \\
 ReverseAdaptive ($\tau{=}0.01$)     & 1533.13 & 40.53\% & $1.2749 \pm 0.0006$ & $-0.5929 \pm 0.0008$ & $1.1 \times 10^{-5}$ \\
-FFA-LoRA \citep{sun2024ffalora}     & \phantom{0}983.13 & 61.87\% & $1.3031 \pm 0.0012$ & $-0.5746 \pm 0.0004$ & $1.7 \times 10^{-4}$ \\
+FFA-LoRA                             & \phantom{0}983.13 & 61.87\% & $1.3031 \pm 0.0012$ & $-0.5746 \pm 0.0004$ & $1.7 \times 10^{-4}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -243,14 +245,16 @@ Two-Phase $K{=}8$ costs 0.0034 on Alpaca and 0.0043 on Dolly, a shift of 25.5\%.
 A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and reached the same 1533.13 MB, matching the IID behaviour on both datasets. No Dolly FLoRA baseline was run under heterogeneity, so no quality cost is reported for that configuration.
 
 \begin{table}[t]
-\caption{Dolly-15k replication. TinyLlama-1.1B, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Gap is the held-out $\Delta$loss difference against the same dataset's FLoRA baseline, which is the quantity comparable across datasets; held-out levels are not, since base-model losses differ (1.9352 on Alpaca, 2.2608 on Dolly-15k).}
+\caption{Dolly-15k replication. TinyLlama-1.1B, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Gap is the held-out $\Delta$loss difference against the same dataset's FLoRA baseline, which is the quantity comparable across datasets; held-out levels are not, since base-model losses differ (1.9352 on Alpaca, 2.2608 on Dolly-15k). Methods: FLoRA \citep{wang2024flora}, FedIT \citep{zhang2024federatedgpt}, FFA-LoRA \citep{sun2024ffalora}.}
 \label{tab:dolly}
 \begin{center}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccc}
 \toprule
 Method & Comm.\ (MB) & Final loss & Held-out $\Delta$loss & Gap (Dolly) & Gap (Alpaca) \\
 \midrule
-FLoRA \citep{wang2024flora}     & 2578.13 & $1.6544 \pm 0.0021$ & $-0.5330 \pm 0.0010$ & -- & -- \\
+FLoRA                           & 2578.13 & $1.6544 \pm 0.0021$ & $-0.5330 \pm 0.0010$ & -- & -- \\
 Two-Phase $K{=}8$               & 1863.13 & $1.6643 \pm 0.0021$ & $-0.5287 \pm 0.0010$ & 0.0043 & 0.0034 \\
 ReverseAdaptive ($\tau{=}0.01$) & 1533.13 & $1.6686 \pm 0.0022$ & $-0.5268 \pm 0.0005$ & 0.0061 & 0.0063 \\
 \bottomrule
@@ -279,7 +283,7 @@ Figure~\ref{fig:cumcomm} shows cumulative communication in megabytes against rou
 \label{fig:cumcomm}
 \end{figure}
 
-The no-switch sanity baseline (ReverseAdaptive with \texttt{switch\_threshold} $= -1.0$, \texttt{warmup\_rounds} $= 999$) produces final loss 1.2594342812 on seed 42, matching the FLoRA seed 42 result to 10 decimal places. Upload and download match to the byte across all 15 rounds.
+The no-switch sanity baseline (ReverseAdaptive with \texttt{switch\_threshold} $= -1.0$, \texttt{warmup\_rounds} $= 999$) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Table~\ref{tab:b1} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
 
 \subsection{Downstream Evaluation}
 Tables~\ref{tab:downstream_tiny}--\ref{tab:downstream_llama} and Figure~\ref{fig:downstream} present downstream results on MMLU \citep{hendrycks2020measuring}, ARC-Easy \citep{clark2018arc}, BoolQ \citep{clark2019boolq}, and HellaSwag \citep{zellers2019hellaswag}. MMLU is excluded from TinyLlama-1.1B comparisons: base accuracy of 0.250 on 4-way multiple choice indicates chance-level performance, making the benchmark uninformative at 1.1B scale.
@@ -333,7 +337,7 @@ ReverseAdaptive   & $0.557 \pm 0.003$ & $0.839 \pm 0.008$ & $0.739 \pm 0.004$ & 
 
 \subsection{Threshold Ablation}
 \label{sec:ablation}
-Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} characterize how $\tau$ controls the savings-quality tradeoff. The method has a sensitive regime for $\tau \leq 0.002$: at $\tau{=}0.002$ the switch occurs at round 9, matching Two-Phase $K{=}8$; at $\tau{=}0.001$ the switch occurs at round 11, matching Two-Phase $K{=}10$. For $\tau \geq 0.005$ the method saturates: the switch fires at round 6, the first round after warmup. All rows for $\tau \in \{0.005, 0.010, 0.020, 0.050, 0.100, 0.200\}$ produce identical results.
+Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} characterize how $\tau$ controls the savings-quality tradeoff. Since $\tau$ bounds a relative rather than an absolute loss improvement, the values below are fractions of the previous round's loss: $\tau{=}0.01$ requires the loss to fall by at least 1\% in a round for the FLoRA phase to continue. The method has a sensitive regime for $\tau \leq 0.002$: at $\tau{=}0.002$ the switch occurs at round 9, matching Two-Phase $K{=}8$; at $\tau{=}0.001$ the switch occurs at round 11, matching Two-Phase $K{=}10$. For $\tau \geq 0.005$ the method saturates: the switch fires at round 6, the first round after warmup. All rows for $\tau \in \{0.005, 0.010, 0.020, 0.050, 0.100, 0.200\}$ produce identical results.
 
 \begin{figure}[t]
 \begin{center}
