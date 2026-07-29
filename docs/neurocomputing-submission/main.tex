@@ -1,0 +1,98 @@
+\documentclass[preprint,review,12pt]{elsarticle}
+
+\input{math_commands.tex}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{url}
+
+\journal{Neurocomputing}
+
+\title{Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\begin{document}
+\raggedbottom
+\begin{frontmatter}
+
+\title{Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning}
+
+\author[ind]{Jerry Adams Franklin}
+\ead{jerry.adamsf@gmail.com}
+\address[ind]{Independent Researcher, Rochester, NY, USA}
+
+\begin{abstract}
+Federated fine-tuning of large language models with low-rank adaptation (LoRA)
+reduces per-client trainable parameters, but client-to-server communication
+remains the dominant cost. Existing accounting for federated LoRA protocols
+omits the asymmetric transition round incurred when a protocol changes
+aggregation mode, and reports savings that are insensitive to the
+architecture-dependent shapes induced by grouped-query attention. This paper
+measures per-round upload and download bytes directly for a bidirectional
+B-only federated LoRA protocol, and uses that instrumentation to place five
+published methods on a single communication-quality frontier. The measurements
+show the frontier has a knee, and we operationalize it with ReverseAdaptive, a
+schedule that locates that point by monitoring the relative improvement in
+global training loss against a dimensionless threshold $\tau$ rather than by
+fixing a phase boundary $K$ in advance. On
+TinyLlama-1.1B-Chat with Alpaca, ReverseAdaptive attains 40.5\% measured
+round-trip savings over FLoRA (1533.1 MB against 2578.1 MB, three seeds) at a
+held-out instruction-following loss cost of 0.0063. It outperforms FFA-LoRA,
+which freezes $A$ at initialization, by 0.0182 in held-out loss, more than
+twenty times the largest per-method seed standard deviation on that metric,
+indicating that
+learning $A$ before freezing it produces materially better adapters. Moving
+from ReverseAdaptive to FFA-LoRA buys a further 21.3 percentage points of
+savings at roughly five times the quality cost per point. The quality cost of the transition is stable across
+datasets (0.0061 on Dolly-15k against 0.0063 on Alpaca) and the protocol
+yields $30.0 \pm 4.0$\% savings on LLaMA-3.2-3B, where ReverseAdaptive and
+hand-tuned Two-Phase $K{=}8$ reach final losses differing by 0.000012, roughly
+350 times less than the gap between them at 1.1B scale. Code, configurations, and scripts to
+reproduce all figures and tables are publicly released.
+\end{abstract}
+
+\begin{keyword}
+Federated learning \sep Low-rank adaptation \sep Communication efficiency \sep
+Parameter-efficient fine-tuning \sep Large language models
+\end{keyword}
+
+\end{frontmatter}
+
+\input{body.tex}
+
+\section*{CRediT authorship contribution statement}
+\textbf{Jerry Adams Franklin:} Conceptualization, Methodology, Software,
+Validation, Formal analysis, Investigation, Data curation, Writing -- original
+draft, Writing -- review and editing, Visualization.
+
+\section*{Declaration of competing interest}
+The author declares no known competing financial interests or personal
+relationships that could have appeared to influence the work reported in this
+paper.
+
+\section*{Data availability}
+All code, configuration files, and analysis scripts are publicly available at
+https://github.com/jerryadamsfranklin/fedlora-protocols. Adapter checkpoints
+are not released. The Alpaca and Dolly-15k datasets are publicly available from
+their respective sources.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+The author used Claude (Anthropic) for grammar and language editing only. All
+technical content, analysis, and interpretations are the author's own.
+
+\bibliography{main}
+\bibliographystyle{elsarticle-num-names}
+
+\input{appendix.tex}
+
+\end{document}
