@@ -450,6 +450,42 @@ def build(d: Data) -> list[tuple]:
         lambda: d.hold.loc[d.hold.dataset.astype(str).str.contains("alpaca", case=False,
                                                                    na=False), "tuned_loss"].max())
 
+    # -- Abstract: "more than twenty times the largest per-method sd" -------
+    # Holds at 21.8x against held-out sds but only 11.3x against final-loss
+    # sds, so the abstract must name the metric.
+    add("abstract.twenty_times_heldout", "Abstract (>20x, held-out metric)", 21.8, 0.1,
+        lambda: (d.heldout(FFA)[0] - d.heldout(RA)[0])
+                / max(d.heldout(e)[1] for e, _ in FRONTIER))
+    add("abstract.twenty_times_needs_metric", "Abstract (guard: ambiguous without metric)", 1, 0,
+        lambda: 1 if (d.heldout(FFA)[0] - d.heldout(RA)[0])
+                     / max(d.final_loss(e)[1] for e, _ in FRONTIER) < 20 else 0)
+
+    # -- G11.4: non-IID variance finding -----------------------------------
+    NONIID = {FLORA: "exp_flora_noniid_alpha05", FEDIT: "exp_fedit_noniid_alpha05",
+              TP8: "exp_two_phase_k8_noniid_alpha05",
+              RA: "exp_reverse_adaptive_noniid_alpha05",
+              FFA: "exp_ffa_lora_noniid_alpha05"}
+    for iid_e, label in FRONTIER:
+        ratio = {"FLoRA": 47, "FedIT": 12, "Two-Phase K=8": 40,
+                 "ReverseAdaptive": 44, "FFA-LoRA": 15}[label]
+        add(f"g11.variance_ratio.{label}", "Appendix B opening (order of magnitude)",
+            ratio, 1.0,
+            lambda i=iid_e: d.final_loss(NONIID[i])[1] / d.final_loss(i)[1])
+        add(f"g11.noniid_mean_indistinguishable.{label}",
+            "Appendix B opening (mean diff << sd)", 1, 0,
+            lambda i=iid_e: 1 if abs(d.final_loss(NONIID[i])[0] - d.final_loss(i)[0])
+                                 < d.final_loss(NONIID[i])[1] else 0)
+
+    # -- G17 / G19: the 3B CI contains the 1.1B effect ----------------------
+    # This is why p=0.997 cannot establish equivalence.
+    add("g17.l3_ci_halfwidth", "Sec 4.6, Appendix C (+/-0.0114)", 0.0114, 5e-5,
+        lambda: 4.303 * (d.l3("reverse_adaptive").set_index("seed").final_loss
+                         - d.l3("two_phase").set_index("seed").final_loss).std(ddof=1) / 3 ** 0.5)
+    add("g17.ci_contains_1b_effect", "Sec 4.6 (CI contains the 1.1B difference)", 1, 0,
+        lambda: 1 if 4.303 * (d.l3("reverse_adaptive").set_index("seed").final_loss
+                              - d.l3("two_phase").set_index("seed").final_loss).std(ddof=1) / 3 ** 0.5
+                     > (d.final_loss(RA)[0] - d.final_loss(TP8)[0]) else 0)
+
     # -- G10 / C23: commit provenance --------------------------------------
     # T-N1 spans two run batches: FLoRA, Two-Phase K=8 and ReverseAdaptive from
     # phase1_cuda_rerun (commit 7b957752); FedIT and FFA-LoRA from
@@ -480,6 +516,48 @@ def build(d: Data) -> list[tuple]:
                         (RA, D_RA, "ReverseAdaptive")]:
         add(f"g13.byte_invariance.{label}", "Appendix D revision-invariance claim", 0.0, 1e-9,
             lambda x=a, y=b: d.comm(x) - d.comm(y))
+
+    # -- G14 / G16: conclusion and introduction figures ---------------------
+    def l3_bench_spread():
+        b = d.final[(d.final.scale == "llama3_3b") & d.final.boolq_acc.notna()]
+        out = 0.0
+        for c in ("mmlu_acc", "arc_easy_acc", "boolq_acc", "hellaswag_acc"):
+            g = b.groupby("method")[c].mean()
+            out = max(out, (g.max() - g.min()) * 100)
+        return out
+
+    # C26: the manuscript says 0.4 pp; the measured maximum is 0.47 (HellaSwag).
+    add("c26.l3_bench_spread_pp", "Intro + Conclusion (0.5 pp, not 0.4)", 0.47, 0.02,
+        l3_bench_spread)
+    add("c26.not_0p4", "C26 guard", 1, 0, lambda: 1 if l3_bench_spread() > 0.4 else 0)
+
+    add("g14.tp8_savings_3b", "Intro + Conclusion (26.0% at 3B)", 26.0, 0.05,
+        lambda: (st.mean(d.l3("flora").total_mb) - st.mean(d.l3("two_phase").total_mb))
+                / st.mean(d.l3("flora").total_mb) * 100)
+    add("g14.transition_cost_fixed", "Conclusion (fixed 55.0 MB)", 55.0, 1e-6,
+        lambda: d.comm(FFA) - TL_ALL_BONLY)
+    add("g14.ffa_extra_heldout", "Intro headline (0.0182 more held-out loss)", 0.018220, 5e-6,
+        lambda: d.heldout(FFA)[0] - d.heldout(RA)[0])
+
+    # -- G13: every cross-backend value lands on the switch lattice ---------
+    # Table N3b. If these stop matching, the "one step" claim is wrong.
+    for run, mps_s, cuda_s, mps_mb, cuda_mb in [
+        (11, 11, 10, 2083.125, 1973.125),
+        (12, 9, 8, 1863.125, 1753.125),
+        (17, 6, 7, 1533.125, 1643.125),
+    ]:
+        add(f"g13.n3b.run{run}.mps_on_lattice", "Table N3b", mps_mb, 1e-6,
+            lambda x=mps_s: tl_total(x))
+        add(f"g13.n3b.run{run}.cuda_on_lattice", "Table N3b", cuda_mb, 1e-6,
+            lambda x=cuda_s: tl_total(x))
+        add(f"g13.n3b.run{run}.one_step", "Appendix E (exactly one 110 MB step)", 110.0, 1e-6,
+            lambda a=mps_mb, b=cuda_mb: abs(a - b))
+
+    # The three absent MPS references recorded the full FLoRA volume.
+    add("g13.absent_ref_is_flora_volume", "Appendix E (2578.13, never switched)",
+        2578.125, 1e-6, lambda: d.comm(FLORA))
+    add("g13.denominator", "Appendix E, Table N3a (27 + 4 = 31 comparable)", 31, 0,
+        lambda: 27 + 4)
 
     # -- G11: Appendix B corpora ------------------------------------------
     def a01():
