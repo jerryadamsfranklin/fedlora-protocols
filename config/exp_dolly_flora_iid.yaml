@@ -1,0 +1,21 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_dolly_flora_iid"
+  description: "FLoRA on Dolly-15k subset (3k), IID"
+
+lora:
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+
+federated:
+  aggregation_method: "flora"
+
+data:
+  dataset_name: "databricks/databricks-dolly-15k"
+  dataset_split: "train"
+  max_samples: 3000
+  partition_method: "iid"
+  eval_split: null
+  eval_samples: 300

@@ -1,0 +1,27 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_dolly_reverse_adaptive_iid"
+  description: "ReverseAdaptive on Dolly-15k subset (3k), IID"
+
+lora:
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+
+federated:
+  aggregation_method: "reverse_adaptive"
+
+reverse_adaptive:
+  switch_threshold: 0.01
+  warmup_rounds: 5
+  transition_rounds: 0
+  stability_threshold: 1.1
+
+data:
+  dataset_name: "databricks/databricks-dolly-15k"
+  dataset_split: "train"
+  max_samples: 3000
+  partition_method: "iid"
+  eval_split: null
+  eval_samples: 300

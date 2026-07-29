@@ -1,0 +1,24 @@
+_inherit: base_config_4layers.yaml
+
+experiment:
+  name: "exp_dolly_two_phase_k8_iid"
+  description: "Two-Phase K=8 on Dolly-15k subset (3k), IID"
+
+lora:
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+
+federated:
+  aggregation_method: "two_phase"
+
+two_phase:
+  phase_boundary: 8
+
+data:
+  dataset_name: "databricks/databricks-dolly-15k"
+  dataset_split: "train"
+  max_samples: 3000
+  partition_method: "iid"
+  eval_split: null
+  eval_samples: 300

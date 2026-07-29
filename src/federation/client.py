@@ -95,12 +95,26 @@ class FederatedClient:
         def tokenize(examples):
             # Handle different dataset formats
             if "instruction" in examples:
-                texts = [
-                    f"### Instruction:\n{inst}\n\n### Response:\n{out}"
-                    for inst, out in zip(
-                        examples["instruction"], examples["output"]
-                    )
-                ]
+                outputs = examples.get("output")
+                responses = examples.get("response")
+                contexts = examples.get("context")
+                texts = []
+                for i, inst in enumerate(examples["instruction"]):
+                    out = ""
+                    if outputs is not None:
+                        out = outputs[i]
+                    elif responses is not None:
+                        out = responses[i]
+                    ctx = contexts[i] if contexts is not None else ""
+                    if ctx:
+                        text = (
+                            f"### Instruction:\n{inst}\n\n"
+                            f"### Context:\n{ctx}\n\n"
+                            f"### Response:\n{out}"
+                        )
+                    else:
+                        text = f"### Instruction:\n{inst}\n\n### Response:\n{out}"
+                    texts.append(text)
             elif "question" in examples:
                 # CommonsenseQA: include choices + answer for a meaningful task.
                 if "choices" in examples and "answerKey" in examples:

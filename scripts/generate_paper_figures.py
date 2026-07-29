@@ -7,7 +7,9 @@ import glob
 import json
 import os
 import re
+import statistics as st
 import warnings
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -21,6 +23,7 @@ from matplotlib.figure import Figure
 REPO = Path(__file__).resolve().parents[1]
 OUTDIR = REPO / "figures"
 TABLE_PATH = REPO / "analysis" / "final_results_table.csv"
+ANALYSIS_DIR = REPO / "analysis"
 
 plt.rcParams.update(
     {
@@ -34,7 +37,19 @@ plt.rcParams.update(
 
 _COLORS = plt.cm.tab10(np.linspace(0, 1, 10))
 
+_TAU = "\N{GREEK SMALL LETTER TAU}"
+
 _TS_RE = re.compile(r"^\d{8}_\d{6}$")
+
+# Figure 1 frontier spec (IID Alpaca, qv-only/cuda corpus).
+FIG1_METHODS: Dict[str, Tuple[str, int]] = {
+    "exp_flora_iid": ("FLoRA", 0),
+    "exp_fedit_iid": ("FedIT", 1),
+    "exp_two_phase_k8": ("Two-Phase K=8", 2),
+    "exp_reverse_adaptive_iid": ("ReverseAdaptive", 3),
+    "exp_ffa_lora_iid": ("FFA-LoRA", 4),
+}
+FIG1_KNEE = "exp_reverse_adaptive_iid"
 
 
 def load_table(path: Path) -> List[Dict[str, str]]:
@@ -105,112 +120,115 @@ def _save(fig: Figure, name: str) -> None:
     print(f"Saved {pdf}")
 
 
-def figure1_pareto_iid(rows: List[Dict[str, str]]) -> None:
-    """Pareto with FLoRA, K10, K8 means plus four ReverseAdaptive threshold points (seed 42)."""
-    tiny = [
-        r
-        for r in rows
-        if r.get("setting") == "iid"
-        and r.get("scale") == "tinyllama_1b"
-        and _f(r.get("total_mb", "") or "") is not None
-        and _f(r.get("final_loss", "") or "") is not None
-    ]
+def _read_frontier_comm(path: Path) -> Dict[str, float]:
+    """exp_name -> deterministic total communication MB."""
+    if not path.is_file():
+        raise FileNotFoundError(f"Missing frontier communication CSV: {path}")
+    comm: Dict[str, float] = {}
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            name = row["exp_name"]
+            if name not in FIG1_METHODS:
+                continue
+            mb = float(row["total_communication_mb"])
+            if name in comm and abs(comm[name] - mb) > 1e-6:
+                raise ValueError(
+                    f"{name}: communication varies across seeds ({comm[name]} vs {mb})"
+                )
+            comm[name] = mb
+    return comm
 
-    def collect(exp: str, tag_filter: Optional[str] = None) -> Tuple[float, float, float, float]:
-        rs = [r for r in tiny if r["exp_name"] == exp]
-        if tag_filter:
-            rs = [r for r in rs if tag_filter in r["tag"]]
-        losses = [_f(r["final_loss"]) for r in rs]
-        mbs = [_f(r["total_mb"]) for r in rs]
-        losses = [x for x in losses if x is not None]
-        mbs = [x for x in mbs if x is not None]
-        if not losses:
-            return float("nan"), float("nan"), float("nan"), float("nan")
-        lm, ls = _mean_std(losses)
-        mm, ms = _mean_std(mbs)
-        return mm, ms, lm, ls
 
-    mb_f, eb_f, loss_f, el_f = collect("exp_flora_iid", "run_")
-    mb_10, eb_10, loss_10, el_10 = collect("exp_two_phase_k10", "stage1_bidirectional")
-    mb_8, eb_8, loss_8, el_8 = collect("exp_two_phase_k8", "stage1_bidirectional")
+def _read_frontier_holdout(paths: Sequence[Path]) -> Dict[str, Tuple[float, float, int]]:
+    """exp_name -> (mean delta loss, population std, n)."""
+    vals: Dict[str, List[float]] = defaultdict(list)
+    for path in paths:
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing frontier holdout CSV: {path}")
+        with open(path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                name = row["exp_name"]
+                if name in FIG1_METHODS:
+                    vals[name].append(float(row["delta_loss_tuned_minus_base"]))
+    return {k: (st.mean(v), st.pstdev(v), len(v)) for k, v in vals.items()}
 
-    ra_thresholds: List[Tuple[str, str, str]] = [
-        ("0.001", "stage2_threshold_extended_0.001", "τ=0.001"),
-        ("0.002", "stage2_threshold_extended_0.002", "τ=0.002"),
-        ("0.005", "stage2_threshold_0.005", "τ=0.005"),
-        ("0.010", "stage2_threshold_0.01", "τ=0.01"),
-    ]
-    ra_points: List[Tuple[float, float, str]] = []
-    for _tid, folder, label in ra_thresholds:
-        pat = str(
-            REPO
-            / "results/raw/exp_reverse_adaptive_threshold_ablation/reverse_adaptive/seed_42"
-            / folder
-            / "*"
-            / "results.json"
+
+def figure1_frontier() -> None:
+    """Five-method frontier on held-out delta loss (G5/T-N1)."""
+    comm = _read_frontier_comm(ANALYSIS_DIR / "qv_only_cuda_per_seed_runs.csv")
+    hold = _read_frontier_holdout(
+        [
+            ANALYSIS_DIR / "neuro_part12_qvonly_holdout_strict24.csv",
+            ANALYSIS_DIR / "neuro_existing_alpaca_holdout_phase1_only.csv",
+        ]
+    )
+
+    missing = set(FIG1_METHODS) - (set(comm) & set(hold))
+    if missing:
+        raise ValueError(f"Figure 1 frontier missing methods: {sorted(missing)}")
+
+    distinct_comm = {round(comm[k], 6) for k in FIG1_METHODS}
+    if len(FIG1_METHODS) != 5 or len(distinct_comm) != 4:
+        raise ValueError(
+            "Figure 1 frontier guard failed: expected 5 methods at 4 distinct communication levels"
         )
-        matches = sorted(glob.glob(pat))
-        if not matches:
-            warnings.warn(f"Figure 1: missing RA threshold run for {folder}")
-            continue
-        path = matches[-1]
-        data = _load_rounds(path)
-        if not data:
-            continue
-        final = data[-1]
-        mb = float(final["communication_mb"])
-        loss = float(final["avg_loss"])
-        ra_points.append((mb, loss, label))
 
-    fig, ax = plt.subplots(figsize=(6.0, 4.0))
-    ax.errorbar(
-        [mb_f],
-        [loss_f],
-        xerr=[eb_f],
-        yerr=[el_f],
-        fmt="o",
-        color=_COLORS[0],
-        capsize=3,
-        label="FLoRA",
-    )
-    ax.errorbar(
-        [mb_10],
-        [loss_10],
-        xerr=[eb_10],
-        yerr=[el_10],
-        fmt="s",
-        color=_COLORS[1],
-        capsize=3,
-        label="Two-Phase K=10",
-    )
-    ax.errorbar(
-        [mb_8],
-        [loss_8],
-        xerr=[eb_8],
-        yerr=[el_8],
-        fmt="^",
-        color=_COLORS[2],
-        capsize=3,
-        label="Two-Phase K=8",
+    order = sorted(FIG1_METHODS, key=lambda k: FIG1_METHODS[k][1])
+    baseline = comm["exp_flora_iid"]
+    markers = ["o", "s", "^", "D", "v"]
+
+    # Emit values for manual verification.
+    print("Figure1 frontier points:")
+    for k in order:
+        mean, sd, n = hold[k]
+        print(f" - {FIG1_METHODS[k][0]:16s}  MB={comm[k]:9.3f}  delta={mean:+.6f} ± {sd:.6f} (n={n})")
+
+    fig, ax = plt.subplots(figsize=(7.0, 4.6))
+    by_comm = sorted(order, key=lambda k: -comm[k])
+    ax.plot(
+        [comm[k] for k in by_comm],
+        [hold[k][0] for k in by_comm],
+        linestyle="--",
+        linewidth=1.0,
+        color="0.6",
+        zorder=1,
     )
 
-    if len(ra_points) >= 2:
-        rax = [p[0] for p in ra_points]
-        ray = [p[1] for p in ra_points]
-        ax.plot(rax, ray, "k--", alpha=0.55, linewidth=1.2, label="ReverseAdaptive (τ sweep)")
-        for mb, loss, lab in ra_points:
-            ax.scatter([mb], [loss], color=_COLORS[3], s=38, zorder=5, edgecolors="k", linewidths=0.4)
-            ax.annotate(lab, (mb, loss), textcoords="offset points", xytext=(4, 4), fontsize=8)
+    for i, k in enumerate(order):
+        mean, sd, _ = hold[k]
+        savings = (baseline - comm[k]) / baseline * 100
+        ax.errorbar(
+            comm[k],
+            mean,
+            yerr=sd,
+            marker=markers[i % len(markers)],
+            markersize=8,
+            capsize=4,
+            linestyle="none",
+            color=_COLORS[i],
+            zorder=3,
+            label=f"{FIG1_METHODS[k][0]} ({savings:.1f}%)",
+        )
+
+    kx, (ky, _, _) = comm[FIG1_KNEE], hold[FIG1_KNEE]
+    ax.annotate(
+        "knee",
+        xy=(kx, ky),
+        xytext=(kx + 260, ky - 0.006),
+        arrowprops=dict(arrowstyle="->", linewidth=1.0, color="0.3"),
+        fontsize=10,
+        color="0.3",
+    )
 
     ax.set_xlabel("Total round-trip communication (MB)")
-    ax.set_ylabel("Final training loss")
-    ax.set_xlim(1200, 2700)
-    ax.set_ylim(1.255, 1.295)
-    ax.set_title("Communication-quality tradeoff (TinyLlama-1.1B, IID)")
-    ax.legend(loc="upper right", framealpha=0.92)
-    ax.grid(True, alpha=0.25)
+    ax.set_ylabel(r"Held-out $\Delta$loss (tuned $-$ base)")
+    ax.set_title("Communication-quality frontier (TinyLlama-1.1B, Alpaca-3k, IID)")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="lower left", framealpha=0.9)
+    ax.set_xlim(900, 2625)
+    ax.set_ylim(-0.605, -0.57)
     fig.tight_layout()
-    _save(fig, "fig1_pareto_iid")
+    _save(fig, "fig1_frontier")
 
 
 def figure2_convergence() -> None:
@@ -540,7 +558,7 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
 def main() -> None:
     os.chdir(REPO)
     rows = load_table(TABLE_PATH)
-    figure1_pareto_iid(rows)
+    figure1_frontier()
     figure2_convergence()
     figure3_cumulative_comm()
     figure4_downstream()
