@@ -47,11 +47,19 @@ venv/
 
 # macOS
 .DS_Store
+* 2.*
 
 # Logs / experiment artifacts
 wandb/
 *.log
 logs/
+
+# LaTeX build artifacts
+*.aux
+*.out
+*.bbl
+*.blg
+*.synctex.gz
 
 # Local caches
 .cache/
