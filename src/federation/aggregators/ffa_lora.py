@@ -84,7 +84,7 @@ class FFALoRAAggregator:
             for name, p in state.items()
             if "lora_B" in name or "lora_b" in name
         )
-        return b_params * 2 * 2  # float32 bytes/param, single direction
+        return b_params * 4  # float32 (4 bytes/param), single direction
 
     def reset(self):
         """Reset for new experiment."""
