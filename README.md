@@ -4,14 +4,14 @@ Communication-efficient federated fine-tuning for large language models, with me
 
 ## Overview
 
-This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA*. It implements four federated LoRA aggregation methods, evaluates them on Alpaca-3k instruction-tuning at two model scales (TinyLlama-1.1B and LLaMA-3.2-3B), and reports per-round byte-tracked communication costs and downstream zero-shot benchmark accuracy.
+This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA*, submitted to Neurocomputing. It implements federated LoRA aggregation methods, evaluates five published protocols on Alpaca-3k and Dolly-15k instruction tuning at two model scales (TinyLlama-1.1B and LLaMA-3.2-3B), and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Downstream zero-shot benchmarks are included but, at TinyLlama scale, do not discriminate between methods.
 
 ### Headline results
 
 - **Two-Phase K=8** achieves 27.7 percent measured round-trip communication savings versus full-rank federated LoRA on TinyLlama-1.1B.
-- **ReverseAdaptive** achieves 40.5 percent measured savings via single-parameter threshold tuning, recovering the entire fixed-K Pareto frontier.
-- All federated methods cluster within 1.0 percentage point on LLaMA-3.2-3B downstream accuracy across MMLU, ARC-Easy, BoolQ, and HellaSwag.
-- A no-switch sanity baseline produces bit-identical results to plain FLoRA, confirming the adaptive wrapper introduces zero observable perturbation when its switching logic is disabled.
+- **ReverseAdaptive** achieves 40.5 percent measured savings via single-parameter threshold tuning, locating the communication-quality knee on the measured frontier without fixing a phase boundary $K$ in advance.
+- At TinyLlama-1.1B, federated methods cluster within 1.0 percentage point on downstream accuracy across ARC-Easy, BoolQ, and HellaSwag (MMLU omitted at this scale). At LLaMA-3.2-3B, cross-method spread is at most 0.5 percentage points on any benchmark.
+- A no-switch sanity baseline matches plain FLoRA to 10 decimal places on final loss within a single backend, establishing that the adaptive wrapper introduces no observable perturbation when switching is disabled.
 
 ## Aggregators implemented
 
@@ -66,14 +66,13 @@ python3 scripts/evaluate_checkpoint.py \
 
 ```bash
 python3 scripts/build_results_table.py
-python3 scripts/statistical_analysis.py
 python3 scripts/generate_paper_figures.py
 ls figures/  # six PDFs corresponding to paper figures
 ```
 
 ## Hardware
 
-The codebase was developed and tested on Apple M4 Pro (48 GB unified memory) with the MPS backend. CUDA is supported via PyTorch's standard device selection but has not been validated by the maintainer. LLaMA-3.2-3B requires float16 base weights with float32 LoRA parameters on MPS for numerical stability; this is configured automatically by `config/base_config_llama3_3b.yaml`.
+The primary experiment corpus was produced on Apple M4 Pro (48 GB unified memory) with the MPS backend and reproduced on rented NVIDIA hardware (RTX 4090 for TinyLlama-1.1B, A100 40 GB for LLaMA-3.2-3B). LLaMA-3.2-3B uses float16 base weights with float32 LoRA parameters for numerical stability; this is configured automatically by `config/base_config_llama3_3b.yaml`.
 
 ## Citation
 
@@ -81,10 +80,11 @@ If you use this codebase, please cite the paper:
 
 ```
 @article{franklin2026fedlora,
-  title  = {Adaptive Phase-Switching for Communication-Efficient Federated LoRA},
+  title  = {Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning},
   author = {Franklin, Jerry Adams},
   year   = {2026},
-  note   = {Manuscript in preparation, Transactions on Machine Learning Research}
+  journal = {Neurocomputing},
+  note   = {Manuscript under review}
 }
 ```
 

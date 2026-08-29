@@ -1,0 +1,5 @@
+Byte-level measurement of federated LoRA communication, incl. transition cost
+Phase switch fires on a relative loss plateau, not a hand-selected round K
+40.5% measured communication savings for 0.0063 held-out loss on TinyLlama
+Beats FFA-LoRA by 0.018 held-out loss: freezing A at init gives worse adapters
+Past this operating point, savings cost about 5x more quality per point saved

@@ -140,7 +140,7 @@ def _read_frontier_comm(path: Path) -> Dict[str, float]:
 
 
 def _read_frontier_holdout(paths: Sequence[Path]) -> Dict[str, Tuple[float, float, int]]:
-    """exp_name -> (mean delta loss, population std, n)."""
+    """exp_name -> (mean delta loss, sample std, n)."""
     vals: Dict[str, List[float]] = defaultdict(list)
     for path in paths:
         if not path.is_file():
@@ -150,7 +150,7 @@ def _read_frontier_holdout(paths: Sequence[Path]) -> Dict[str, Tuple[float, floa
                 name = row["exp_name"]
                 if name in FIG1_METHODS:
                     vals[name].append(float(row["delta_loss_tuned_minus_base"]))
-    return {k: (st.mean(v), st.pstdev(v), len(v)) for k, v in vals.items()}
+    return {k: (st.mean(v), st.stdev(v), len(v)) for k, v in vals.items()}
 
 
 def figure1_frontier() -> None:

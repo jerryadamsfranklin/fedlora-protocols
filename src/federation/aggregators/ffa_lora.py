@@ -74,13 +74,17 @@ class FFALoRAAggregator:
         return aggregated
 
     def get_communication_cost(self, state: Dict[str, torch.Tensor]) -> int:
-        """Bytes for one client (only B matrices after init)."""
+        """Bytes for one client, one direction (B matrices only).
+
+        Note: reported manuscript byte accounting is measured at transport time
+        in server.py and does not call this helper.
+        """
         b_params = sum(
             p.numel()
             for name, p in state.items()
             if "lora_B" in name or "lora_b" in name
         )
-        return b_params * 2 * 2  # float16 * 2 (upload + download)
+        return b_params * 4  # float32 (4 bytes/param), single direction
 
     def reset(self):
         """Reset for new experiment."""
