@@ -43,8 +43,8 @@ FFA-LoRA & 456 & 1.303628 & \phantom{0}983.13 & init$^\dagger$ \\
 \caption{Non-IID results, MPS corpus, five seeds at $\alpha{=}0.1$. This table documents partition sensitivity rather than comparing methods, so the larger MPS seed set is retained; Table~\ref{tab:b1} follows the CUDA corpus because it backs a method comparison. Seeds 42 and 1000 at $\alpha{=}0.1$ had 9 and 8 active clients due to empty Dirichlet partitions, which scales communication to $9/10$ and $8/10$ of the full value (1379.81 and 1226.50 MB against 1533.13).}
 \label{tab:b2}
 \begin{center}
-\small
-\setlength{\tabcolsep}{4pt}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{llcccc}
 \toprule
 Setting & Seed & Final loss & Total MB & Switch round & Active clients \\
@@ -74,8 +74,8 @@ The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 
 \caption{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss.}
 \label{tab:d1}
 \begin{center}
-\small
-\setlength{\tabcolsep}{4pt}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{lcccc}
 \toprule
 Comparison & $\Delta$ final loss & $p$ & $\Delta$ held-out & $p$ \\
@@ -155,8 +155,8 @@ Total & 34 \\
 \caption{Cross-backend disagreements. Every communication difference is exactly one 110\,MB step of the switch-round lattice. Run 16 breached only the consecutive-spike rule, with no communication or switch-round difference.}
 \label{tab:n3b}
 \begin{center}
-\small
-\setlength{\tabcolsep}{4pt}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{llccl}
 \toprule
 Run & Configuration & MPS (MB) & CUDA (MB) & Failing check \\
