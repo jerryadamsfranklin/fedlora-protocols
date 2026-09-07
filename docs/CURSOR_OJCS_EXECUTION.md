@@ -945,6 +945,7 @@ grep -rn "\\\\fix\|\\\\new{" docs/ojcs-submission/*.tex
 
 # 4. No Elsevier residue
 grep -rin "neurocomputing\|elsarticle\|citep\|citet\|CRediT" docs/ojcs-submission/
+grep -in "declaration of\|competing interest\|CRediT\|Data Availability\|Highlights\|Graphical Abstract" docs/ojcs-submission/*.tex
 
 # 5. Affiliation and name
 grep -n "Independent Researcher" docs/ojcs-submission/main.tex
