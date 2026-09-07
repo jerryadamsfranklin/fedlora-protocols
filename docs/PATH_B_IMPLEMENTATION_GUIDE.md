@@ -3,14 +3,14 @@
 **Audience:** Cursor AI
 **Repository:** `fedlora-protocols` (currently on branch `chore/public-release-prep` or main)
 **Branch suggestion:** `experiments/path-b-revision`
-**Goal:** Run the highest-leverage pre-submission experiments to strengthen the TMLR paper. Specifically: add two more seeds (123 and 456) at LLaMA-3.2-3B for all three methods (FLoRA, Two-Phase K=8, ReverseAdaptive), produce downstream evaluations on the six new checkpoints, and regenerate analysis artifacts to reflect the expanded data.
+**Goal:** Run the highest-leverage pre-submission experiments to strengthen the manuscript. Specifically: add two more seeds (123 and 456) at LLaMA-3.2-3B for all three methods (FLoRA, Two-Phase K=8, ReverseAdaptive), produce downstream evaluations on the six new checkpoints, and regenerate analysis artifacts to reflect the expanded data.
 **Time budget:** ~7-8 calendar days, mostly overnight compute. Total compute estimate: ~52 hours of training + ~6 hours of evaluation = ~58 hours.
 
 ---
 
 ## 0. CONTEXT YOU NEED BEFORE STARTING
 
-The maintainer (Jerry) is preparing to submit a paper to TMLR. An external review of the v5 paper draft flagged that single-seed LLaMA-3.2-3B results are the most likely reviewer complaint. This brief addresses that gap directly by adding seeds 123 and 456 at LLaMA-3.2-3B for all three methods evaluated in the paper.
+The maintainer (Jerry) is preparing to submit the manuscript. An external review of the v5 paper draft flagged that single-seed LLaMA-3.2-3B results are the most likely reviewer complaint. This brief addresses that gap directly by adding seeds 123 and 456 at LLaMA-3.2-3B for all three methods evaluated in the paper.
 
 What already exists on disk (do NOT re-run):
 

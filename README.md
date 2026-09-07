@@ -4,14 +4,16 @@ Communication-efficient federated fine-tuning for large language models, with me
 
 ## Overview
 
-This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA*, submitted to Neurocomputing. It implements federated LoRA aggregation methods, evaluates five published protocols on Alpaca-3k and Dolly-15k instruction tuning at two model scales (TinyLlama-1.1B and LLaMA-3.2-3B), and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Downstream zero-shot benchmarks are included but, at TinyLlama scale, do not discriminate between methods.
+This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning*. It implements six federated LoRA aggregation methods, evaluates them on Alpaca-3k and Dolly-15k instruction-tuning at two model scales (TinyLlama-1.1B and LLaMA-3.2-3B), and reports per-round byte-tracked communication costs measured at the transport layer.
 
 ### Headline results
 
-- **Two-Phase K=8** achieves 27.7 percent measured round-trip communication savings versus full-rank federated LoRA on TinyLlama-1.1B.
-- **ReverseAdaptive** achieves 40.5 percent measured savings via single-parameter threshold tuning, locating the communication-quality knee on the measured frontier without fixing a phase boundary $K$ in advance.
-- At TinyLlama-1.1B, federated methods cluster within 1.0 percentage point on downstream accuracy across ARC-Easy, BoolQ, and HellaSwag (MMLU omitted at this scale). At LLaMA-3.2-3B, cross-method spread is at most 0.5 percentage points on any benchmark.
-- A no-switch sanity baseline matches plain FLoRA to 10 decimal places on final loss within a single backend, establishing that the adaptive wrapper introduces no observable perturbation when switching is disabled.
+- Five published protocols are placed on one measured communication-quality frontier at four distinct operating points.
+- **ReverseAdaptive** achieves 40.5 percent measured round-trip communication savings versus FLoRA on TinyLlama-1.1B, at a held-out instruction-following loss cost of 0.0063.
+- The frontier has a knee: continuing past that point to FFA-LoRA buys 21.3 further percentage points of savings at roughly five times the quality cost per point.
+- **Two-Phase K=8** achieves 27.7 percent measured savings on TinyLlama-1.1B.
+- Federated methods cluster within 0.5 percentage points on LLaMA-3.2-3B downstream accuracy and within 1.0 percentage point on TinyLlama-1.1B, where the zero-shot benchmarks do not discriminate between protocols.
+- A no-switch sanity baseline reproduces the matched FLoRA run to 10 decimal places within a single backend, confirming the adaptive wrapper introduces no perturbation when its switching logic is disabled.
 
 ## Aggregators implemented
 
