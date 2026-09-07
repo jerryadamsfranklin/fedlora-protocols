@@ -1,9 +1,10 @@
 # CURSOR EXECUTION PLAN: OJ-CS Conversion
 
-**Read this whole file before running any command.**
+**Read this whole file before running any command. It replaces the earlier
+copy in `docs/`.**
 
 Repo: `fedlora-protocols`
-Current branch: `neurocomputing/paper-writing`
+Current branch: `ojcs/paper-writing` (already created; see STATUS below)
 Source dir: `docs/neurocomputing-submission/`
 
 Rules for this task:
@@ -19,6 +20,89 @@ Rules for this task:
 - Writing mandates that apply to every line you write or edit: no em-dashes, no
   curly quotes, no signposting words (First, Furthermore, Moreover,
   Additionally).
+
+---
+
+## STATUS as of handoff
+
+**STEPS 0 through 3 are COMPLETE** on branch `ojcs/paper-writing`:
+
+| Commit | Step |
+|---|---|
+| `9bdd8b8` | STEP 0, seed `docs/ojcs-submission/` |
+| `5df6ea5` | STEP 1, drop highlights / duplicate verifier / stale PDF |
+| `ef4b732` | STEP 2, C29-C34 |
+| `4477144` | STEP 3, venue / README / orphan figure |
+| `fac585c` | C32 correction, held-out delta 0.0246 to 0.0245 |
+
+Verifier: 176/176 passing. Both 2026 references resolved and matched.
+`docs/neurocomputing-submission/` untouched.
+
+**This file supersedes the earlier version in `docs/`.** The earlier version put
+length cuts at STEP 4 and gated them on the page limit. That ordering was wrong:
+it would have cut content on the strength of an estimate rather than a measured
+page count. Replace the repo copy with this file before continuing.
+
+**Resume at STEP 4.**
+
+---
+
+## AUTONOMY AND COMMIT POLICY
+
+### Run this in two sessions, not one
+
+**Session A: STEPS 0 through 4** (branch, file removal, content corrections,
+repo cleanup, unconditional cuts).
+**Session B: STEPS 5 through 8** (LaTeX conversion, measurement, length cuts,
+verification, cover letter).
+
+Reason: this file plus `body.tex` plus `appendix.tex` approaches the context
+limit of a single session. STEP 5 is the most delicate work in the plan and
+should not run at the tail of a long context. The break falls naturally between
+content work and format work.
+
+### Proceed unattended through these
+
+STEP 0, STEP 1, STEP 3 in full, and C29a, C29b, C30, C31, C33 in STEP 2. These
+are verbatim find/replace or file operations, and every one of them is
+verifiable by a command in this plan. Commit after each STEP and continue
+without waiting.
+
+### HARD STOP. Report and wait for the author at each of these four
+
+Do not proceed past any of these without an explicit go-ahead.
+
+**STOP 1 - C32, the missing statistics row.** You must recompute the two deltas
+and two p-values from the CSVs, not derive them from Table 2 arithmetic and not
+copy the illustrative values in this plan. Report the four computed values and
+the code path used. If you cannot run the computation, say so plainly and take
+the documented fallback instead. **Writing plausible-looking numbers into a
+statistics table is the single worst failure available in this task.**
+
+**STOP 2 - C34, reference verification.** Resolve both DOIs and both arXiv IDs
+and report what you actually retrieved: title, full author list, venue, year.
+If you have no network access, say so and stop. **Do not report these as
+verified without having retrieved them.** This project has previously shipped
+drafts containing fabricated arXiv identifiers.
+
+**STOP 3 - F4, the abstract.** Draft it, then stop. Do not commit it. The
+abstract must drop from roughly 330 words to under 200, remove all mathematical
+notation, and still carry the FFA-LoRA comparison, which is the paper's
+strongest empirical claim. The author approves the wording.
+
+**STOP 4 - After M1, the page measurement.** Report the compiled page count and
+stop. Do not run any length cut in STEP 6 without the author choosing which
+items fire. A prior submission in this project was desk-rejected for appendix
+ordering; the F7 split plus unreviewed cutting is the same category of risk.
+
+### Commit discipline
+
+After each STEP, report the commit SHA and a one-line summary of what changed.
+The author must be able to `git revert <sha>` a single step without untangling
+it from the others. Never squash. Never amend a prior step's commit.
+
+If any command in this plan fails, or any FIND string does not match exactly,
+stop and report rather than improvising a substitute.
 
 ---
 
@@ -307,116 +391,74 @@ git commit -m "STEP 3: R1-R4 repo cleanup; CITATION.cff venue, README stale coun
 
 ---
 
-## STEP 4: Length reduction
 
-`body.tex` is 8,685 words. The IEEE double-column budget after 6 figures, 7
-tables, 2 algorithms, and 26 references leaves roughly 5,000 words. Target cut:
-approximately 3,600 words.
+## STEP 4: Unconditional cuts (do these regardless of page count)
 
-Do the cuts in this order. Recount after each.
+These are not length cuts. Each removes material that is unsupported,
+duplicated, or contrary to IEEE house style. Do all of them now, before
+conversion, whatever the page budget turns out to be. Total: approximately
+1,100 words.
 
-```bash
-wc -w docs/ojcs-submission/body.tex
+**Length cuts are STEP 6, after conversion and measurement.** Do not cut for
+length until you have a real page count from a compiled IEEEtran document.
+
+
+**L7a. Delete the loss-plateau speculation paragraph.** File: `body.tex`,
+Section 3.3. The paragraph beginning "The choice of loss-plateau as the switching
+signal reflects an empirical observation about federated LoRA training dynamics"
+claims that the A matrices "carry meaningful task-specific gradient information"
+early and "approach a stable configuration" later. The paper presents no evidence
+for either claim; no gradient norms or singular values of A are measured. It is an
+unsupported mechanism story and a reviewer attack surface.
+
+Keep only the final sentence about the signal's practical merits, rewritten:
 ```
-
-### L1. Move the downstream-benchmark block to supplemental (saves ~1,280 words plus ~1.2 pages of floats)
-
-Cut from `body.tex` and paste into a new file
-`docs/ojcs-submission/supplemental.tex`:
-
-- The whole of Section 4.6 "Downstream Evaluation" (heading, body text, Figure 4
-  block, Table `tab:downstream_tiny`, Table `tab:downstream_llama`)
-- The whole of Section 5.5 "The Base-Model Regression Observation" including its
-  `\label{sec:baseregression}`
-
-Insert this replacement at the end of Section 4.2 "Held-Out Instruction-Following
-Metric", as a new final paragraph:
-
+The loss-plateau signal is chosen for its simplicity, its availability without additional instrumentation, and the fact that it tracks the quantity a practitioner optimizes. Alternative signals such as the gradient norm of $A$ or the singular value spectrum of stacked client matrices could provide more direct measures of whether $A$ has converged, and are untested here.
 ```
-The four zero-shot benchmarks do not discriminate between aggregation protocols at either scale. Cross-method spread is at most 1.0 percentage point at TinyLlama-1.1B, where every fine-tuned checkpoint also scores below the base model, and at most 0.5 percentage points at LLaMA-3.2-3B. Quality conclusions in this paper therefore rest on held-out instruction-following loss. The full downstream results, and an account of the TinyLlama regression, are in the supplemental material.
-```
+Saves approximately 200 words and removes a claim the paper cannot defend.
 
-Then repair every dangling reference:
+**L7b. Halve the Conclusion.** File: `body.tex`, Section 7. It currently runs
+about 450 words restating numbers already given in the Abstract, Introduction,
+and Section 4.3. IEEE Computer Society style states that conclusions should not
+summarize but instead outline lessons learned.
 
-```bash
-grep -n "sec:baseregression\|tab:downstream_tiny\|tab:downstream_llama\|fig:downstream" docs/ojcs-submission/body.tex
-```
+Keep: the methodological shift from parameter-count to measured bytes, the fixed
+55.0 MB transition cost, the knee and its 5x marginal ratio, and the closing
+point that reporting what protocols transmit is a prerequisite for comparing
+them. Delete every restated percentage that appears earlier in the paper.
+Saves approximately 220 words.
 
-Each hit must become either a reference to the supplemental material or be
-deleted. Known sites to check: the Introduction headline-numbers paragraph, the
-Section 4.2 opening sentence, and the Limitations paragraph about zero-shot
-benchmarks.
+**L7c. Delete duplicated forward references.** File: `body.tex`, Section 2.2.
+Both the FedIT and FFA-LoRA paragraphs end with a sentence announcing that the
+method "is evaluated directly in Section~\ref{sec:frontier}". Delete both
+sentences; Section 4.3 introduces all five methods on its own. Saves
+approximately 80 words.
 
-This cut is defensible on the merits: the paper's own argument is that these
-benchmarks are uninformative. Do not weaken that argument to justify keeping
-them.
+**L7d. Delete the duplicated qualifications in Section 5.2.** The paragraph
+beginning "Two qualifications bound this result" restates the saturation finding
+from Section 4.7 and the switch-round spread from Section 4.8. Compress to two
+sentences that state the qualification and cross-reference, rather than
+re-deriving. Saves approximately 150 words.
 
-### L2. Move Section 5.4 to supplemental (saves ~370 words)
+**L7e. Trim Section 5.3's opening paragraph.** It restates the Related Work claim
+that prior methods report parameter-count ratios. Cut to one sentence and go
+straight to the contribution. Saves approximately 100 words.
 
-Cut the whole of Section 5.4 "The Reproducibility Guarantee" from `body.tex` into
-`supplemental.tex`.
+**L7f. Trim the backend-provenance paragraph in Section 4.1**, which duplicates
+the supplemental cross-backend section. Keep the two load-bearing sentences: that
+communication totals are backend-invariant while loss values are not, and that
+tables are labelled with their corpus. Saves approximately 100 words.
 
-Insert this single sentence at the end of Section 4.5 "Convergence and Switching
-Behavior", after the existing no-switch paragraph:
+**NEVER cut, under any circumstance:**
 
-```
-Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in the supplemental material.
-```
+- Section 5.3's closed-form lattice derivation (`55(2s-1) + 928.125`). Every
+  measured total in the paper lands on that lattice, which is what makes the byte
+  accounting verifiable rather than merely asserted. It is one of the paper's
+  genuinely novel results.
+- Section 5.3's FFA-LoRA overcharge disclosure (the 55.0 MB harvest-rule
+  paragraph beginning "One artifact of this implementation deserves disclosure").
+- Section 5.2's effect-size-not-equivalence framing around the p=0.997 result.
 
-Keep the existing Section 4.5 sentence reporting the 10-decimal-place match. Do
-not delete it.
-
-### L3. Compress Related Work (target ~250 words)
-
-File: `body.tex`, Section 2.
-
-**2.1:** delete the QLoRA sentence and the closing "compact and composable"
-sentence. Keep the `dettmers2023qlora` citation by folding it into the adapter
-sentence.
-
-**2.3:** delete the FedPAQ sentence and the Deep Gradient Compression detail
-about 0.1 percent. Keep both citations by compressing to one sentence naming
-QSGD, deep gradient compression, and FedPAQ together as quantization and
-sparsification approaches.
-
-**2.4:** delete the FedNova sentence detail and the curriculum-scheduling
-sentence. Keep the final sentence beginning "To the authors' knowledge", which
-is the positioning claim.
-
-**Do not drop any `\cite` key.** Verify:
-```bash
-grep -o "\\\\citep\?{[^}]*}" docs/ojcs-submission/body.tex | tr ',' '\n' | grep -o "[a-z0-9]*20[0-9][0-9][a-z]*" | sort -u > /tmp/after.txt
-```
-Compare against the same command run on the Neurocomputing copy. The sets must
-be identical.
-
-### L4. Compress Limitations from twelve paragraphs to six (target ~450 words)
-
-File: `body.tex`, Section 6.
-
-**Merge into one paragraph:** the dataset/task-type paragraph and the
-Alpaca-only-baselines paragraph.
-
-**Merge into one paragraph:** the code-revisions paragraph and the
-LLaMA-multi-revision/seed-noise paragraph.
-
-**Delete outright:** the zero-shot benchmark paragraph (its content moves to
-supplemental under L1) and the final "Future work should address..." paragraph,
-whose three items are already named elsewhere in the section.
-
-**DO NOT CUT, DO NOT SHORTEN, DO NOT MERGE these three paragraphs:**
-
-1. The partial-participation paragraph
-2. The semantic-heterogeneity paragraph ("Non-IID partitions are constructed by
-   Dirichlet skew over instruction-length buckets...")
-3. The transition-round harvest-rule paragraph ("At the transition round the
-   server freezes $A$ from the first client's uploaded state...")
-
-These three are the paper's honest disclosures. Item 3 in particular is the
-result of the C20 correction, which found that the paper's own measurement
-overcharges the strongest baseline. Removing it to save space would undo that
-work. If the page count still does not fit after every other cut, cut prose from
-the Discussion instead.
 
 ### L5. Compress Section 5.1 to one paragraph (saves ~90 words)
 
@@ -427,6 +469,7 @@ REPLACE the entire subsection body with:
 ```
 In mobile or IoT federated settings where uplink bandwidth is scarce and metered, cutting round-trip communication by 30 to 40\% for a held-out instruction-following loss cost of 0.0063 can change the economic viability of federated fine-tuning. Whether that trade is acceptable is a deployment decision rather than a universal one, and the frontier in Section~\ref{sec:frontier} is intended to let a practitioner make it explicitly: the same measurements show that accepting a further 21.3 points of savings costs roughly five times more quality per point. \citet{kairouz2021advances} identify communication as a fundamental open problem in federated learning at scale, and measured byte-level reporting is a prerequisite for addressing it.
 ```
+
 
 ### L6. Trim the Introduction (saves ~150 words)
 
@@ -446,31 +489,16 @@ refers to downstream benchmarks now moved to supplemental:
 All federated methods on LLaMA-3.2-3B cluster within 0.5 percentage points across the four downstream benchmarks.
 ```
 
-### L7. If still over budget
-
-Compile and measure first. If more is needed, cut in this order and stop as soon
-as it fits:
-
-1. Section 5.2 paragraph 1 (restates what Two-Phase requires; the point is made
-   again in paragraph 2)
-2. Section 4.4 paragraph 4 (the non-IID Dolly run at alpha=0.5, which reports no
-   quality cost anyway)
-3. Section 5.3 paragraph 4 (the closed-form lattice derivation; move the
-   derivation to supplemental and keep the one-sentence result)
-
-**Never cut to fit by reducing font size, shrinking margins, adding negative
-`\vspace`, or moving a `\DeclareMathSizes`. IEEE prescreening rejects for this.**
 
 ### Commit STEP 4
 
 ```bash
-wc -w docs/ojcs-submission/body.tex   # target: at or under ~5,100
+wc -w docs/ojcs-submission/body.tex   # expect roughly 7,600
 python3 scripts/verify_numbers.py --analysis-dir analysis
 git add -A
-git commit -m "STEP 4: L1-L6 length reduction for 12-page IEEE limit; downstream block and reproducibility guarantee moved to supplemental"
+git commit -m "STEP 4: remove unsupported plateau claim, duplicated cross-references, summarizing conclusion, roadmap paragraph"
 ```
 
----
 
 ## STEP 5: LaTeX conversion to IEEEtran
 
@@ -710,7 +738,195 @@ limit confirmed in STEP 6, return to L7.
 
 ---
 
-## STEP 6: Pre-submission verification
+
+## STEP 6: Measure, then cut for length only if needed
+
+### M1. Measure first
+
+After STEP 5 compiles, get the real number before touching content:
+
+```bash
+cd docs/ojcs-submission
+pdflatex main && bibtex main && pdflatex main && pdflatex main
+pdfinfo main.pdf | grep Pages
+cd ../..
+```
+
+**Report the page count to the author before cutting anything.**
+
+The source document is `elsarticle` with `[preprint,review,12pt]`: single
+column, 12pt, double line spacing. IEEEtran journal class is 9.5pt on 11.5pt
+in two columns. The compiled length will drop sharply on conversion alone, and
+the estimates below may prove unnecessary.
+
+### M2. Decision rule
+
+| Measured pages | Action |
+|---|---|
+| At or under the limit | **Stop. Cut nothing.** Go to STEP 7. |
+| 1 page over | L2 only |
+| 2 pages over | L2, then L3 |
+| 3 pages over | L2, L3, then L4 |
+| 4+ pages over | L2, L3, L4, then L1 |
+
+Recompile and re-measure after each item. Stop the moment it fits. Do not run
+the whole list because it is written down.
+
+Order rationale: L2 and L3 cost the reader nothing, L4 costs a little, and L1
+is the only one that removes real evidence. It fires last.
+
+**If the document is 5 or more pages over**, stop and report. The float
+estimates behind this plan were wrong and the author needs to reconsider the
+venue rather than cut a further 2,000 words.
+
+### L2. Move Section 5.4 to supplemental (saves ~370 words)
+
+Cut the whole of Section 5.4 "The Reproducibility Guarantee" from `body.tex` into
+`supplemental.tex`.
+
+Insert this single sentence at the end of Section 4.5 "Convergence and Switching
+Behavior", after the existing no-switch paragraph:
+
+```
+Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in the supplemental material.
+```
+
+Keep the existing Section 4.5 sentence reporting the 10-decimal-place match. Do
+not delete it.
+
+
+### L3. Compress Related Work (target ~250 words)
+
+File: `body.tex`, Section 2.
+
+**2.1:** delete the QLoRA sentence and the closing "compact and composable"
+sentence. Keep the `dettmers2023qlora` citation by folding it into the adapter
+sentence.
+
+**2.3:** delete the FedPAQ sentence and the Deep Gradient Compression detail
+about 0.1 percent. Keep both citations by compressing to one sentence naming
+QSGD, deep gradient compression, and FedPAQ together as quantization and
+sparsification approaches.
+
+**2.4:** delete the FedNova sentence detail and the curriculum-scheduling
+sentence. Keep the final sentence beginning "To the authors' knowledge", which
+is the positioning claim.
+
+**Do not drop any `\cite` key.** Verify:
+```bash
+grep -o "\\\\citep\?{[^}]*}" docs/ojcs-submission/body.tex | tr ',' '\n' | grep -o "[a-z0-9]*20[0-9][0-9][a-z]*" | sort -u > /tmp/after.txt
+```
+Compare against the same command run on the Neurocomputing copy. The sets must
+be identical.
+
+
+### L4. Compress Limitations from twelve paragraphs to six (target ~450 words)
+
+File: `body.tex`, Section 6.
+
+**Merge into one paragraph:** the dataset/task-type paragraph and the
+Alpaca-only-baselines paragraph.
+
+**Merge into one paragraph:** the code-revisions paragraph and the
+LLaMA-multi-revision/seed-noise paragraph.
+
+**Delete outright:** only the final "Future work should address..." paragraph,
+whose three items are already named elsewhere in the section.
+
+**DO NOT CUT, DO NOT SHORTEN, DO NOT MERGE these four paragraphs:**
+
+1. The partial-participation paragraph
+2. The semantic-heterogeneity paragraph ("Non-IID partitions are constructed by
+   Dirichlet skew over instruction-length buckets...")
+3. The transition-round harvest-rule paragraph ("At the transition round the
+   server freezes $A$ from the first client's uploaded state...")
+4. The zero-shot-benchmark paragraph ("The four zero-shot benchmarks do not
+   discriminate between aggregation protocols at TinyLlama scale...")
+
+These four are the paper's honest disclosures. Item 3 is the result of the C20
+correction, which found that the paper's own measurement overcharges the
+strongest baseline. Item 4 is the stated reason that quality conclusions rest on
+held-out loss alone; deleting it while keeping the conclusion would leave the
+restriction unjustified. Update item 4's cross-reference from
+`Section~\ref{sec:baseregression}` to the supplemental material, but keep the
+paragraph.
+
+If the page count still does not fit after every other cut, cut prose from the
+Discussion instead.
+
+
+### L1. Partially move the downstream-benchmark block (saves ~900 words plus ~0.9 pages of floats)
+
+**Read this whole item before cutting. An earlier draft of this plan moved the
+entire block, which would have removed the paper's only out-of-distribution
+quality evidence. Do not do that.**
+
+Held-out instruction-following loss is measured on `train[3000:3500]`, drawn from
+the same distribution as the training data. The Limitations section says so
+explicitly. The zero-shot benchmarks are therefore the only evidence in the paper
+that communication savings do not damage capability outside the training
+distribution, independent of whether they separate protocols from each other.
+That evidence stays in the body.
+
+**KEEP in `body.tex`:**
+- Table `tab:downstream_llama` (LLaMA-3.2-3B, three seeds). This is the stronger
+  of the two tables: three seeds rather than one, and it shows federated methods
+  flat-to-positive against the base model.
+- A shortened Section 4.6 built from the two paragraphs below.
+
+**MOVE to `supplemental.tex`:**
+- Figure 4 and its caption
+- Table `tab:downstream_tiny` (single-seed, MPS corpus, weaker evidence)
+- The whole of Section 5.5 "The Base-Model Regression Observation" including
+  `\label{sec:baseregression}`
+
+REPLACE the body of Section 4.6 with exactly this, keeping
+Table `tab:downstream_llama` in place after it:
+
+```
+Table~\ref{tab:downstream_llama} reports zero-shot accuracy on MMLU \cite{hendrycks2020measuring}, ARC-Easy \cite{clark2018arc}, BoolQ \cite{clark2019boolq}, and HellaSwag \cite{zellers2019hellaswag} at LLaMA-3.2-3B. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and every cross-method difference lies within the seed-to-seed standard deviation of the individual methods. Federated methods match or slightly exceed the base model on all four benchmarks, so the communication savings reported above do not come at a measurable cost outside the training distribution at this scale.
+
+At TinyLlama-1.1B the same benchmarks are less informative. MMLU sits at chance for 4-way multiple choice, and on the three remaining benchmarks all methods regress relative to the base model by 2.2 to 7.4 percentage points while clustering within 1.0 percentage point of each other. The regression is uniform across aggregation methods and coincides with a large improvement on the held-out objective, where the base model scores 1.9352 and every fine-tuned checkpoint scores between 1.3349 and 1.3608. It is a divergence between the training objective and these benchmarks rather than a training failure; the supplemental material gives the per-benchmark figures and a specific account of the BoolQ result. Protocol comparisons in this paper therefore rest on held-out instruction-following loss.
+```
+
+This preserves the out-of-distribution claim, states the TinyLlama regression
+with its explanation attached rather than orphaned, and still removes a figure, a
+table, and roughly 900 words.
+
+Then repair dangling references:
+
+```bash
+grep -n "sec:baseregression\|tab:downstream_tiny\|fig:downstream" docs/ojcs-submission/body.tex
+```
+
+Each remaining hit becomes a reference to the supplemental material.
+`tab:downstream_llama` stays and its references stay.
+
+
+### L9. Last resort, only if L1 through L4 all ran and it still does not fit
+
+Compile and measure first. Only then, and stopping as soon as it fits:
+
+1. Section 4.4 paragraph 4 (the non-IID Dolly run at alpha=0.5, which reports no
+   quality cost and adds no operating point)
+2. Section 2.1's LoRA background, which any reader of this venue already knows,
+   compressed to two sentences
+
+**Never cut to fit by reducing font size, shrinking margins, adding negative
+`\vspace`, or moving a `\DeclareMathSizes`. IEEE prescreening rejects for this.**
+
+
+### Commit STEP 6
+
+```bash
+pdfinfo docs/ojcs-submission/main.pdf | grep Pages
+python3 scripts/verify_numbers.py --analysis-dir analysis
+git add -A
+git commit -m "STEP 6: length cuts to fit page limit (record which of L1-L4 were needed)"
+```
+
+
+## STEP 7: Pre-submission verification
 
 Run all of these. Report each result.
 
@@ -749,16 +965,17 @@ Then, manually and outside the repo:
 - Run the full text through a grammar checker. IEEE prescreening rejects for poor
   grammar before review reaches a reviewer.
 
-### Commit STEP 6
+### Commit STEP 7
 
 ```bash
 git add -A
-git commit -m "STEP 6: pre-submission verification passed; LaTeX Analyzer and RefAssist clean"
+git commit -m "STEP 7: pre-submission verification passed; LaTeX Analyzer and RefAssist clean"
 ```
 
 ---
 
-## STEP 7: Cover letter
+
+## STEP 8: Cover letter
 
 Rewrite `docs/ojcs-submission/cover_letter.md`.
 
@@ -782,20 +999,33 @@ instruction from the author.
 
 ---
 
-## Open questions for the author, answer before STEP 4
+## Answered: items previously open
 
-1. **Page limit.** The OJ-CS Author Information page blocks automated retrieval.
-   The 12-page figure used throughout this plan comes from the general IEEE
-   Computer Society regular-paper policy. Confirm the OJ-CS number manually at
-   `computer.org/csdl/journal/oj/write-for-us/75639` and report it. The size of
-   the STEP 4 cut depends on the answer.
+1. **Editor-in-chief: Vincenzo Piuri**, University of Milan,
+   `vincenzo.piuri@unimi.it`. Confirmed from the IEEE Xplore masthead and the
+   IEEE Computer Society press room. Song Guo was the inaugural EIC and is no
+   longer in post; any address found on the older call-for-papers page is stale.
 
-2. **Editor-in-chief.** Sources disagree on whether the current EIC is Song Guo
-   or Vincenzo Piuri. Confirm from the journal masthead before sending any
-   correspondence.
+2. **IEEE membership: drop the tag.** Delete
+   `,~\IEEEmembership{Member,~IEEE}` in F3 and leave the author name plain.
+   The author is not currently an IEEE member. Joining before acceptance still
+   secures the 20 percent APC discount, which is applied at invoicing.
 
-3. **IEEE membership status at submission**, which determines whether the
-   `\IEEEmembership` tag in F3 stays or goes.
+3. **Review timeline: plan on 10 weeks**, not the 5 weeks stated on the
+   call-for-papers page. Four independent IEEE sources give 10 weeks: the
+   Computer Society peer-review schedules page, the open-access content page,
+   the 2020 launch announcement, and the 2019 EIC call. Also note the schedules
+   page states OJ-CS has **no revision option**.
+
+## Still open: the page limit
+
+The OJ-CS Author Information page blocks automated retrieval. The 12-page
+figure used in this plan comes from the general IEEE Computer Society
+regular-paper policy, which defines the regular paper limit as 12 formatted
+pages including references and biographies.
+
+**This does not block STEP 4 or STEP 5.** It is needed at M2 in STEP 6. The
+author will confirm it before then.
 
 ## Stop conditions
 
@@ -803,7 +1033,7 @@ Stop and ask the author if any of the following occur:
 
 - `verify_numbers.py` reports any failure
 - A FIND string in STEP 2 does not match exactly
-- The page count still exceeds the limit after L1 through L7
+- The page count still exceeds the limit after L1 through L4 and L9
 - A reference in C34 does not resolve, or resolves to different metadata
 - Any cut would require removing one of the three protected Limitations
   paragraphs named in L4
