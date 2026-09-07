@@ -126,7 +126,7 @@ Per-round upload and download megabytes are recorded in \texttt{results.json}. B
 \textbf{Frozen-$A$ provenance.} At the transition round the server seeds $A_{\text{frozen}}$ from the first client's uploaded state rather than from an average across clients. Because every client begins that round from the same broadcast global state, this is the aggregated global $A$ of the preceding round plus one epoch of local adaptation at learning rate $10^{-4}$. Client ordering is fixed for the duration of a run, so the choice is deterministic and reproducible. Two-Phase and ReverseAdaptive share this rule, since both dispatch to the same FFA-LoRA aggregator at their boundary. Averaging $A$ across clients at the transition round is a plausible alternative that this work does not test.
 
 \textbf{GQA B-fraction.}
-For TinyLlama-1.1B with rank $r{=}16$ targeting $\{\texttt{q\_proj}, \texttt{v\_proj}\}$, the projections adapted in the original LoRA formulation \cite{hu2022lora}, accounting for GQA in the value projection, the B-only fraction of the full state is exactly 36\% rather than the 50\% a naive parameter count would suggest. This fraction is invariant to the size of the target set, since \texttt{q\_proj} and \texttt{o\_proj} share a shape and \texttt{k\_proj} and \texttt{v\_proj} share a shape under GQA; the ratio is fixed by the GQA configuration, not by how many projections are adapted.
+For TinyLlama-1.1B with rank $r{=}16$ targeting $\{\texttt{q\_proj}, \texttt{v\_proj}\}$, the projections adapted in the original LoRA formulation \cite{hu2022lora}, accounting for GQA in the value projection, the B-only fraction of the full state is exactly 36\% rather than the 50\% a naive parameter count would suggest. This fraction is invariant to the size of the target set, since \texttt{q\_proj} and \texttt{o\_proj} share a shape and \texttt{k\_proj} and \texttt{v\_proj} share a shape under GQA; the ratio is fixed by the GQA configuration, not by how many projections are adapted. LLaMA-3.2-3B's different GQA configuration yields exactly 40\%.
 
 \textbf{Partition mechanics.}
 Alpaca and Dolly-15k carry no class labels, so non-IID partitions apply Dirichlet skew over a task-diversity proxy: each instruction $s$ is assigned to one of ten buckets by character length, $\min(\lfloor |s| / 50 \rfloor, 9)$, and a Dirichlet distribution with concentration $\alpha \in \{0.5, 0.1\}$ is applied over those buckets. This induces heterogeneity in task form rather than task semantics; Section~\ref{sec:limitations} notes that semantic heterogeneity is untested.
@@ -144,7 +144,7 @@ Table~\ref{tab:setup} summarizes the experimental configuration. The primary cor
 \begin{center}
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{0.95}
-\resizebox{\textwidth}{!}{
+\resizebox{\columnwidth}{!}{
 \begin{tabular}{ll}
 \toprule
 Parameter & Value \\
@@ -211,12 +211,11 @@ FedIT lands on FLoRA's communication volume exactly, to the byte, and within 0.0
 
 Loss differences between methods are small in absolute terms, 0.0141 between FLoRA and ReverseAdaptive at $\tau{=}0.01$, but are resolved across three seeds because the per-seed spread is more than twenty times smaller. Paired $t$-tests on final loss give $p < 10^{-3}$ for every comparison against FLoRA except FedIT, which is correctly indistinguishable. With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values, and no multiplicity correction is applied in Table~\ref{tab:frontier}; the supplemental material reports the full matrix on both metrics with the correction stated.
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Measured communication-quality frontier. TinyLlama-1.1B, Alpaca-3k, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Communication is protocol-deterministic and identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice of Section~\ref{sec:heldout}; more negative is better. $p$-values are paired $t$-tests against FLoRA on final loss; the full matrix on both metrics is in the supplemental material. Methods: FLoRA \cite{wang2024flora}, FedIT \cite{zhang2024federatedgpt}, FFA-LoRA \cite{sun2024ffalora}. The MB column is total round-trip communication over 15 rounds.}
 \label{tab:frontier}
 \begin{center}
-\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{
+\setlength{\tabcolsep}{6pt}
 \begin{tabular}{lccccc}
 \toprule
 Method & MB & Savings & Final loss & Held-out $\Delta$ & $p$ vs.\ FLoRA \\
@@ -228,9 +227,8 @@ ReverseAdaptive ($\tau{=}0.01$)     & 1533.13 & 40.53\% & $1.2749 \pm 0.0006$ & 
 FFA-LoRA                             & \phantom{0}983.13 & 61.87\% & $1.3031 \pm 0.0012$ & $-0.5746 \pm 0.0004$ & $1.7 \times 10^{-4}$ \\
 \bottomrule
 \end{tabular}
-}
 \end{center}
-\end{table}
+\end{table*}
 
 This frontier sweeps through the fixed-$K$ Two-Phase operating points: on the MPS corpus, $\tau{=}0.002$ lands on Two-Phase $K{=}8$ communication and $\tau{=}0.001$ on $K{=}10$. Because total communication is a step function of the discrete switch round, at 110\,MB per round, this correspondence is not backend-invariant; the supplemental material reports that both tight-$\tau$ settings fire one round earlier on CUDA. The robust claim is that the adaptive method traverses the same frontier as the fixed-$K$ family without requiring $K$ to be specified, rather than that it reproduces particular $K$ values byte for byte.
 
@@ -244,12 +242,11 @@ Two-Phase $K{=}8$ costs 0.0034 on Alpaca and 0.0043 on Dolly, a shift of 25.5\%.
 
 A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and reached the same 1533.13 MB, matching the IID behaviour on both datasets. No Dolly FLoRA baseline was run under heterogeneity, so no quality cost is reported for that configuration.
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Dolly-15k replication. TinyLlama-1.1B, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Gap is the held-out $\Delta$loss difference against the same dataset's FLoRA baseline, which is the quantity comparable across datasets; held-out levels are not, since base-model losses differ (1.9352 on Alpaca, 2.2608 on Dolly-15k). Methods: FLoRA \cite{wang2024flora}, FedIT \cite{zhang2024federatedgpt}, FFA-LoRA \cite{sun2024ffalora}. The MB column is total round-trip communication over 15 rounds.}
 \label{tab:dolly}
 \begin{center}
-\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{
+\setlength{\tabcolsep}{6pt}
 \begin{tabular}{lccccc}
 \toprule
 Method & MB & Final loss & Held-out $\Delta$ & Gap (Dolly) & Gap (Alpaca) \\
@@ -259,9 +256,8 @@ Two-Phase $K{=}8$               & 1863.13 & $1.6643 \pm 0.0021$ & $-0.5287 \pm 0
 ReverseAdaptive ($\tau{=}0.01$) & 1533.13 & $1.6686 \pm 0.0022$ & $-0.5268 \pm 0.0005$ & 0.0061 & 0.0063 \\
 \bottomrule
 \end{tabular}
-}
 \end{center}
-\end{table}
+\end{table*}
 
 \subsection{Convergence and Switching Behavior}
 Figure~\ref{fig:convergence} shows mean $\pm$ std loss trajectories across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity.
@@ -301,7 +297,7 @@ At TinyLlama-1.1B (Table~\ref{tab:downstream_tiny}), all federated methods clust
 
 At LLaMA-3.2-3B scale, the three federated methods are statistically indistinguishable on downstream benchmarks. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and all cross-method differences lie within the seed-to-seed standard deviation of each individual method. The picture differs from the TinyLlama panel in two ways. The federated methods are flat to slightly positive relative to the base model at 3B rather than regressing as they did at 1.1B; the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and federated methods either match or slightly exceed each of these. The within-method seed variance is also smaller at 3B than the within-scale spread observed at TinyLlama, indicating that downstream benchmarks become more stable as model capacity grows.
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Downstream zero-shot accuracy, TinyLlama-1.1B. MMLU omitted: base accuracy is at chance for 4-way multiple choice.}
 \label{tab:downstream_tiny}
 \begin{center}
@@ -317,14 +313,13 @@ Spread (max--min) & 0.006 & 0.010 & 0.000 & -- \\
 \bottomrule
 \end{tabular}
 \end{center}
-\end{table}
+\end{table*}
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Downstream zero-shot accuracy, LLaMA-3.2-3B. Mean $\pm$ 1 standard deviation across three random seeds (42, 123, 456). 500 examples per benchmark. Cross-method spread is at most 0.5 percentage points on any benchmark and is within the seed-to-seed standard deviation of each method.}
 \label{tab:downstream_llama}
 \begin{center}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{6pt}
 \begin{tabular}{lcccc}
 \toprule
 Method & MMLU & ARC-Easy & BoolQ & HellaSwag \\
@@ -336,7 +331,7 @@ ReverseAdaptive   & $0.557 \pm 0.003$ & $0.839 \pm 0.008$ & $0.739 \pm 0.004$ & 
 \bottomrule
 \end{tabular}
 \end{center}
-\end{table}
+\end{table*}
 
 \subsection{Threshold Ablation}
 \label{sec:ablation}
