@@ -1,15 +1,17 @@
 # Cover Letter
 
-To the Editors, *Neurocomputing*
+To: Professor Vincenzo Piuri, Editor-in-Chief  
+*IEEE Open Journal of the Computer Society*  
+vincenzo.piuri@unimi.it
 
-**Manuscript:** Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning
+**Manuscript:** Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning  
 **Author:** Jerry Adams Franklin, Independent Researcher
 
 ---
 
-Dear Editors,
+Dear Professor Piuri,
 
-Please consider the enclosed manuscript for publication in *Neurocomputing*.
+Please consider the enclosed manuscript for publication in the *IEEE Open Journal of the Computer Society*. Appendices are submitted as a separate supplemental PDF.
 
 The paper addresses a measurement problem in federated fine-tuning of large language models. Existing work on federated low-rank adaptation reports communication savings as parameter-count ratios rather than as bytes actually transmitted. Two consequences follow, and neither is visible in a parameter ratio. Protocols that change aggregation mode mid-training incur an asymmetric transition cost that ratio-based accounting omits entirely. And the fraction of a low-rank adapter that a protocol can decline to transmit is fixed by the model's grouped-query attention configuration, so a savings figure derived for one architecture does not carry to another.
 
@@ -19,9 +21,9 @@ A secondary contribution operationalizes it. ReverseAdaptive is a schedule that 
 
 We also report results that do not favor the proposed method, because they bound what the measurements support. The four zero-shot benchmarks commonly used in this literature do not discriminate between aggregation protocols at the smaller scale, where every fine-tuned checkpoint scores below the base model; quality conclusions therefore rest on held-out instruction-following loss alone. At 3B, the adaptive and hand-tuned configurations differ by an amount three seeds cannot resolve, and we report this as an effect size rather than as evidence of equivalence. The 55 MB transition cost we measure is a property of our implementation's frozen-parameter harvest rule rather than of phase-switching protocols in general, and we identify the untested alternative that would eliminate it. We also disclose that our own measurement charges the strongest baseline 55 MB it should not pay, and show that correcting it moves the headline ratio from 5.5 to 5.0 while leaving the conclusion unchanged.
 
-All experiments were produced on a single consumer workstation, approximately 285 hours of compute with no institutional cluster, and subsequently reproduced on rented GPU hardware. The cross-backend comparison is reported in full, including every disagreement.
+The primary corpus of 34 runs was produced on a single consumer workstation, approximately 285 hours of compute with no institutional cluster, and subsequently reproduced on rented GPU hardware. The cross-backend comparison is reported in full in the supplemental material, including every disagreement.
 
-Code, configuration files, analysis data, and scripts sufficient to regenerate every figure and table are publicly released. Adapter checkpoints are not released; the reproduction scripts are sufficient without them.
+Code, configuration files, analysis data, and scripts sufficient to regenerate every figure and table are publicly released. Adapter checkpoints are not released; the reproduction scripts are sufficient without them. The analysis CSVs are prepared for deposit on IEEE DataPort.
 
 This manuscript is original, has not been published elsewhere, and is not under consideration by another journal. I have no competing interests to declare. As sole author I am responsible for all aspects of the work.
 
@@ -31,7 +33,7 @@ Thank you for your consideration.
 
 Sincerely,
 
-Jerry Adams Franklin
-Independent Researcher
-jerry.adamsf@gmail.com
+Jerry Adams Franklin  
+Independent Researcher  
+jerry.adamsf@gmail.com  
 ORCID: 0009-0006-8470-8349

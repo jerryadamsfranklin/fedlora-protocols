@@ -964,6 +964,12 @@ Then, manually and outside the repo:
   `refassist.ieee.org`.
 - Run the full text through a grammar checker. IEEE prescreening rejects for poor
   grammar before review reaches a reviewer.
+- Submit through the **IEEE Author Portal** (OJ-CS CFP confirmation). Supply the
+  six figures as individual PDF files alongside the manuscript (PS/EPS/PDF/PNG/TIF
+  are accepted); production may reflow from those files.
+- Encourage an **IEEE DataPort** deposit of `analysis/*.csv` (DOI). The CSVs are
+  the natural companion to the measurement claims and reinforce the strongest part
+  of the paper.
 
 ### Commit STEP 7
 

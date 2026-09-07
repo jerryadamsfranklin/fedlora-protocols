@@ -19,9 +19,10 @@
 \maketitle
 
 This supplemental material accompanies the main paper. It provides hyperparameter
-details, per-seed results, statistical tests, a reproducibility checklist, and
-cross-backend verification. Cross-references to the main paper use fixed table
-and section numbers from the compiled manuscript.
+details, per-seed results, statistical tests, a reproducibility checklist,
+cross-backend verification, and the mechanics of disabling the ReverseAdaptive
+switch. Cross-references to the main paper use fixed table and section numbers
+from the compiled manuscript.
 
 \appendices
 
@@ -142,21 +143,7 @@ ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 
 The primary corpus was produced on the MPS backend and subsequently re-executed on CUDA. Table~\ref{tab:n3a} summarizes the comparison; Table~\ref{tab:n3b} details every disagreement.
 
-Tolerances are setting-aware. IID runs require per-round training loss to agree within $0.01$ absolute. Non-IID runs allow $0.025$, since heterogeneous partitions amplify per-round variation, but additionally require the switch round to match exactly and permit no more than two consecutive rounds exceeding $0.01$. Communication must agree within $0.01$ in all settings, which is effectively exact since totals are protocol-deterministic.
-
-Of 34 run pairs, 31 have a valid MPS reference. The three Two-Phase $K{=}8$ runs at $\alpha{=}0.5$ do not: their MPS executions predate the bidirectional B-only implementation and never switched, recording 2578.13 MB, the full FLoRA volume. Those are absent references rather than disagreements, and CUDA is the source of truth for that configuration. Of the 31 comparable pairs, 27 agree within tolerance and 4 do not.
-
-All four disagreements are the same phenomenon. Total communication is a step function of the discrete switch round with 110\,MB granularity (Section~V-C of the main paper), and every observed cross-backend communication difference is exactly one step: the MPS and CUDA totals in Table~\ref{tab:n3b} are adjacent points on the same lattice. The backends do not disagree about the protocol, only about which round the plateau criterion fires, and only where that decision sits near a boundary. Two of the four are IID runs at tight thresholds ($\tau{=}0.001$ and $\tau{=}0.002$), where the criterion is nearly satisfied in either of two adjacent rounds; two are $\alpha{=}0.1$ runs, where heterogeneity produces a noisier loss trajectory. This is boundary sensitivity rather than heterogeneity sensitivity.
-
-Run 17 was investigated separately. Re-executing on CUDA with the data partition seed fixed at 456 and the training seed changed to 999 reproduced switch round 7 exactly, establishing that the one-round difference is a stable property of the backend and partition rather than run-to-run stochasticity. At $\alpha{=}0.1$, cross-backend agreement on the discrete switch round is therefore not guaranteed: one of three partitions fired one round later on CUDA, and CUDA is reported as primary for that setting.
-
-The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B runs, which is what supports the cross-scale transfer claim in Section~V of the main paper.
-
-\textbf{Byte accounting.} Communication is instrumented at the transport layer, counting \texttt{numel} times \texttt{element\_size} on the tensors actually transmitted, rather than derived from parameter counts. The \texttt{get\_communication\_cost} helper in the FFA-LoRA aggregator is not used by this accounting.
-
-\textbf{Code revisions.} Runs were produced across multiple code revisions with uncommitted working-tree modifications, so no reported number is recoverable by checking out a single commit. Reproducibility rests instead on the cross-backend replication documented here. The byte accounting is revision-invariant by direct measurement: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive were each executed under two different revisions within the CUDA corpus and produced identical totals of 2578.13, 1863.13 and 1533.13\,MB. Loss values carry revision uncertainty; the FLoRA and FedIT rows of Table~II of the main paper span that boundary and differ by 0.0006, against a ReverseAdaptive-to-FFA-LoRA separation of 0.0282.
-
-\begin{table}[t]
+\begin{table}[!t]
 \caption{Cross-backend verification summary, MPS against CUDA, 34 run pairs.}
 \label{tab:n3a}
 \begin{center}
@@ -178,13 +165,13 @@ Total & 34 \\
 \end{center}
 \end{table}
 
-\begin{table*}[t]
+\begin{table}[!t]
 \caption{Cross-backend disagreements. Every communication difference is exactly one 110\,MB step of the switch-round lattice. Run 16 breached only the consecutive-spike rule, with no communication or switch-round difference.}
 \label{tab:n3b}
 \begin{center}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llccl}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llp{0.16\columnwidth}p{0.16\columnwidth}p{0.30\columnwidth}@{}}
 \toprule
 Run & Configuration & MPS (MB) & CUDA (MB) & Failing check \\
 \midrule
@@ -195,8 +182,29 @@ Run & Configuration & MPS (MB) & CUDA (MB) & Failing check \\
 \bottomrule
 \end{tabular}
 \end{center}
-\end{table*}
+\end{table}
 
+Tolerances are setting-aware. IID runs require per-round training loss to agree within $0.01$ absolute. Non-IID runs allow $0.025$, since heterogeneous partitions amplify per-round variation, but additionally require the switch round to match exactly and permit no more than two consecutive rounds exceeding $0.01$. Communication must agree within $0.01$ in all settings, which is effectively exact since totals are protocol-deterministic.
+
+Of 34 run pairs, 31 have a valid MPS reference. The three Two-Phase $K{=}8$ runs at $\alpha{=}0.5$ do not: their MPS executions predate the bidirectional B-only implementation and never switched, recording 2578.13 MB, the full FLoRA volume. Those are absent references rather than disagreements, and CUDA is the source of truth for that configuration. Of the 31 comparable pairs, 27 agree within tolerance and 4 do not.
+
+All four disagreements are the same phenomenon. Total communication is a step function of the discrete switch round with 110\,MB granularity (Section~V-C of the main paper), and every observed cross-backend communication difference is exactly one step: the MPS and CUDA totals in Table~\ref{tab:n3b} are adjacent points on the same lattice. The backends do not disagree about the protocol, only about which round the plateau criterion fires, and only where that decision sits near a boundary. Two of the four are IID runs at tight thresholds ($\tau{=}0.001$ and $\tau{=}0.002$), where the criterion is nearly satisfied in either of two adjacent rounds; two are $\alpha{=}0.1$ runs, where heterogeneity produces a noisier loss trajectory. This is boundary sensitivity rather than heterogeneity sensitivity.
+
+Run 17 was investigated separately. Re-executing on CUDA with the data partition seed fixed at 456 and the training seed changed to 999 reproduced switch round 7 exactly, establishing that the one-round difference is a stable property of the backend and partition rather than run-to-run stochasticity. At $\alpha{=}0.1$, cross-backend agreement on the discrete switch round is therefore not guaranteed: one of three partitions fired one round later on CUDA, and CUDA is reported as primary for that setting.
+
+The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B runs, which is what supports the cross-scale transfer claim in Section~V of the main paper.
+
+\textbf{Byte accounting.} Communication is instrumented at the transport layer, counting \texttt{numel} times \texttt{element\_size} on the tensors actually transmitted, rather than derived from parameter counts. The \texttt{get\_communication\_cost} helper in the FFA-LoRA aggregator is not used by this accounting.
+
+\textbf{Code revisions.} Runs were produced across multiple code revisions with uncommitted working-tree modifications, so no reported number is recoverable by checking out a single commit. Reproducibility rests instead on the cross-backend replication documented here. The byte accounting is revision-invariant by direct measurement: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive were each executed under two different revisions within the CUDA corpus and produced identical totals of 2578.13, 1863.13 and 1533.13\,MB. Loss values carry revision uncertainty; the FLoRA and FedIT rows of Table~II of the main paper span that boundary and differ by 0.0006, against a ReverseAdaptive-to-FFA-LoRA separation of 0.0282.
+
+\section{Disabling the ReverseAdaptive Switch}
+\label{app:noswitch}
+The no-switch sanity baseline deserves specific comment. Running ReverseAdaptive with switching disabled reproduces the matched FLoRA \cite{wang2024flora} run to 10 decimal places at every round, establishing that the wrapper is a zero-cost modification when unused: it rules out numerical artifacts from the wrapper's presence, not merely from its activation. The comparison is within a single backend and a single execution environment. Agreement across hardware is weaker than bit-identity and is reported in Appendix~E of this supplement.
+
+Disabling the switch requires care. Setting $\tau$ to a small positive value does not achieve it: any round in which the training loss fails to improve satisfies $\rho_r < \tau$, so the criterion fires. On the FLoRA trajectory underlying the threshold ablation the loss rises once, at round 11, so $\tau{=}0$ still triggers a switch at that round, and suppressing the switch entirely requires $\tau$ below the most negative round-over-round relative change observed, approximately $-0.0009$ here. The sanity baseline accordingly uses $\tau{=}-1.0$ together with a warmup exceeding the round budget. A practitioner wanting the wrapper present but inert should disable it by one of those means rather than by choosing a conservative threshold.
+
+\clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{main}
 
