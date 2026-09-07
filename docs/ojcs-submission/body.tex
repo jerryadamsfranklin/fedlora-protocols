@@ -481,6 +481,8 @@ Future work should address partial participation, non-Llama architectures, seman
 
 This paper's central contribution is a shift from theoretical parameter-count savings to measured byte-level reporting for federated LoRA. Tracking per-round upload and download megabytes, including at the asymmetric transition boundary, shows that the transition costs a fixed 55.0\,MB on TinyLlama-1.1B regardless of when it occurs, a quantity parameter-count accounting cannot express.
 
-Those measurements place five published protocols on a single communication-quality frontier with a knee: the first tranche of savings costs far less held-out instruction-following loss per point than the next. ReverseAdaptive sits at that knee and locates it without a phase boundary being specified in advance; the marginal cost of moving past it is roughly five times higher per point saved.
+Those measurements place five published protocols on a single communication-quality frontier with a knee. ReverseAdaptive sits at that knee and locates it without a phase boundary being specified in advance; the marginal cost of moving past it is roughly five times higher per point saved.
+
+The same threshold transfers across model scales without retuning, firing at round 6 on TinyLlama-1.1B and at a mean of round 8 on LLaMA-3.2-3B, and the quality cost of the transition is stable across the two datasets tested.
 
 As open-weight LLMs continue to grow in capability and federated deployments expand into privacy-sensitive domains, the communication bottleneck identified by \citet{kairouz2021advances} will only intensify. Reporting what protocols actually transmit, rather than what a parameter count predicts, is a prerequisite for comparing them.
