@@ -282,9 +282,9 @@ def build(d: Data) -> list[tuple]:
     add("g5.spread_ratio", "Sec 4.2 G5.7 (roughly 25x)", 25.02, 0.3,
         lambda: (d.final_loss(RA)[0] - d.final_loss(FLORA)[0]) / d.final_loss(RA)[1])
 
-    # Bonferroni disclosure: the one cell that must fail at 5 comparisons.
+    # Bonferroni disclosure: the one cell that must fail at 6 comparisons.
     add("ptest.bonferroni_failing_cell", "Appendix C text (disclosed failure)", 1, 0,
-        lambda: 1 if d.paired_p(RA, TP8, "heldout") > 0.05 / 5 else 0)
+        lambda: 1 if d.paired_p(RA, TP8, "heldout") > 0.05 / 6 else 0)
 
     # -- T-N2: Dolly replication -------------------------------------------
     add("dolly.comm.FLoRA", "T-N2", 2578.125, 1e-6, lambda: d.comm(D_FLORA))
