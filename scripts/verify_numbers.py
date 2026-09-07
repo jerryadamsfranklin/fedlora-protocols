@@ -242,11 +242,13 @@ def build(d: Data) -> list[tuple]:
         (RA, FLORA, "loss", "RA_vs_FLoRA.loss", 1.09e-5),
         (RA, TP8, "loss", "RA_vs_TP8.loss", 3.40e-4),
         (FFA, RA, "loss", "FFA_vs_RA.loss", 4.40e-4),
+        (FFA, FLORA, "loss", "FFA_vs_FLoRA.loss", 1.71e-4),
         (FEDIT, FLORA, "loss", "FedIT_vs_FLoRA.loss", 0.588),
         (TP8, FLORA, "heldout", "TP8_vs_FLoRA.heldout", 7.85e-5),
         (RA, FLORA, "heldout", "RA_vs_FLoRA.heldout", 6.23e-3),
         (RA, TP8, "heldout", "RA_vs_TP8.heldout", 2.62e-2),
         (FFA, RA, "heldout", "FFA_vs_RA.heldout", 3.81e-4),
+        (FFA, FLORA, "heldout", "FFA_vs_FLoRA.heldout", 1.13e-4),
         (FEDIT, FLORA, "heldout", "FedIT_vs_FLoRA.heldout", 0.425),
     ]:
         add(f"ptest.{label}", "Appendix C Table 9", p, abs(p) * 0.02 + 1e-9,

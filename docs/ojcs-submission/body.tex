@@ -50,7 +50,7 @@ Several federated learning methods adapt their behavior based on observed traini
 \subsection{Background and Notation}
 Each of $N$ clients holds a local dataset. A shared base model has weight matrices $W$. LoRA \citep{hu2022lora} parameterizes updates as $\Delta W = BA$ where $B$ is $d \times r$ and $A$ is $r \times k$. In each federated round, clients train their local adapters for one epoch, upload some representation to the server, and receive a global state.
 
-The communication cost of a round is the sum of upload bytes and download bytes. For TinyLlama-1.1B with rank $r{=}16$ targeting $\{\texttt{q\_proj}, \texttt{v\_proj}\}$, the projections adapted in the original LoRA formulation \citep{hu2022lora}, accounting for GQA in the value projection, the B-only fraction of the full state is exactly 36\% rather than the 50\% a naive parameter count would suggest. This fraction is invariant to the size of the target set, since \texttt{q\_proj} and \texttt{o\_proj} share a shape and \texttt{k\_proj} and \texttt{v\_proj} share a shape under GQA; the ratio is fixed by the GQA configuration, not by how many projections are adapted. LLaMA-3.2-3B has a B-only fraction of approximately 40\% due to different GQA configuration.
+The communication cost of a round is the sum of upload bytes and download bytes. The B-only fraction of the full state is not the 50\% a naive parameter count suggests, because grouped-query attention fixes the ratio of $B$ to $A$ parameters; Section~\ref{sec:implementation} derives the exact fractions of 36\% for TinyLlama-1.1B and 40\% for LLaMA-3.2-3B.
 
 \subsection{Bidirectional B-Only Protocol}
 \textbf{Phase 1 (FLoRA, rounds 1 to $K$).}
@@ -211,7 +211,7 @@ ReverseAdaptive outperforms FFA-LoRA by 0.0282 on final loss and 0.0182 on held-
 
 FedIT lands on FLoRA's communication volume exactly, to the byte, and within 0.0006 on both quality metrics. It contributes no new operating point, which is the intended result: FedIT is an independently implemented full-state protocol, so its coincidence with FLoRA is evidence that the byte accounting measures the protocol rather than an implementation artifact.
 
-Loss differences between methods are small in absolute terms, 0.0141 between FLoRA and ReverseAdaptive at $\tau{=}0.01$, but are resolved across three seeds because the per-seed spread is roughly twenty-five times smaller. Paired $t$-tests on final loss give $p < 10^{-4}$ for every comparison against FLoRA except FedIT, which is correctly indistinguishable. With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values, and no multiplicity correction is applied in Table~\ref{tab:frontier}; Appendix~\ref{app:stats} reports the full matrix on both metrics with the correction stated.
+Loss differences between methods are small in absolute terms, 0.0141 between FLoRA and ReverseAdaptive at $\tau{=}0.01$, but are resolved across three seeds because the per-seed spread is more than twenty times smaller. Paired $t$-tests on final loss give $p < 10^{-3}$ for every comparison against FLoRA except FedIT, which is correctly indistinguishable. With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values, and no multiplicity correction is applied in Table~\ref{tab:frontier}; Appendix~\ref{app:stats} reports the full matrix on both metrics with the correction stated.
 
 \begin{table}[t]
 \caption{Measured communication-quality frontier. TinyLlama-1.1B, Alpaca-3k, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Communication is protocol-deterministic and identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice of Section~\ref{sec:heldout}; more negative is better. $p$-values are paired $t$-tests against FLoRA on final loss; the full matrix on both metrics is in Appendix~\ref{app:stats}. Methods: FLoRA \citep{wang2024flora}, FedIT \citep{zhang2024federatedgpt}, FFA-LoRA \citep{sun2024ffalora}. The MB column is total round-trip communication over 15 rounds.}
@@ -272,7 +272,7 @@ Figure~\ref{fig:convergence} shows mean $\pm$ std loss trajectories across three
 \begin{center}
 \includegraphics[width=0.85\linewidth]{figures/fig2_convergence.pdf}
 \end{center}
-\caption{Training loss trajectories on TinyLlama-1.1B IID. Mean $\pm$ 1 standard deviation over three seeds. Vertical dashed lines mark ReverseAdaptive's switch round (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8). All three methods converge similarly through the FLoRA phase; the loss gap accumulates gradually after the switch.}
+\caption{Training loss trajectories on TinyLlama-1.1B IID. Mean $\pm$ 1 standard deviation over three seeds. Vertical dashed lines mark ReverseAdaptive's switch round (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, in which the upload is still full, is round 9). All three methods converge similarly through the FLoRA phase; the loss gap accumulates gradually after the switch.}
 \label{fig:convergence}
 \end{figure}
 
@@ -447,7 +447,7 @@ Federated Alpaca-3k \citep{taori2023alpaca} instruction tuning regresses TinyLla
 
 The same procedure improves substantially on the objective it optimizes. On the held-out Alpaca slice the base model scores 1.9352 (perplexity 6.9254) and every fine-tuned checkpoint scores between 1.3349 and 1.3608 (perplexity 3.80 to 3.90). The regression is a divergence between the training objective and these benchmarks rather than a training failure, and it is why quality is reported here as held-out instruction-following loss. The held-out slice is drawn from the same distribution as the training data, so it measures instruction following on unseen examples and is not evidence of generalization to unrelated tasks.
 
-The regression is independent of aggregation method. Cross-method spread at TinyLlama scale is 0.006 on ARC-Easy, 0.010 on BoolQ, and 0.000 on HellaSwag, so the zero-shot benchmarks do not separate protocols that the held-out metric separates at $p < 10^{-4}$. These accuracies are single-seed (seed 42, MPS corpus), unlike the three-seed CUDA results in Table~\ref{tab:frontier}, so the spreads carry no variance estimate and indicate insensitivity rather than establishing equivalence.
+The regression is independent of aggregation method. Cross-method spread at TinyLlama scale is 0.006 on ARC-Easy, 0.010 on BoolQ, and 0.000 on HellaSwag, so the zero-shot benchmarks do not separate protocols that the held-out metric separates at $p < 0.05$. These accuracies are single-seed (seed 42, MPS corpus), unlike the three-seed CUDA results in Table~\ref{tab:frontier}, so the spreads carry no variance estimate and indicate insensitivity rather than establishing equivalence.
 
 The BoolQ result admits a specific account. The base model's accuracy of 0.626 closely matches BoolQ's natural yes-class rate of approximately 0.62, suggesting the base exploits a yes-biased prior. Instruction tuning attenuates that prior, which is why BoolQ moves furthest of the three.
 
