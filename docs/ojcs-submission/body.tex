@@ -14,7 +14,7 @@ The protocol implements both upload and download B-only transmission for Two-Pha
 The aggregator starts in FLoRA mode and monitors the relative per-round improvement in global training loss. When that relative improvement falls below a dimensionless threshold $\tau$ for the first time after a warmup period, the aggregator switches to FFA-LoRA permanently. Varying $\tau$ traverses the same communication-quality frontier as the fixed-$K$ Two-Phase family without requiring $K$ to be selected in advance.
 
 \textbf{A five-method frontier and its knee.}
-Five published protocols are placed on one measured frontier at two model scales and on two datasets, evaluated by held-out instruction-following loss rather than by zero-shot benchmarks, which do not discriminate between protocols at the smaller scale. The frontier has a knee at ReverseAdaptive: savings beyond that point cost roughly five times more quality per point.
+Five protocols, three from prior work, are placed on one measured frontier on Alpaca at TinyLlama-1.1B scale; three of them are also compared on Dolly-15k and at LLaMA-3.2-3B. Quality is evaluated by held-out instruction-following loss rather than by zero-shot benchmarks, which do not discriminate between protocols at the smaller scale. The frontier has a knee at ReverseAdaptive: savings beyond that point cost roughly five times more quality per point.
 
 \textbf{Headline numbers:}
 Two-Phase $K{=}8$ saves 27.7\% (TinyLlama-1.1B) and 26.0\% (LLaMA-3.2-3B) over FLoRA. ReverseAdaptive saves 40.5\% and $30.0 \pm 4.0$\% respectively, and FFA-LoRA saves 61.9\% at TinyLlama scale for 0.0182 more held-out loss than ReverseAdaptive. At LLaMA-3.2-3B, ReverseAdaptive and Two-Phase $K{=}8$ differ in final loss by $1.25 \times 10^{-5}$, roughly 350 times less than at 1.1B.
@@ -207,13 +207,13 @@ Final training loss measures fit to the federated objective, and the four zero-s
 
 \subsection{THE COMMUNICATION-QUALITY FRONTIER}
 \label{sec:frontier}
-Table~\ref{tab:frontier} and Figure~\ref{fig:frontier} place five published federated LoRA protocols on a single measured communication-quality frontier for TinyLlama-1.1B \cite{zhang2024tinyllama} under IID partitioning. The five methods occupy four distinct operating points. FLoRA \cite{wang2024flora} and FedIT \cite{zhang2024federatedgpt} coincide at 2578.13 MB, since both transmit full $A$ and $B$ in both directions every round. Two-Phase $K{=}8$ reaches 1863.13 MB (27.73\% savings), ReverseAdaptive at $\tau{=}0.01$ reaches 1533.13 MB (40.53\%), and FFA-LoRA \cite{sun2024ffalora} reaches 983.13 MB (61.87\%). Across the four distinct points communication falls and both quality metrics degrade in the same order, so the frontier is monotone on each metric independently rather than only on the metric used to construct it.
+Table~\ref{tab:frontier} and Figure~\ref{fig:frontier} place five federated LoRA protocols on a single measured communication-quality frontier for TinyLlama-1.1B \cite{zhang2024tinyllama} under IID partitioning. The five methods occupy four distinct operating points. FLoRA \cite{wang2024flora} and FedIT \cite{zhang2024federatedgpt} coincide at 2578.13 MB, since both transmit full $A$ and $B$ in both directions every round. Two-Phase $K{=}8$ reaches 1863.13 MB (27.73\% savings), ReverseAdaptive at $\tau{=}0.01$ reaches 1533.13 MB (40.53\%), and FFA-LoRA \cite{sun2024ffalora} reaches 983.13 MB (61.87\%). Across the four distinct points communication falls and both quality metrics degrade in the same order, so the frontier is monotone on each metric independently rather than only on the metric used to construct it.
 
 \begin{figure}[ht]
 \begin{center}
 \includegraphics[width=\columnwidth]{figures/fig1_frontier.pdf}
 \end{center}
-\caption{Measured communication-quality frontier on Alpaca-3k, TinyLlama-1.1B, IID, CUDA corpus. Five published protocols at four distinct operating points; error bars are one sample standard deviation over three seeds, and communication is identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice defined in Section~\ref{sec:experiments}-\ref{sec:heldout}; more negative is better. FLoRA and FedIT coincide at upper right. The segment from ReverseAdaptive to FFA-LoRA is markedly steeper than the segment preceding it, which Section~\ref{sec:discussion} quantifies.}
+\caption{Measured communication-quality frontier on Alpaca-3k, TinyLlama-1.1B, IID, CUDA corpus. Five protocols, three from prior work, at four distinct operating points; error bars are one sample standard deviation over three seeds, and communication is identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice defined in Section~\ref{sec:experiments}-\ref{sec:heldout}; more negative is better. FLoRA and FedIT coincide at upper right. The segment from ReverseAdaptive to FFA-LoRA is markedly steeper than the segment preceding it, which Section~\ref{sec:discussion} quantifies.}
 \label{fig:frontier}
 \end{figure}
 
@@ -478,7 +478,7 @@ Future work should address partial participation, non-Llama architectures, seman
 
 This paper's central contribution is a shift from theoretical parameter-count savings to measured byte-level reporting for federated LoRA. Tracking per-round upload and download megabytes, including at the asymmetric transition boundary, shows that the transition costs a fixed 55.0\,MB on TinyLlama-1.1B regardless of when it occurs, a quantity parameter-count accounting cannot express.
 
-Those measurements place five published protocols on a single communication-quality frontier with a knee. ReverseAdaptive sits at that knee and locates it without a phase boundary being specified in advance; the marginal cost of moving past it is roughly five times higher per point saved.
+Those measurements place five protocols on a single communication-quality frontier with a knee. ReverseAdaptive sits at that knee and locates it without a phase boundary being specified in advance; the marginal cost of moving past it is roughly five times higher per point saved.
 
 The same threshold transfers across model scales without retuning, firing at round 6 on TinyLlama-1.1B and at a mean of round 8 on LLaMA-3.2-3B, and the quality cost of the transition is stable across the two datasets tested.
 

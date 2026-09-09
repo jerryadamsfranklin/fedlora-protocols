@@ -36,6 +36,7 @@
 \author{Jerry Adams Franklin\authorrefmark{1}}
 \affil{Independent Researcher, Fairport, NY 14450 USA}
 \corresp{Corresponding author: Jerry Adams Franklin (email: jerry.adamsf@gmail.com). ORCID: 0009-0006-8470-8349.}
+\authornote{This work received no external funding. The author declares no competing financial interests.}
 
 \begin{abstract}
 Federated fine-tuning of large language models with low-rank adaptation
@@ -44,7 +45,8 @@ remains the dominant cost. Existing accounting for federated LoRA protocols
 omits the asymmetric transition round when a protocol changes aggregation
 mode, and reports savings that ignore grouped-query attention shapes. This
 paper measures per-round upload and download bytes for a bidirectional
-B-only federated LoRA protocol and places five published methods on a single
+B-only federated LoRA protocol and places five methods, three from prior work,
+on a single
 communication-quality frontier. The frontier has a knee, which ReverseAdaptive
 locates by monitoring the relative improvement in global training loss against
 a dimensionless threshold rather than by fixing a phase boundary in advance.
@@ -67,7 +69,7 @@ Communication efficiency, federated learning, large language models, low-rank ad
 \input{body.tex}
 
 \section*{ACKNOWLEDGMENT}
-The author declares no competing financial interests. All code, configuration
+All code, configuration
 files, and analysis scripts are publicly available at
 \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are
 not released. The Alpaca and Dolly-15k datasets are publicly available from
