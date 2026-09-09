@@ -92,3 +92,4 @@ docs/neurocomputing/
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed
 figures/**/*.tif
 figures/**/*.psd
+dist/
