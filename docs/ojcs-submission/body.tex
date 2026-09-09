@@ -1,4 +1,4 @@
-\section{Introduction}
+\section{INTRODUCTION}
 \label{sec:intro}
 
 Federated learning enables model training across distributed clients without sharing raw data, making it attractive for privacy-sensitive applications of LLMs \cite{kairouz2021advances}. Fine-tuning with LoRA \cite{hu2022lora} substantially reduces the number of trainable parameters per client, but federated LoRA aggregation still transmits nontrivial bytes per round. With 10 clients participating in every round across 15 rounds, the cumulative cost determines whether a protocol is deployable in bandwidth-constrained settings.
@@ -21,7 +21,7 @@ Two-Phase $K{=}8$ saves 27.7\% (TinyLlama-1.1B) and 26.0\% (LLaMA-3.2-3B) over F
 
 Code, configuration files, and scripts to reproduce every figure and table are publicly released; see the supplemental material.
 
-\section{Related Work}
+\section{RELATED WORK}
 \label{sec:related}
 
 \subsection{LoRA and Parameter-Efficient Fine-Tuning}
@@ -42,7 +42,7 @@ Communication efficiency in federated learning has been a central concern since 
 \subsection{Adaptive Aggregation and Scheduling}
 Several federated learning methods adapt their behavior based on observed training dynamics. FedProx \cite{li2020fedprox} adds an adaptive proximal term to the local objective, controlling deviation from the global model. FedNova \cite{wang2020fednova} normalizes local gradients by effective step count, adaptively correcting for heterogeneous local training. FedAdam and FedYogi \cite{reddi2020adaptive} apply adaptive moment estimation at the server level, treating the aggregated pseudo-gradient as input to Adam-style updates. Curriculum scheduling in federated learning adjusts the aggregation frequency over training, structurally related to ReverseAdaptive's phase-switching in that both methods behave differently early vs.\ late in training. To the author's knowledge, no prior federated LoRA work uses a loss-plateau signal to switch between distinct aggregation modes during training.
 
-\section{Method}
+\section{METHOD}
 \label{sec:method}
 
 \subsection{Background and Notation}
@@ -131,7 +131,7 @@ For TinyLlama-1.1B with rank $r{=}16$ targeting $\{\texttt{q\_proj}, \texttt{v\_
 \textbf{Partition mechanics.}
 Alpaca and Dolly-15k carry no class labels, so non-IID partitions apply Dirichlet skew over a task-diversity proxy: each instruction $s$ is assigned to one of ten buckets by character length, $\min(\lfloor |s| / 50 \rfloor, 9)$, and a Dirichlet distribution with concentration $\alpha \in \{0.5, 0.1\}$ is applied over those buckets. This induces heterogeneity in task form rather than task semantics; Section~\ref{sec:limitations} notes that semantic heterogeneity is untested.
 
-\section{Experiments and Results}
+\section{EXPERIMENTS AND RESULTS}
 \label{sec:experiments}
 
 \subsection{Setup}
@@ -402,7 +402,7 @@ ReverseAdaptive ($\tau{=}0.01$) & $1.3938 \pm 0.0036$ & $1837.5 \pm 105.0$ & $30
 \end{center}
 \end{table}
 
-\section{Discussion}
+\section{DISCUSSION}
 \label{sec:discussion}
 
 \subsection{Implications for Federated LLM Deployment}
@@ -440,7 +440,7 @@ The regression is independent of aggregation method. Cross-method spread at Tiny
 
 The BoolQ result admits a specific account. The base model's accuracy of 0.626 closely matches BoolQ's natural yes-class rate of approximately 0.62, suggesting the base exploits a yes-biased prior. Instruction tuning attenuates that prior, which is why BoolQ moves furthest of the three.
 
-\section{Limitations}
+\section{LIMITATIONS}
 \label{sec:limitations}
 
 The experiments use two instruction-following datasets (Alpaca-3k \cite{taori2023alpaca} and Dolly-15k \cite{dolly2023}) and a single task type. Generalization to classification tasks, longer training runs, or generation-quality metrics is not characterized. Quality is measured as held-out loss on examples drawn from the same distribution as the training data, which captures instruction following on unseen examples rather than transfer to unrelated tasks.
@@ -467,7 +467,7 @@ No differential privacy analysis is included. FFA-LoRA \cite{sun2024ffalora} was
 
 Future work should address partial participation, non-Llama architectures, semantic heterogeneity, and real network conditions to validate deployment claims more broadly. Composing the bidirectional B-only protocol with gradient compression techniques \cite{alistarh2017qsgd,lin2017deep} for savings beyond the B-only floor is a natural extension. Per-layer adaptive phase-switching, where different transformer layers switch at different rounds based on their individual loss-plateau signals, is another direction.
 
-\section{Conclusion}
+\section{CONCLUSION}
 \label{sec:conclusion}
 
 This paper's central contribution is a shift from theoretical parameter-count savings to measured byte-level reporting for federated LoRA. Tracking per-round upload and download megabytes, including at the asymmetric transition boundary, shows that the transition costs a fixed 55.0\,MB on TinyLlama-1.1B regardless of when it occurs, a quantity parameter-count accounting cannot express.

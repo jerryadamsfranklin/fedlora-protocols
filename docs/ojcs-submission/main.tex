@@ -1,27 +1,46 @@
-\documentclass[journal]{IEEEtran}
+\documentclass{ieeetj}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx,color}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{hidelinks=true}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{url}
+\usepackage{bm}
+\setlength{\emergencystretch}{2em}
 
 \input{math_commands.tex}
 
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-\usepackage{multirow}
-\usepackage{siunitx}
-\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
-\usepackage{url}
-\setlength{\emergencystretch}{2em}
+\AtBeginDocument{%
+  \definecolor{tmlcncolor}{cmyk}{0.93,0.59,0.15,0.02}%
+  \definecolor{NavyBlue}{RGB}{0,86,125}}
+
+\def\OJlogo{\vspace{-4pt}}
+\def\seclogo{\vspace{10pt}}
+
+\def\authorrefmark#1{\ensuremath{^{\textbf{#1}}}}
 
 \begin{document}
+\receiveddate{XX Month, XXXX}
+\reviseddate{XX Month, XXXX}
+\accepteddate{XX Month, XXXX}
+\publisheddate{XX Month, XXXX}
+\currentdate{XX Month, XXXX}
+\doiinfo{XXXX.2026.1234567}
+
+\markboth{}{Franklin}
 
 \title{Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning}
 
-\author{Jerry~Adams~Franklin%
-\thanks{J. A. Franklin is an Independent Researcher, Fairport, NY 14450 USA (e-mail: jerry.adamsf@gmail.com). ORCID: 0009-0006-8470-8349.}}
-
-\maketitle
+\author{Jerry Adams Franklin}
+\affil{Independent Researcher, Fairport, NY 14450 USA}
+\corresp{Corresponding author: Jerry Adams Franklin (email: jerry.adamsf@gmail.com). ORCID: 0009-0006-8470-8349.}
 
 \begin{abstract}
 Federated fine-tuning of large language models with low-rank adaptation
@@ -45,12 +64,14 @@ of the transition is stable across the two datasets tested.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Federated learning, low-rank adaptation, communication efficiency, parameter-efficient fine-tuning, large language models.
+Communication efficiency, federated learning, large language models, low-rank adaptation, parameter-efficient fine-tuning.
 \end{IEEEkeywords}
+
+\maketitle
 
 \input{body.tex}
 
-\section*{Acknowledgment}
+\section*{ACKNOWLEDGMENT}
 The author declares no competing financial interests. All code, configuration
 files, and analysis scripts are publicly available at
 \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are
@@ -70,5 +91,8 @@ His research interests include federated learning, parameter-efficient
 fine-tuning, and communication-efficient distributed training.
 Contact him at jerry.adamsf@gmail.com.
 \end{IEEEbiographynophoto}
+
+\vfill
+\pagebreak
 
 \end{document}
