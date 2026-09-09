@@ -32,7 +32,7 @@ FedIT \cite{zhang2024federatedgpt} applies standard FedAvg \cite{mcmahan2017comm
 
 FFA-LoRA \cite{sun2024ffalora} addresses the aggregation mismatch by freezing $A$ at initialization and training only $B$ across clients. Because $A$ is constant, the server aggregates $B$ matrices directly without product-space distortion. The theoretical upload saving is 50\%. The original work also motivates the frozen-$A$ design in terms of differential privacy. A critical difference from the protocol in this paper: FFA-LoRA freezes $A$ at initialization, whereas the bidirectional B-only protocol allows $A$ to be learned through a FLoRA phase before freezing, recovering expressivity at the cost of longer initial overhead.
 
-FLoRA \cite{wang2024flora} preserves product-space semantics by stacking client LoRA modules horizontally and applying truncated SVD to recover a global low-rank adapter, reducing the aggregation bias present in FedIT. The tradeoff is communication cost: FLoRA transmits full $A{+}B$ payloads in both directions every round. FLoRA is the full-state baseline in this paper's experiments.
+FLoRA \cite{wang2024flora} preserves product-space semantics by stacking client LoRA modules horizontally and applying truncated SVD to recover a global low-rank adapter, reducing the aggregation bias present in FedIT. The tradeoff is communication cost: FLoRA transmits full $A{+}B$ payloads in both directions every round. FLoRA is the full-state baseline in this paper's experiments. FedSA-LoRA \cite{guo2025fedsalora} makes the opposite choice, sharing only $A$ on the grounds that $A$ carries general knowledge while $B$ is client-specific; under the byte accounting of Section~\ref{sec:method}-\ref{sec:implementation}, sharing $A$ instead of $B$ transmits 64\% of the full TinyLlama state rather than 36\%.
 
 FlexLoRA \cite{bai2024flexlora} extends federated LoRA to the heterogeneous-rank setting, where different clients use different LoRA ranks based on local compute budgets. FlexLoRA's contribution is orthogonal to this paper's; the bidirectional B-only protocol applies equally to homogeneous-rank clients.
 
@@ -358,18 +358,14 @@ A practitioner seeking maximum savings can set $\tau$ anywhere in $[0.005, 0.2]$
 \caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus).}
 \label{tab:ablation}
 \begin{center}
-\begin{tabular}{lcccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
 $\tau$ & Switch round & Final loss & Total comm.\ (MB) & Savings \\
 \midrule
 0.001 & 11 & 1.2638 & 2083.13 & 19.20\% \\
 0.002 & 9  & 1.2675 & 1863.13 & 27.73\% \\
-0.005 & 6  & 1.2736 & 1533.13 & 40.53\% \\
-0.010 & 6  & 1.2736 & 1533.13 & 40.53\% \\
-0.020 & 6  & 1.2736 & 1533.13 & 40.53\% \\
-0.050 & 6  & 1.2736 & 1533.13 & 40.53\% \\
-0.100 & 6  & 1.2736 & 1533.13 & 40.53\% \\
-0.200 & 6  & 1.2736 & 1533.13 & 40.53\% \\
+0.005--0.2 & 6  & 1.2736 & 1533.13 & 40.53\% \\
 \bottomrule
 \end{tabular}
 \end{center}
