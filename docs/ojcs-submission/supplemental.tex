@@ -1,7 +1,5 @@
 \documentclass[journal]{IEEEtran}
 
-\input{math_commands.tex}
-
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath}
@@ -197,6 +195,20 @@ The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all 
 \textbf{Byte accounting.} Communication is instrumented at the transport layer, counting \texttt{numel} times \texttt{element\_size} on the tensors actually transmitted, rather than derived from parameter counts. The \texttt{get\_communication\_cost} helper in the FFA-LoRA aggregator is not used by this accounting.
 
 \textbf{Code revisions.} Runs were produced across multiple code revisions with uncommitted working-tree modifications, so no reported number is recoverable by checking out a single commit. Reproducibility rests instead on the cross-backend replication documented here. The byte accounting is revision-invariant by direct measurement: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive were each executed under two different revisions within the CUDA corpus and produced identical totals of 2578.13, 1863.13 and 1533.13\,MB. Loss values carry revision uncertainty; the FLoRA and FedIT rows of Table~II of the main paper span that boundary and differ by 0.0006, against a ReverseAdaptive-to-FFA-LoRA separation of 0.0282.
+
+\section{Downstream Accuracy Figure}
+\label{app:downstream_figure}
+Figure~\ref{fig:supp_downstream} plots the downstream zero-shot accuracies of
+Tables~4 and~5 of the main paper. It restates those tables graphically and
+introduces no additional measurements.
+
+\begin{figure*}[t]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/fig4_downstream_accuracy.pdf}
+\end{center}
+\caption{Downstream zero-shot accuracy across two model scales (500 examples per benchmark). Left: TinyLlama-1.1B (seed 42 only; ARC-Easy, BoolQ, HellaSwag; MMLU omitted because base accuracy is at chance for 4-way multiple choice). Right: LLaMA-3.2-3B (mean across three seeds; MMLU, ARC-Easy, BoolQ, HellaSwag). Federated methods cluster within 1.0 percentage points at TinyLlama-1.1B, across the three informative benchmarks, and 0.5 percentage points at LLaMA-3.2-3B. TinyLlama accuracies are single-seed and from the MPS corpus; loss values elsewhere in the main paper for the same configurations are three-seed and from the CUDA corpus.}
+\label{fig:supp_downstream}
+\end{figure*}
 
 \section{Disabling the ReverseAdaptive Switch}
 \label{app:noswitch}

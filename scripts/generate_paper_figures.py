@@ -25,11 +25,20 @@ OUTDIR = REPO / "figures"
 TABLE_PATH = REPO / "analysis" / "final_results_table.csv"
 ANALYSIS_DIR = REPO / "analysis"
 
+# IEEE figure widths: one column 3.5in, page wide 7.16in (OJ template, Sec. VI-L).
+# Figures are authored at final output size so no downscaling occurs on
+# inclusion and in-figure lettering stays legible in print.
+COL_W = 3.5    # inches, IEEE single-column figure width
+FULL_W = 7.16  # inches, IEEE page-wide figure width
+
 plt.rcParams.update(
     {
-        "font.size": 10,
-        "axes.labelsize": 10,
-        "legend.fontsize": 9,
+        "font.size": 8,
+        "axes.labelsize": 8,
+        "axes.titlesize": 8,
+        "xtick.labelsize": 7,
+        "ytick.labelsize": 7,
+        "legend.fontsize": 7,
         "figure.dpi": 300,
         "savefig.dpi": 300,
     }
@@ -183,7 +192,7 @@ def figure1_frontier() -> None:
         mean, sd, n = hold[k]
         print(f" - {FIG1_METHODS[k][0]:16s}  MB={comm[k]:9.3f}  delta={mean:+.6f} ± {sd:.6f} (n={n})")
 
-    fig, ax = plt.subplots(figsize=(7.0, 4.6))
+    fig, ax = plt.subplots(figsize=(COL_W, 2.15))
     by_comm = sorted(order, key=lambda k: -comm[k])
     ax.plot(
         [comm[k] for k in by_comm],
@@ -202,7 +211,7 @@ def figure1_frontier() -> None:
             mean,
             yerr=sd,
             marker=markers[i % len(markers)],
-            markersize=8,
+            markersize=5,
             capsize=4,
             linestyle="none",
             color=_COLORS[i],
@@ -214,19 +223,20 @@ def figure1_frontier() -> None:
     ax.annotate(
         "knee",
         xy=(kx, ky),
-        xytext=(kx + 260, ky - 0.006),
+        xytext=(kx + 90, ky - 0.0085),
         arrowprops=dict(arrowstyle="->", linewidth=1.0, color="0.3"),
-        fontsize=10,
+        fontsize=7,
         color="0.3",
     )
 
     ax.set_xlabel("Total round-trip communication (MB)")
-    ax.set_ylabel(r"Held-out $\Delta$loss (tuned $-$ base)")
-    ax.set_title("Communication-quality frontier (TinyLlama-1.1B, Alpaca-3k, IID)")
+    ax.set_ylabel(r"Held-out $\Delta$loss")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="lower left", framealpha=0.9)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.42), ncol=2,
+              frameon=False, handletextpad=0.4, columnspacing=1.0)
     ax.set_xlim(900, 2625)
     ax.set_ylim(-0.605, -0.57)
+    ax.yaxis.set_major_locator(plt.MultipleLocator(0.01))
     fig.tight_layout()
     _save(fig, "fig1_frontier")
 
@@ -254,7 +264,7 @@ def figure2_convergence() -> None:
     r2, m2, s2 = curve(tp)
     r3, m3, s3 = curve(ra)
 
-    fig, ax = plt.subplots(figsize=(7.0, 4.0))
+    fig, ax = plt.subplots(figsize=(COL_W, 2.05))
     ax.plot(r1, m1, label="FLoRA", color=_COLORS[0])
     ax.fill_between(r1, m1 - s1, m1 + s1, color=_COLORS[0], alpha=0.2)
     ax.plot(r2, m2, label="Two-Phase K=8", color=_COLORS[1])
@@ -268,8 +278,7 @@ def figure2_convergence() -> None:
     ax.set_xlabel("Round")
     ax.set_ylabel("Training loss")
     ax.set_xlim(1, 15)
-    ax.set_title("Convergence trajectories (mean ± 1 std over seeds)")
-    ax.legend(loc="upper right", fontsize=8, framealpha=0.92)
+    ax.legend(loc="upper right", fontsize=7, framealpha=0.92)
     ax.grid(True, alpha=0.25)
     fig.tight_layout()
     _save(fig, "fig2_convergence")
@@ -292,7 +301,7 @@ def figure3_cumulative_comm() -> None:
         warnings.warn("Figure 3: missing seed-42 run for a method")
         return
 
-    fig, ax = plt.subplots(figsize=(7.0, 4.0))
+    fig, ax = plt.subplots(figsize=(COL_W, 2.05))
     for label, p in paths.items():
         assert p is not None
         rd = _load_rounds(p)
@@ -301,10 +310,9 @@ def figure3_cumulative_comm() -> None:
         ax.plot(xs, ys, label=label, linewidth=1.8)
 
     ax.set_xlabel("Round")
-    ax.set_ylabel("Cumulative communication (MB)")
+    ax.set_ylabel("Cumulative MB")
     ax.set_xlim(1, 15)
     ax.set_ylim(0, 2600)
-    ax.set_title("Cumulative communication (seed 42)")
     ax.legend(loc="lower right")
     ax.grid(True, alpha=0.25)
     fig.tight_layout()
@@ -364,7 +372,7 @@ def figure4_downstream() -> None:
     tiny_data = series_for(tiny_dirs, tiny_bench, tiny_base)
     llama_data = series_for(llama_dirs, llama_bench, llama_base)
 
-    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10.5, 4.0))
+    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(FULL_W, 2.70))
     x = np.arange(len(tiny_bench))
     w = 0.2
     labels_row = ["Base", "FLoRA", "Two-Phase K=8", "ReverseAdaptive"]
@@ -392,7 +400,6 @@ def figure4_downstream() -> None:
     ax1.grid(True, axis="y", alpha=0.25)
     ax1.legend(fontsize=7, ncol=2)
 
-    fig.suptitle("Downstream zero-shot accuracy")
     fig.tight_layout()
     _save(fig, "fig4_downstream_accuracy")
 
@@ -420,21 +427,23 @@ def figure5_threshold_ablation() -> None:
     sw = np.array([r[1] for r in rows])
     loss = np.array([r[2] for r in rows])
 
-    fig, ax0 = plt.subplots(figsize=(7.0, 4.0))
+    fig, ax0 = plt.subplots(figsize=(COL_W, 2.05))
     ax1 = ax0.twinx()
     ax0.plot(xs, sw, "o-", color=_COLORS[0], label="Switch round")
     ax1.plot(xs, loss, "s--", color=_COLORS[3], label="Final loss")
 
     ax0.set_xscale("log")
+    ax0.set_xticks([0.001, 0.01, 0.1])
+    ax0.set_xticklabels(["0.001", "0.01", "0.1"])
+    ax0.minorticks_off()
     ax0.set_xlabel("switch_threshold τ (log scale)")
     ax0.set_ylabel("Switch round", color=_COLORS[0])
     ax1.set_ylabel("Final loss", color=_COLORS[3])
-    ax0.set_title("ReverseAdaptive threshold ablation (seed 42)")
     ax0.grid(True, alpha=0.25)
 
     h0, l0 = ax0.get_legend_handles_labels()
     h1, l1 = ax1.get_legend_handles_labels()
-    ax0.legend(h0 + h1, l0 + l1, loc="center right", fontsize=8)
+    ax0.legend(h0 + h1, l0 + l1, loc="center right", fontsize=7)
     fig.tight_layout()
     _save(fig, "fig5_threshold_ablation")
 
@@ -499,7 +508,7 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
     l8_mb, l8_eb, l8_ls, el_8 = agg_llama("exp_llama3_two_phase_k8_iid")
     lr_mb, lr_eb, lr_ls, el_r = agg_llama("exp_llama3_reverse_adaptive_iid")
 
-    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10.5, 4.0))
+    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(FULL_W, 2.70))
 
     ax0.errorbar([mb_f], [lf], xerr=[eb_f], yerr=[elf], fmt="o", color=_COLORS[0], capsize=3, label="FLoRA")
     ax0.errorbar([mb_8], [l8], xerr=[eb_8], yerr=[el8], fmt="^", color=_COLORS[2], capsize=3, label="Two-Phase K=8")
@@ -509,7 +518,7 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
     ax0.set_xlabel("Total round-trip MB")
     ax0.set_ylabel("Final loss")
     ax0.grid(True, alpha=0.25)
-    ax0.legend(fontsize=8)
+    ax0.legend(fontsize=7)
 
     if not (np.isnan(lf_mb) or np.isnan(l8_mb)):
         ax1.errorbar(
@@ -548,9 +557,8 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
     ax1.set_xlabel("Total round-trip MB")
     ax1.set_ylabel("Final loss")
     ax1.grid(True, alpha=0.25)
-    ax1.legend(fontsize=8)
+    ax1.legend(fontsize=7)
 
-    fig.suptitle("Scale validation: communication versus final loss")
     fig.tight_layout()
     _save(fig, "fig6_scale_validation")
 
