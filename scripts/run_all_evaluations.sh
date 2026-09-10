@@ -2,7 +2,7 @@
 # Run downstream evaluation on all completed checkpoints.
 #
 # Skips runs where final_adapter_state.pt is missing (those need re-running
-# under Stage 5's full matrix).
+# before downstream evaluation).
 
 set -u
 ROOT="results/raw"

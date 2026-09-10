@@ -389,7 +389,7 @@ class FederatedServer:
             self._total_download_bytes = total_download_bytes
             print(f"  Loss: {avg_loss:.4f}, Time: {round_time:.1f}s")
 
-            # Mid-run checkpoint (Neurocomputing Phase 0 / C.8)
+            # Mid-run checkpoint
             completed = round_num + 1
             if self.save_every > 0 and completed % self.save_every == 0:
                 self.save_checkpoint(completed)

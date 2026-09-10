@@ -11,7 +11,8 @@ Uses published Llama* config geometry (no model download required).
 Target modules match config/base_config_4layers.yaml and base_config_llama3_3b.yaml:
 q_proj, k_proj, v_proj, o_proj.
 
-Pass criterion (guide): 8B fraction within a few percentage points of 1.1B / 3.2-3B.
+The B-only fraction is nearly scale-invariant across TinyLlama-1.1B, LLaMA-3.2-3B,
+and LLaMA-3.1-8B geometries (within a few percentage points).
 """
 
 from __future__ import annotations

@@ -7,15 +7,12 @@ Walks results/raw/, resolves the paper-suite canonical results.json for each
 
 Default mode (--suite paper) emits exactly the 34 runs used by the paper /
 figure pipelines (FLoRA, Two-Phase K=8, ReverseAdaptive; TinyLlama + LLaMA-3.2-3B).
-Rows are ordered for the Phase 1 early-gate protocol:
-  1) cheapest Non-IID gate
-  2) FLoRA IID seed 42 gate
-  3) remaining 32
+Rows are ordered with cheap Non-IID and FLoRA IID seed 42 first, then the rest.
 
 Usage:
   python3 scripts/list_existing_runs.py \\
       --results-dir results/raw/ \\
-      --output docs/phase1_run_manifest.csv
+      --output results/run_checklist.csv
 """
 
 from __future__ import annotations
@@ -315,7 +312,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=REPO / "docs" / "phase1_run_manifest.csv",
+        default=REPO / "results" / "run_checklist.csv",
         help="Output CSV path",
     )
     parser.add_argument(

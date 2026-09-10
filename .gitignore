@@ -65,7 +65,7 @@ logs/
 .cache/
 
 # Experiment results: track summaries (JSON/CSV) for reproducibility.
-# Ignore heavy artifacts and the full raw run tree (provenance is in docs/run_provenance_manifest.csv).
+# Ignore heavy artifacts and the full raw run tree (see results/MANIFEST.csv and analysis/README.md).
 *.pt
 *.bin
 *.safetensors

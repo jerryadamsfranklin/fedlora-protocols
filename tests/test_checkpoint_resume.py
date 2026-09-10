@@ -1,4 +1,4 @@
-"""Tests for federated checkpoint save / resume (Neurocomputing Phase 0 C.8)."""
+"""Tests for federated checkpoint save / resume."""
 
 from __future__ import annotations
 

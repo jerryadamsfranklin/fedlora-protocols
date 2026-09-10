@@ -1,12 +1,11 @@
 # Documentation
 
-This directory contains design notes and the paper outline.
+Submission materials for the accompanying paper, plus pointers into the
+reproduction artifacts elsewhere in the repository.
 
-## Files
+## Contents
 
-- `paper_outline.md`: Section-by-section outline of the manuscript, including headline numerical claims and supporting experiments.
-- `PATH_B_IMPLEMENTATION_GUIDE.md`: Pre-submission experiment brief (Path B). Adds LLaMA-3.2-3B IID seeds 123 and 456 for FLoRA, Two-Phase K=8, and ReverseAdaptive; downstream evals; updated analysis and Figure 6. Follow task order and commit rules inside that file.
-
-## Not in this directory
-
-Internal handoff documents (Stage 1-5 implementation briefs and execution reports) are kept in the maintainer's local working tree under `exports/` (gitignored). They are not public-release artifacts but are available on request.
+- `ojcs-submission/`: IEEE Open Journal of the Computer Society manuscript
+  sources, cover letter, bibliography, and template materials.
+- See also [`analysis/README.md`](../analysis/README.md) for which analysis
+  CSVs back which tables and figures, and how to regenerate them.
