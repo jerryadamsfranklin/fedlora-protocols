@@ -37,8 +37,8 @@ fedlora-protocols/
 │   └── evaluation/         # Benchmarks, scorers, metrics
 ├── config/                 # YAML experiment configs (with _inherit)
 ├── scripts/                # Runners, analysis, figure generation
-├── tests/                  # 20 unit tests covering aggregators and runner
-├── results/                # Per-run JSONs (raw/) and downstream eval (downstream/)
+├── tests/                  # 28 unit tests covering aggregators and runner
+├── results/                # Run manifest and downstream eval (downstream/)
 ├── analysis/               # Master CSVs and statistical tests
 ├── figures/                # Paper-ready PDFs
 └── docs/                   # Method notes and paper outline
@@ -57,9 +57,11 @@ python3 scripts/run_experiment.py \
     --seed 42 \
     --tag my_run
 
-# Evaluate a saved checkpoint on downstream benchmarks
+# Evaluate a checkpoint you produced above on downstream benchmarks.
+# Adapter checkpoints are not distributed with this repository; run an
+# experiment first and point --checkpoint at the state file it writes.
 python3 scripts/evaluate_checkpoint.py \
-    --checkpoint results/raw/.../final_adapter_state.pt \
+    --checkpoint <path printed by run_experiment.py> \
     --num-examples 500 \
     --output results/downstream/my_eval.json
 ```
@@ -69,7 +71,7 @@ python3 scripts/evaluate_checkpoint.py \
 ```bash
 python3 scripts/build_results_table.py
 python3 scripts/generate_paper_figures.py
-ls figures/  # six PDFs corresponding to paper figures
+ls figures/  # six PDFs corresponding to paper figures (fig1 through fig6)
 ```
 
 ## Hardware
@@ -85,7 +87,7 @@ If you use this codebase, please cite the paper:
   title  = {Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning},
   author = {Franklin, Jerry Adams},
   year   = {2026},
-  journal = {Neurocomputing},
+  journal = {IEEE Open Journal of the Computer Society},
   note   = {Manuscript under review}
 }
 ```

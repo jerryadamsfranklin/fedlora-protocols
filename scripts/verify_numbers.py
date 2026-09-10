@@ -19,10 +19,12 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import os
 import statistics as st
 import sys
+from pathlib import Path
 
 import pandas as pd
 from scipy import stats
@@ -242,11 +244,13 @@ def build(d: Data) -> list[tuple]:
         (RA, FLORA, "loss", "RA_vs_FLoRA.loss", 1.09e-5),
         (RA, TP8, "loss", "RA_vs_TP8.loss", 3.40e-4),
         (FFA, RA, "loss", "FFA_vs_RA.loss", 4.40e-4),
+        (FFA, FLORA, "loss", "FFA_vs_FLoRA.loss", 1.71e-4),
         (FEDIT, FLORA, "loss", "FedIT_vs_FLoRA.loss", 0.588),
         (TP8, FLORA, "heldout", "TP8_vs_FLoRA.heldout", 7.85e-5),
         (RA, FLORA, "heldout", "RA_vs_FLoRA.heldout", 6.23e-3),
         (RA, TP8, "heldout", "RA_vs_TP8.heldout", 2.62e-2),
         (FFA, RA, "heldout", "FFA_vs_RA.heldout", 3.81e-4),
+        (FFA, FLORA, "heldout", "FFA_vs_FLoRA.heldout", 1.13e-4),
         (FEDIT, FLORA, "heldout", "FedIT_vs_FLoRA.heldout", 0.425),
     ]:
         add(f"ptest.{label}", "Appendix C Table 9", p, abs(p) * 0.02 + 1e-9,
@@ -278,9 +282,9 @@ def build(d: Data) -> list[tuple]:
     add("g5.spread_ratio", "Sec 4.2 G5.7 (roughly 25x)", 25.02, 0.3,
         lambda: (d.final_loss(RA)[0] - d.final_loss(FLORA)[0]) / d.final_loss(RA)[1])
 
-    # Bonferroni disclosure: the one cell that must fail at 5 comparisons.
+    # Bonferroni disclosure: the one cell that must fail at 6 comparisons.
     add("ptest.bonferroni_failing_cell", "Appendix C text (disclosed failure)", 1, 0,
-        lambda: 1 if d.paired_p(RA, TP8, "heldout") > 0.05 / 5 else 0)
+        lambda: 1 if d.paired_p(RA, TP8, "heldout") > 0.05 / 6 else 0)
 
     # -- T-N2: Dolly replication -------------------------------------------
     add("dolly.comm.FLoRA", "T-N2", 2578.125, 1e-6, lambda: d.comm(D_FLORA))
@@ -577,6 +581,77 @@ def build(d: Data) -> list[tuple]:
     add("g11.alpha01_comm_observed", "Table B2 (observed totals match client scaling)", 1, 0,
         lambda: 1 if set(round(x, 4) for x in a01().total_mb)
                      <= {1533.125, 1379.8125, 1226.5} else 0)
+
+    # Sec III-C: no stability revert in any reported ReverseAdaptive run.
+    # Checked via results.json for every reverse_adaptive row in both the
+    # MPS final_results_table.csv and the CUDA qv_only corpus CSV.
+    repo_root = Path(__file__).resolve().parents[1]
+
+    def _resolve_results_json(path_like: str) -> Path | None:
+        p = Path(path_like)
+        if not p.is_absolute():
+            p = repo_root / p
+        if p.is_file() and p.name.endswith(".json"):
+            return p
+        if p.is_dir():
+            cand = p / "results.json"
+            if cand.is_file():
+                return cand
+        return None
+
+    def _max_revert_count(results_path: Path) -> int | None:
+        data = json.loads(results_path.read_text())
+        rounds = data if isinstance(data, list) else data.get("rounds", [])
+        if not isinstance(rounds, list):
+            return None
+        vals = []
+        for r in rounds:
+            if not isinstance(r, dict):
+                continue
+            stats = r.get("aggregator_stats") or {}
+            if "revert_count" in stats:
+                vals.append(int(stats["revert_count"] or 0))
+            elif "revert_count" in r:
+                vals.append(int(r["revert_count"] or 0))
+        return max(vals) if vals else None
+
+    def _ra_rows_all_zero_reverts() -> int:
+        checked = 0
+        # CUDA corpus: run_path column points at the run directory.
+        for _, row in d.runs.loc[d.runs.method == "reverse_adaptive"].iterrows():
+            rp = _resolve_results_json(str(row.run_path))
+            if rp is None:
+                return 0
+            m = _max_revert_count(rp)
+            if m is None or m > 0:
+                return 0
+            checked += 1
+        # MPS / primary table: reconstruct results/raw/.../tag/timestamp/
+        for _, row in d.final.loc[d.final.method == "reverse_adaptive"].iterrows():
+            base = (repo_root / "results" / "raw" / str(row.exp_name)
+                    / "reverse_adaptive" / f"seed_{int(row.seed)}"
+                    / str(row.tag) / str(row.timestamp))
+            rp = _resolve_results_json(str(base))
+            if rp is None:
+                return 0
+            m = _max_revert_count(rp)
+            if m is None or m > 0:
+                return 0
+            checked += 1
+        # Both corpora must contribute; currently 12 CUDA + 26 final = 38.
+        return 1 if checked >= 38 else 0
+
+    add("g11.ra_no_revert_all_reported",
+        "Sec III-C (no revert in any reported ReverseAdaptive run)",
+        1, 0, _ra_rows_all_zero_reverts)
+    add("g11.ra_no_revert_cuda_corpus_n",
+        "Sec III-C (CUDA reverse_adaptive rows checked)",
+        12, 0,
+        lambda: int((d.runs.method == "reverse_adaptive").sum()))
+    add("g11.ra_no_revert_final_corpus_n",
+        "Sec III-C (final_results reverse_adaptive rows checked)",
+        26, 0,
+        lambda: int((d.final.method == "reverse_adaptive").sum()))
 
     # -- G9: switch-disabling behavior (Sec 5.4) ---------------------------
     # Per-round training loss of the canonical MPS FLoRA seed-42 run
