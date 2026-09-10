@@ -41,7 +41,7 @@ fedlora-protocols/
 ├── results/                # Run manifest and downstream eval (downstream/)
 ├── analysis/               # Master CSVs and statistical tests
 ├── figures/                # Paper-ready PDFs
-└── docs/                   # Method notes and paper outline
+└── docs/                   # Submission materials (docs/ojcs-submission/)
 ```
 
 ## Quick start
