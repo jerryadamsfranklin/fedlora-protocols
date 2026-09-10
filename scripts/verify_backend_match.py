@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Neurocomputing Phase 0/1: compare MPS vs CUDA experiment outputs.
+Compare MPS vs CUDA experiment outputs.
 
 Setting-aware absolute tolerances (rtol=0):
   - IID:     per-round and final loss atol=0.01 (Phase 0)
@@ -176,7 +176,7 @@ def compare(
     if rounds_only_final:
         pairs = [p for p in pairs if p[0].startswith("final_")]
 
-    print("Neurocomputing Phase 0/1 — backend match (MPS vs CUDA)")
+    print("Backend match (MPS vs CUDA)")
     print(f"  MPS:  {_resolve_results(mps_path)}")
     print(f"  CUDA: {_resolve_results(cuda_path)}")
     print(f"  setting={resolved}  loss_atol={loss_atol}  comm_atol={ATOL_COMM}  rtol={RTOL}")
@@ -230,7 +230,7 @@ def compare(
     print()
     if failures:
         print(
-            f"Result: {failures} failure(s) — do not proceed to Neurocomputing Phase 1."
+            f"Result: {failures} failure(s)."
         )
         return 1
     print(f"Result: all checks passed (setting={resolved}, loss_atol={loss_atol}).")

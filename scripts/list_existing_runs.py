@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Neurocomputing Phase 1 — enumerate the canonical 34 MPS training runs.
+Enumerate the canonical 34 MPS training runs.
 
 Walks results/raw/, resolves the paper-suite canonical results.json for each
 (config × seed), and writes a CSV checklist for CUDA reruns.

@@ -6,7 +6,6 @@ Usage:
     python scripts/run_experiment.py --config config/exp_reverse_adaptive_iid.yaml \\
         --seed 42 --device cuda --tag phase0_cuda_validation
 
-CURSOR AI: Implement this script as specified.
 """
 
 import argparse
@@ -75,7 +74,7 @@ def load_config(path: str) -> Dict[str, Any]:
 
 def resolve_device(requested: str | None) -> str:
     """
-    Resolve training device for Neurocomputing Phase 0+.
+    Resolve training device.
 
     --device cuda|mps|cpu selects explicitly (validated).
     --device omit/"auto" keeps the historical default: MPS if available else CPU
@@ -250,7 +249,7 @@ def main() -> None:
         choices=["auto", "cuda", "mps", "cpu"],
         help=(
             "Compute device. 'auto' = MPS if available else CPU (legacy default). "
-            "Use 'cuda' on NVIDIA hosts for Neurocomputing Phase 0 validation."
+            "Use 'cuda' on NVIDIA hosts."
         ),
     )
     parser.add_argument(
