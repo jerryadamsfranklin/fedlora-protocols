@@ -65,11 +65,12 @@ logs/
 .cache/
 
 # Experiment results: track summaries (JSON/CSV) for reproducibility.
-# Ignore heavy artifacts if you ever write checkpoints under results/.
-results/**/*.pt
+# Ignore heavy artifacts and the full raw run tree (provenance is in docs/run_provenance_manifest.csv).
+*.pt
+*.bin
+*.safetensors
+results/raw/
 results/**/*.pth
-results/**/*.bin
-results/**/*.safetensors
 results/**/checkpoint*/
 
 # Local exports: handoffs, Stage 0 summaries, Claude bundles (do not commit)
@@ -77,9 +78,6 @@ exports/**
 !exports/.gitkeep
 **/*handoff*.txt
 **/*handoff*.md
-
-# TMLR Path B implementation guide (optional local copy in docs/; do not track)
-docs/TMLR_PATH_B_IMPLEMENTATION_GUIDE.md
 
 # Stage 5 brief and stage-specific docs can be kept local-only.
 docs/stage5.md

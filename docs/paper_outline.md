@@ -2,7 +2,7 @@
 
 ## Target venue
 
-TMLR. Single-blind, approximately 5500 word target, no strict page limit.
+Neurocomputing. Single-blind, approximately 5500 word target, no strict page limit.
 
 ## Headline claims
 
