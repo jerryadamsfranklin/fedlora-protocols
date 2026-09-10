@@ -4,11 +4,11 @@ Communication-efficient federated fine-tuning for large language models, with me
 
 ## Overview
 
-This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning*. It implements six federated LoRA aggregation methods, evaluates them on Alpaca-3k and Dolly-15k instruction-tuning at two model scales (TinyLlama-1.1B and LLaMA-3.2-3B), and reports per-round byte-tracked communication costs measured at the transport layer.
+This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning*. It implements six federated LoRA aggregation methods and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Five protocols, three of them from prior work, are placed on a single measured communication-quality frontier at TinyLlama-1.1B scale on Alpaca-3k; three of the five are replicated on Dolly-15k and at LLaMA-3.2-3B.
 
 ### Headline results
 
-- Five published protocols are placed on one measured communication-quality frontier at four distinct operating points.
+- Five protocols, three of them from prior work, are placed on one measured communication-quality frontier at four distinct operating points.
 - **ReverseAdaptive** achieves 40.5 percent measured round-trip communication savings versus FLoRA on TinyLlama-1.1B, at a held-out instruction-following loss cost of 0.0063.
 - The frontier has a knee: continuing past that point to FFA-LoRA buys 21.3 further percentage points of savings at roughly five times the quality cost per point.
 - **Two-Phase K=8** achieves 27.7 percent measured savings on TinyLlama-1.1B.
@@ -22,7 +22,7 @@ This repository accompanies the paper *Adaptive Phase-Switching for Communicatio
 | FedIT | LoRA aggregation via FedAvg over A and B | Zhang et al., 2024 |
 | FFA-LoRA | Frozen A, aggregate only B | Sun et al., 2024 |
 | FLoRA | Stack-and-SVD aggregation of BA products | Wang et al., 2024 |
-| FlexLoRA | Heterogeneous-rank LoRA aggregation | Bai et al., 2024 |
+| FlexLoRA        | Heterogeneous-rank LoRA aggregation (implemented; not evaluated in the paper) | Bai et al., 2024   |
 | Two-Phase | FLoRA for K rounds, then FFA-LoRA | this paper |
 | ReverseAdaptive | Loss-plateau-triggered switch from FLoRA to FFA-LoRA | this paper |
 
@@ -100,4 +100,4 @@ MIT (see LICENSE file). Reuse for research and production is welcome; please cit
 
 ## Acknowledgments
 
-The author used Claude (Anthropic) as a development and writing assistant. All technical content, methodology, and results are the author's own.
+The author used Claude (Anthropic) as a coding assistant during development of this codebase, and for grammar and language editing of the manuscript. All technical content, methodology, and results are the author's own.
