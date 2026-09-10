@@ -5,7 +5,7 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{hyperref}
-\hypersetup{hidelinks=true}
+\hypersetup{hidelinks}
 \usepackage{booktabs}
 \usepackage{url}
 \setlength{\emergencystretch}{2em}
@@ -67,7 +67,7 @@ All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^
 
 \section{Per-Seed Full Results}
 \label{app:perseed}
-Tables in this appendix are labeled with their corpus. Per-seed results backing a method comparison use the CUDA corpus, matching the main results tables; per-seed results documenting partition sensitivity retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
+Tables in this appendix are labeled with their corpus, which follows the corresponding table in the main paper. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~7 of the main paper; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
 
 At $\alpha{=}0.5$, mean final loss is statistically indistinguishable from IID for every method in the released analysis CSVs, with differences of 0.001 to 0.007 against per-seed standard deviations near 0.02 over three seeds. Heterogeneity manifests instead as sensitivity to the partition draw: seed-to-seed standard deviation rises by roughly an order of magnitude, from $0.5$ to $1.6 \times 10^{-3}$ under IID in Table~\ref{tab:b1} to $18$ to $25 \times 10^{-3}$ at $\alpha{=}0.5$ across the methods in the released CSVs, which is also why the per-seed spread at $\alpha{=}0.1$ in Table~\ref{tab:b2} is wide.
 
@@ -183,7 +183,7 @@ With three seeds these tests have very low power, so effect sizes should be read
 The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 95\% confidence interval of $[-0.0114, 0.0114]$, which contains the $0.0043$ difference observed between the same methods at TinyLlama-1.1B. The test therefore cannot distinguish equivalence from a difference of the magnitude seen at the smaller scale.
 
 \begin{table*}[t]
-\caption{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss.}
+\caption{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss. Held-out instruction-following loss was not computed for the LLaMA-3.2-3B corpus; quality at that scale is reported as final training loss and downstream zero-shot accuracy.}
 \label{tab:d1}
 \begin{center}
 \footnotesize
@@ -285,7 +285,7 @@ Three of the four disagreements are the same phenomenon. Total communication is 
 
 Run 17 was investigated separately. Re-executing on CUDA with the data partition seed fixed at 456 and the training seed changed to 999 reproduced switch round 7 exactly, establishing that the one-round difference is a stable property of the backend and partition rather than run-to-run stochasticity. At $\alpha{=}0.1$, cross-backend agreement on the discrete switch round is therefore not guaranteed: one of three partitions with CUDA counterparts (seeds 42, 123, and 456) fired one round later on CUDA, and CUDA is reported as primary for that setting.
 
-The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B runs, which is what supports the cross-scale transfer claim in Section~V of the main paper.
+The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B ReverseAdaptive runs, which is what supports the cross-scale transfer claim in Section~V of the main paper.
 
 \textbf{Byte accounting.} Communication is instrumented at the transport layer, counting \texttt{numel} times \texttt{element\_size} on the tensors actually transmitted, rather than derived from parameter counts. The \texttt{get\_communication\_cost} helper in the FFA-LoRA aggregator is not used by this accounting.
 
