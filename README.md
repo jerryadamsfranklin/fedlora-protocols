@@ -38,7 +38,7 @@ fedlora-protocols/
 ├── config/                 # YAML experiment configs (with _inherit)
 ├── scripts/                # Runners, analysis, figure generation
 ├── tests/                  # 28 unit tests covering aggregators and runner
-├── results/                # Run manifest and downstream eval (downstream/)
+├── results/                # Run manifest, raw per-round records (raw/), downstream eval (downstream/)
 ├── analysis/               # Master CSVs and statistical tests
 ├── figures/                # Paper-ready PDFs
 └── docs/                   # Submission materials (docs/ojcs-submission/)
@@ -71,7 +71,8 @@ python3 scripts/evaluate_checkpoint.py \
 ```bash
 python3 scripts/build_results_table.py
 python3 scripts/generate_paper_figures.py
-ls figures/  # six PDFs corresponding to paper figures (fig1 through fig6)
+ls figures/  # fig1-3 are paper Figures 1-3; fig4 is supplement Figure S1;
+             # fig5 is paper Figure 4; fig6 is paper Figure 5
 ```
 
 ## Hardware
