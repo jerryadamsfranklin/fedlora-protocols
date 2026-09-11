@@ -1,9 +1,9 @@
-# Historical note: before commit 8cddb8b, `target_modules` from config inheritance
-# was not passed into model construction in all paths.
-# Reported runs in the Neurocomputing manuscript adapt q_proj and v_proj only.
+# Shared training-protocol base used by most TinyLlama experiment configs.
+# Historical note: `target_modules` from config inheritance was not passed into
+# model construction in all paths in earlier revisions of this codebase.
+# Reported runs in the manuscript adapt q_proj and v_proj only.
 # The measured byte totals in run artifacts are the source-of-truth evidence.
 # Four attention LoRA targets (q,k,v,o) for meaningful per-layer / hybrid experiments.
-# Aligns training protocol with exp_adaptive_v2 (15 rounds, Alpaca 3k, short seq) unless overridden.
 _inherit: base_config.yaml
 
 lora:

@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_reverse_adaptive_threshold_ablation",
+  "method": "reverse_adaptive",
+  "seed": 42,
+  "timestamp": "20260504_182053",
+  "device": "mps",
+  "output_dir": "results/raw/exp_reverse_adaptive_threshold_ablation/reverse_adaptive/seed_42/stage2_threshold_extended_0.20/20260504_182053",
+  "git_commit": "1e518c63010a4ba67eebd1f4c34e7bcddc530c3d",
+  "git_branch": "impl/adaptive-phase-switching-protocol",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": 0.2
+  }
+}

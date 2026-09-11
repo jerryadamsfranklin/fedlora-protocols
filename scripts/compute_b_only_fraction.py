@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Neurocomputing Phase 0 (A.2): compute LoRA B-only communication fractions.
+Compute LoRA B-only communication fractions.
 
 For each attention projection (q/k/v/o) with LoRA rank r:
   A params = r * d_in
@@ -11,7 +11,8 @@ Uses published Llama* config geometry (no model download required).
 Target modules match config/base_config_4layers.yaml and base_config_llama3_3b.yaml:
 q_proj, k_proj, v_proj, o_proj.
 
-Pass criterion (guide): 8B fraction within a few percentage points of 1.1B / 3.2-3B.
+The B-only fraction is nearly scale-invariant across TinyLlama-1.1B, LLaMA-3.2-3B,
+and LLaMA-3.1-8B geometries (within a few percentage points).
 """
 
 from __future__ import annotations
@@ -31,7 +32,7 @@ class LlamaAttnGeometry:
     hf_id: str
 
 
-# Canonical shapes for the three scales in the Neurocomputing plan.
+# Canonical shapes for the model scales used in the paper.
 # TinyLlama: HF TinyLlama-1.1B-Chat-v1.0 config.json
 # LLaMA-3.2-3B / LLaMA-3.1-8B: Meta Llama GQA configs (same target modules).
 MODELS: List[LlamaAttnGeometry] = [
@@ -97,7 +98,7 @@ def count_lora_ab(
 
 
 def main() -> None:
-    print("Neurocomputing Phase 0 — A.2 B-only communication fractions")
+    print("B-only communication fractions")
     print(f"LoRA rank r={DEFAULT_RANK} (cancels in fraction); targets={TARGET_MODULES}")
     print()
 

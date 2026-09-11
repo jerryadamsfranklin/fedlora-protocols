@@ -1,4 +1,4 @@
-"""Generate Stage 5 paper figures into figures/. Requires analysis/final_results_table.csv."""
+"""Generate paper figures into figures/. Requires analysis/final_results_table.csv."""
 
 from __future__ import annotations
 

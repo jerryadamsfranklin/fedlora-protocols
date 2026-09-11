@@ -1,0 +1,28 @@
+{
+  "experiment": "exp_dolly_two_phase_k8_iid",
+  "method": "two_phase",
+  "seed": 456,
+  "data_seed": 456,
+  "run_seed": 456,
+  "timestamp": "20260727_015800",
+  "device": "cuda",
+  "output_dir": "results/raw/exp_dolly_two_phase_k8_iid/two_phase/seed_456/run_06_of_24/neuro_part12_qvonly/20260727_015800",
+  "git_commit": "cae4c328930088f607c817e0df81711b5c775a86",
+  "git_branch": "neurocomputing/final-experiments",
+  "git_dirty": true,
+  "python": "3.12.13",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.39",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null,
+    "data_seed": 456,
+    "run_seed": 456,
+    "device": "cuda",
+    "save_every": 10,
+    "resume": null
+  },
+  "run_index": 6,
+  "run_total": 24,
+  "run_label": "6/24"
+}

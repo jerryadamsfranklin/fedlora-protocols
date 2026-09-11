@@ -1,0 +1,12 @@
+[
+  {
+    "round": 1,
+    "avg_loss": 1.0757838934659958,
+    "round_time": 922.8094098567963,
+    "communication_mb": 35.0,
+    "upload_mb": 17.5,
+    "download_mb": 17.5,
+    "broadcast_b_only": false,
+    "broadcast_bytes_per_client": 9175040
+  }
+]

@@ -5,9 +5,9 @@ Evaluate held-out instruction-following loss/perplexity for LoRA checkpoints.
 Supports:
 1) Single checkpoint evaluation
 2) Sweep mode via discovered checkpoints under results/raw
-3) Sweep mode via manifest CSV rows (e.g., docs/phase1_run_manifest.csv)
+3) Sweep mode via manifest CSV rows (e.g., results/run_checklist.csv)
 
-Primary use for Neurocomputing final plan Part 3:
+Primary use:
 - Held-out metric on training distribution (default Alpaca train[3000:3500]).
 """
 

@@ -1,0 +1,28 @@
+{
+  "experiment": "exp_ffa_lora_iid",
+  "method": "ffa_lora",
+  "seed": 123,
+  "data_seed": 123,
+  "run_seed": 123,
+  "timestamp": "20260727_054832",
+  "device": "cuda",
+  "output_dir": "results/raw/exp_ffa_lora_iid/ffa_lora/seed_123/run_14_of_24/neuro_part12_qvonly/20260727_054832",
+  "git_commit": "cae4c328930088f607c817e0df81711b5c775a86",
+  "git_branch": "neurocomputing/final-experiments",
+  "git_dirty": true,
+  "python": "3.12.13",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.39",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null,
+    "data_seed": 123,
+    "run_seed": 123,
+    "device": "cuda",
+    "save_every": 10,
+    "resume": null
+  },
+  "run_index": 14,
+  "run_total": 24,
+  "run_label": "14/24"
+}

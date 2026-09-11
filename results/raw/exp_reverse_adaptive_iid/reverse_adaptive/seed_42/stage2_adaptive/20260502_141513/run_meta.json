@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_reverse_adaptive_iid",
+  "method": "reverse_adaptive",
+  "seed": 42,
+  "timestamp": "20260502_141513",
+  "device": "mps",
+  "output_dir": "results/raw/exp_reverse_adaptive_iid/reverse_adaptive/seed_42/stage2_adaptive/20260502_141513",
+  "git_commit": "1e518c63010a4ba67eebd1f4c34e7bcddc530c3d",
+  "git_branch": "impl/adaptive-phase-switching-protocol",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}

@@ -1,6 +1,6 @@
 # Contributing
 
-This repository accompanies a research paper submitted to Neurocomputing. The author welcomes:
+This repository accompanies a research paper currently under peer review. The author welcomes:
 
 1. Bug reports filed as GitHub issues with reproducible commands.
 2. Pull requests that fix bugs without changing experimental semantics.

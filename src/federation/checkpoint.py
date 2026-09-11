@@ -1,5 +1,5 @@
 """
-Federated training checkpoints (Neurocomputing Phase 0 / C.8).
+Federated training checkpoints.
 
 A checkpoint is written after completed communication rounds and stores:
   - LoRA / global adapter weights
