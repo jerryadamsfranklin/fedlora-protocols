@@ -1,0 +1,95 @@
+\documentclass{ieeetj}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx,color}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{url}
+\setlength{\emergencystretch}{2em}
+
+\AtBeginDocument{%
+  \definecolor{tmlcncolor}{cmyk}{0.93,0.59,0.15,0.02}%
+  \definecolor{NavyBlue}{RGB}{0,86,125}}
+
+\def\OJlogo{\vspace{-4pt}$<$Society logo(s) and publication title will appear here.$>$}
+\def\seclogo{\vspace{10pt}$<$Society logo(s) and publication title will appear here.$>$}
+
+\def\authorrefmark#1{\ensuremath{^{\textbf{#1}}}}
+
+\begin{document}
+
+\markboth{}{Franklin}
+
+\title{Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning}
+
+\author{Jerry Adams Franklin\authorrefmark{1}}
+\affil{Independent Researcher, Fairport, NY 14450 USA}
+\corresp{Corresponding author: Jerry Adams Franklin (email: jerry.adamsf@gmail.com). ORCID: 0009-0006-8470-8349.}
+\authornote{This work received no external funding. The author declares no competing financial interests. This manuscript has been submitted to the IEEE Open Journal of the Computer Society for peer review.}
+
+\begin{abstract}
+Federated fine-tuning of large language models with low-rank adaptation
+reduces per-client trainable parameters, but client-to-server communication
+remains the dominant cost. Existing accounting for federated LoRA protocols
+omits the asymmetric transition round when a protocol changes aggregation
+mode, and reports savings that ignore grouped-query attention shapes. This
+paper measures per-round upload and download bytes for a bidirectional
+B-only federated LoRA protocol and places five methods, three from prior work,
+on a single
+communication-quality frontier. The frontier has a knee, which an adaptive
+phase-switching aggregator, ReverseAdaptive, locates by monitoring the relative improvement in global training loss against
+a dimensionless threshold rather than by fixing a phase boundary in advance.
+On TinyLlama-1.1B-Chat with Alpaca, ReverseAdaptive attains 40.5 percent
+measured round-trip savings over FLoRA at a held-out instruction-following
+loss cost of 0.0063. It outperforms FFA-LoRA, which freezes the first of the
+two LoRA factors at initialization, by 0.0182 in held-out loss, more than
+twenty times the largest per-method seed standard deviation on that metric,
+so learning that factor before freezing it produces better adapters. The same
+threshold transfers across model scales without retuning, and the quality cost
+of the transition is stable across the two datasets tested.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Communication efficiency, federated learning, large language models, low-rank adaptation, parameter-efficient fine-tuning.
+\end{IEEEkeywords}
+
+\maketitle
+
+\input{body.tex}
+
+\section*{ACKNOWLEDGMENT}
+All code, configuration
+files, and analysis scripts are publicly available at
+\url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are
+not released. The Alpaca and Dolly-15k datasets are publicly available from
+their respective sources.
+
+The author used Claude (Anthropic) for grammar and language editing only. All
+technical content, analysis, and interpretations are the author's own.
+
+\bibliographystyle{IEEEtran}
+\bibliography{main}
+
+\begin{IEEEbiographynophoto}{Jerry Adams Franklin}
+is an Independent Researcher in Fairport, NY 14450 USA.
+He received the M.S.\ degree in data science from Northeastern University, Boston, MA, USA, in 2022.
+He previously worked in machine learning engineering at Intel Corporation
+and Digital Currency Group.
+His research interests include federated learning, parameter-efficient
+fine-tuning, and communication-efficient distributed training.
+Contact him at jerry.adamsf@gmail.com.
+\end{IEEEbiographynophoto}
+
+\appendices
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\input{appendix_body.tex}
+
+\end{document}

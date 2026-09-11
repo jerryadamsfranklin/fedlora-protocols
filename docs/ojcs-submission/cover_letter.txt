@@ -1,5 +1,3 @@
-# Cover Letter
-
 To: Professor Vincenzo Piuri, Editor-in-Chief
 IEEE Open Journal of the Computer Society
 
