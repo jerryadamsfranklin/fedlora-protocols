@@ -49,3 +49,11 @@ back any number in the paper and in places disagree with it. In particular
 `legacy/neuro_part2_baselines_holdout.csv` were produced under the superseded
 four-projection target set and report held-out values that differ from Table 3.
 Use `neuro_part12_qvonly_holdout_strict24.csv` instead.
+
+## Run provenance
+
+`results/MANIFEST.csv` maps every run that backs a reported number to the table,
+figure, or section it supports, and records the git commit each run was produced
+at. `results/README.md` describes the aggregation hazards that manifest
+membership guards against. Runs in `results/raw/` that are not listed in the
+manifest are development history and do not back any reported result.
