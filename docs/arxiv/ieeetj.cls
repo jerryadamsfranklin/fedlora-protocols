@@ -3436,7 +3436,15 @@ between column types.}%
 \def\@maketitle{\newpage
   \bgroup%
     \vspace*{-10.5pt}%
-     {\receivedfont \ifx\@receiveddate\@empty\else Received\ \@receiveddate\fi\ifx\@revised\@empty\else;\ revised\ \@reviseddate\fi\ifx\@accepteddate\@empty\else;\ accepted\ \@accepteddate\fi\ifx\@publisheddate\@empty\else; Date of publication\nobreakspace\@publisheddate\fi\ifx\@currentdate\@empty\else;\space date of current version\nobreakspace\@currentdate\fi.\space\ifx\@editor\@empty\else\@editor\fi\par}%
+     {\receivedfont
+       \def\@IEEEhasdate{0}%
+       \ifx\@receiveddate\@empty\else Received\ \@receiveddate\def\@IEEEhasdate{1}\fi
+       \ifx\@reviseddate\@empty\else;\ revised\ \@reviseddate\def\@IEEEhasdate{1}\fi
+       \ifx\@accepteddate\@empty\else;\ accepted\ \@accepteddate\def\@IEEEhasdate{1}\fi
+       \ifx\@publisheddate\@empty\else; Date of publication\nobreakspace\@publisheddate\def\@IEEEhasdate{1}\fi
+       \ifx\@currentdate\@empty\else;\space date of current version\nobreakspace\@currentdate\def\@IEEEhasdate{1}\fi
+       \ifnum\@IEEEhasdate=1 .\space\fi
+       \ifx\@editor\@empty\else\@editor\fi\par}%
     \ifx\@doiinfo\@empty\else\vskip3pt{\doi@font Digital Object Identifier 10.1109/\@doiinfo\par}\fi%
      \vskip14.5pt{\titlefont{\textcolor{tmlcncolor}{\@title}}\par\vskip8.5pt}%
     {\authorfont\@author\par}\vskip4pt{\afffont\@affil}\par\@IEEEspecialpapernotice\vskip5pt%

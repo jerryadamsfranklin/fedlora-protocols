@@ -16,8 +16,15 @@
   \definecolor{tmlcncolor}{cmyk}{0.93,0.59,0.15,0.02}%
   \definecolor{NavyBlue}{RGB}{0,86,125}}
 
-\def\OJlogo{\vspace{-4pt}$<$Society logo(s) and publication title will appear here.$>$}
-\def\seclogo{\vspace{10pt}$<$Society logo(s) and publication title will appear here.$>$}
+% ieeetj.cls checks \@revised in \@maketitle but \reviseddate only sets
+% \@reviseddate, which leaves a bare "; revised ." on page 1 when dates are
+% omitted. Clear the mistyped token so the date line stays silent.
+\makeatletter
+\let\@revised\@empty
+\makeatother
+
+\def\OJlogo{}
+\def\seclogo{}
 
 \def\authorrefmark#1{\ensuremath{^{\textbf{#1}}}}
 
