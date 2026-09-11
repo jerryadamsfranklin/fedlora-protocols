@@ -1,0 +1,18 @@
+{
+  "experiment": "exp_llama3_flora_iid",
+  "method": "flora",
+  "seed": 42,
+  "timestamp": "20260506_172045",
+  "device": "mps",
+  "output_dir": "results/raw/exp_llama3_flora_iid/flora/seed_42/stage5_llama3_full/20260506_172045",
+  "git_commit": "d6f903880a51aa586366290ef882003a178f796c",
+  "git_branch": "impl/stage5-final-matrix",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  }
+}

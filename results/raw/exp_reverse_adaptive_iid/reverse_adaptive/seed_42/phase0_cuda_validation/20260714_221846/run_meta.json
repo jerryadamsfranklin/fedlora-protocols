@@ -1,0 +1,19 @@
+{
+  "experiment": "exp_reverse_adaptive_iid",
+  "method": "reverse_adaptive",
+  "seed": 42,
+  "timestamp": "20260714_221846",
+  "device": "cuda",
+  "output_dir": "results/raw/exp_reverse_adaptive_iid/reverse_adaptive/seed_42/phase0_cuda_validation/20260714_221846",
+  "git_commit": "1480b7d265f20c02ad1557ba7e3f0142022c4099",
+  "git_branch": "neurocomputing/phase-0-validation",
+  "git_dirty": true,
+  "python": "3.12.13",
+  "platform": "Linux-5.15.0-185-generic-x86_64-with-glibc2.39",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null,
+    "device": "cuda"
+  }
+}

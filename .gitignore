@@ -64,12 +64,11 @@ logs/
 # Local caches
 .cache/
 
-# Experiment results: track summaries (JSON/CSV) for reproducibility.
-# Ignore heavy artifacts and the full raw run tree (see results/MANIFEST.csv and analysis/README.md).
+# Experiment results: track run JSON/YAML under results/raw/ for reproducibility.
+# Ignore heavy weight artifacts and checkpoint directories.
 *.pt
 *.bin
 *.safetensors
-results/raw/
 results/**/*.pth
 results/**/checkpoint*/
 
@@ -84,8 +83,8 @@ docs/stage5.md
 docs/stage1_pathB.md
 docs/stage4_setup.md
 
-# Neurocomputing implementation guides (local maintainer copies; do not track)
-docs/neurocomputing/
+# Local maintainer drafting copies; do not track
+docs/drafts/
 
 # Figures: keep generated plots (usually small); ignore huge raw exports if needed
 figures/**/*.tif

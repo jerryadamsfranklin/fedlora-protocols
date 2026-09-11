@@ -1,0 +1,21 @@
+{
+  "experiment": "exp_two_phase_k10_noniid_alpha05",
+  "method": "two_phase",
+  "seed": 456,
+  "timestamp": "20260429_162401",
+  "device": "mps",
+  "output_dir": "results/raw/exp_two_phase_k10_noniid_alpha05/two_phase/seed_456/run_15_of_18/20260429_162401",
+  "git_commit": "2d07cd9d49d672a2eb55f71de19d951d7a7dfb18",
+  "git_branch": "experiment/two-phase-validation",
+  "git_dirty": true,
+  "python": "3.10.18",
+  "platform": "macOS-26.4.1-x86_64-i386-64bit",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null
+  },
+  "run_index": 15,
+  "run_total": 18,
+  "run_label": "15/18"
+}
