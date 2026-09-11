@@ -2951,8 +2951,8 @@ between column types.}%
 \def\ps@headings{%
    \def\@oddhead{\vbox{\hsize\textwidth\vspace*{-13.5pt}\hfill\hbox{\vbox to 29pt{\hsize257pt\vspace*{-3pt}\seclogo}}\par\vspace*{-2.25pt}\hbox to \textwidth{\vrule width\textwidth height.3pt depth0pt}}}%
  \def\@evenhead{\vbox{\hsize\textwidth\vbox to 0pt{\hsize\textwidth\vspace*{7.7pt}\rfxfont\raggedright\rightmark:\ \leftmark\hfill\par}\par\vspace*{16pt}\hbox to \textwidth{\vrule width\textwidth height.3pt depth0pt}}}%
-        \def\@evenfoot{\hbox to \textwidth{{\rffont\thepage}\hfill{{\rffont VOLUME\ \@jvol,\ \@pubyear}}}}%
-        \def\@oddfoot{\hbox to \textwidth{{{\rffont VOLUME\ \@jvol,\ \@pubyear}}\hfill{\rffont\thepage}}}%
+        \def\@evenfoot{\hbox to \textwidth{{\rffont\thepage}\hfill}}%
+        \def\@oddfoot{\hbox to \textwidth{\hfill{\rffont\thepage}}}%
 	          }%
 	          %
 % title page style
@@ -2994,9 +2994,9 @@ between column types.}%
    \def\@oddhead{\vbox{\hsize\textwidth\vspace*{-13pt}\vbox to 29pt{\hsize126pt\vspace*{11.5pt}\OJlogo}\hfill\par\vspace*{-2.75pt}\hbox to \textwidth{\vrule width\textwidth height.3pt depth0pt}}}%
    \let\@evenhead\@oddhead%
         \def\@evenfoot{\vbox to 10pt{\hbox to \textwidth{\hfill\rffont This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/\hfill}\par\vspace*{-12pt}%
-                        \hbox to \textwidth{{\rffont\thepage}\hfill{{\rffont VOLUME\ \@jvol,\ \@pubyear}}}}}%
+                        \hbox to \textwidth{{\rffont\thepage}\hfill}}}%
         \def\@oddfoot{\vbox to 10pt{\hbox to \textwidth{\hfill\rffont This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/\hfill}\par\vspace*{-12pt}%
-                        \hbox to \textwidth{{{\rffont VOLUME\ \@jvol,\ \@pubyear}}\hfill{\rffont\thepage}}}}%
+                        \hbox to \textwidth{\hfill{\rffont\thepage}}}}%
 	          }%
 %%%%%%%%%%%%%%%
 % start with empty headings
