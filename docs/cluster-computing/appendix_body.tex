@@ -136,12 +136,16 @@ ReverseAdaptive & 456 & 1.667699 & $-0.526547$ & 1533.13 \\
 \setcounter{figure}{0}
 Paired $t$-tests over three seeds on final-round training loss and on held-out instruction-following loss. TinyLlama-1.1B results use the CUDA corpus, matching Table~\ref{tab:frontier}; LLaMA-3.2-3B results use the MPS corpus.
 
-\begin{table*}[tbp]
+With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values. No multiplicity correction is applied in the main results tables. Applying a Bonferroni correction across the six TinyLlama-1.1B Alpaca IID comparisons gives a threshold of $0.0083$, which the ReverseAdaptive versus Two-Phase $K{=}8$ comparison on held-out loss ($p = 0.026$) does not meet. That comparison is secondary under the frontier framing of Section~\ref{sec:discussion}; the load-bearing comparison is ReverseAdaptive versus FFA-LoRA, which holds at $p < 10^{-3}$ on both metrics with a difference roughly twenty times the largest per-method standard deviation.
+
+The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 95\% confidence interval of $[{-}0.0114, 0.0114]$, which contains the $0.0043$ difference observed between the same methods at TinyLlama-1.1B. The test therefore cannot distinguish equivalence from a difference of the magnitude seen at the smaller scale.
+
+\begin{strip}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{0.88}
-\caption{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss. Held-out instruction-following loss was not computed for the LLaMA-3.2-3B corpus; quality at that scale is reported as final training loss and downstream zero-shot accuracy}
+\captionof{table}{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss. Held-out instruction-following loss was not computed for the LLaMA-3.2-3B corpus; quality at that scale is reported as final training loss and downstream zero-shot accuracy}
 \label{tab:c1}
 \begin{tabular}{lrrrr}
 \toprule
@@ -165,11 +169,7 @@ ReverseAdaptive vs.\ FLoRA & $+0.0215$ & $1.3 \times 10^{-2}$ & -- & -- \\
 ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 \bottomrule
 \end{tabular}
-\end{table*}
-
-With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values. No multiplicity correction is applied in the main results tables. Applying a Bonferroni correction across the six TinyLlama-1.1B Alpaca IID comparisons gives a threshold of $0.0083$, which the ReverseAdaptive versus Two-Phase $K{=}8$ comparison on held-out loss ($p = 0.026$) does not meet. That comparison is secondary under the frontier framing of Section~\ref{sec:discussion}; the load-bearing comparison is ReverseAdaptive versus FFA-LoRA, which holds at $p < 10^{-3}$ on both metrics with a difference roughly twenty times the largest per-method standard deviation.
-
-The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 95\% confidence interval of $[{-}0.0114, 0.0114]$, which contains the $0.0043$ difference observed between the same methods at TinyLlama-1.1B. The test therefore cannot distinguish equivalence from a difference of the magnitude seen at the smaller scale.
+\end{strip}
 
 \section{Cross-Backend Verification}
 \label{app:crossbackend}
