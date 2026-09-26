@@ -194,7 +194,7 @@ Final training loss measures fit to the federated objective, and the four zero-s
 
 \subsection{The Communication-Quality Frontier}
 \label{sec:frontier}
-Table~\ref{tab:frontier} and Figure~\ref{fig:frontier} place five federated LoRA protocols on a single measured communication-quality frontier for TinyLlama-1.1B \cite{zhang2024tinyllama} under IID partitioning. The five methods occupy four distinct operating points. FLoRA \cite{wang2024flora} and FedIT \cite{zhang2024federatedgpt} coincide at 2578.13 MB, since both transmit full $A$ and $B$ in both directions every round. Two-Phase $K{=}8$ reaches 1863.13 MB (27.73\% savings), ReverseAdaptive at $\tau{=}0.01$ reaches 1533.13 MB (40.53\%), and FFA-LoRA \cite{sun2024ffalora} reaches 983.13 MB (61.87\%). Across the four distinct points communication falls and both quality metrics degrade in the same order, so the frontier is monotone on each metric independently rather than only on the metric used to construct it.
+Table~\ref{tab:frontier} and Fig.~\ref{fig:frontier} place five federated LoRA protocols on a single measured communication-quality frontier for TinyLlama-1.1B \cite{zhang2024tinyllama} under IID partitioning. The five methods occupy four distinct operating points. FLoRA \cite{wang2024flora} and FedIT \cite{zhang2024federatedgpt} coincide at 2578.13 MB, since both transmit full $A$ and $B$ in both directions every round. Two-Phase $K{=}8$ reaches 1863.13 MB (27.73\% savings), ReverseAdaptive at $\tau{=}0.01$ reaches 1533.13 MB (40.53\%), and FFA-LoRA \cite{sun2024ffalora} reaches 983.13 MB (61.87\%). Across the four distinct points communication falls and both quality metrics degrade in the same order, so the frontier is monotone on each metric independently rather than only on the metric used to construct it.
 
 \begin{table*}[tbp]
 \centering
@@ -202,8 +202,7 @@ Table~\ref{tab:frontier} and Figure~\ref{fig:frontier} place five federated LoRA
 \setlength{\tabcolsep}{6pt}
 \caption{Measured communication-quality frontier. TinyLlama-1.1B, Alpaca-3k, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Communication is protocol-deterministic and identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice of Section~\ref{sec:heldout}; more negative is better. Differences quoted in the text are computed from unrounded values and may differ from the displayed cells in the final digit. $p$-values are paired $t$-tests against FLoRA on final loss; the complete set of paired tests on both metrics is in Appendix~\ref{app:stats}. Methods: FLoRA \cite{wang2024flora}, FedIT \cite{zhang2024federatedgpt}, FFA-LoRA \cite{sun2024ffalora}. The MB column is total round-trip communication over 15 rounds}
 \label{tab:frontier}
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{@{}lrrrrr@{}}
 \toprule
 Method & MB & Savings & Final loss & Held-out $\Delta$ & $p$ vs.\ FLoRA \\
 \midrule
@@ -246,8 +245,7 @@ Table~\ref{tab:dolly} repeats the three-method comparison on Databricks Dolly-15
 \setlength{\tabcolsep}{6pt}
 \caption{Dolly-15k replication. TinyLlama-1.1B, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Gap is the held-out $\Delta$loss difference against the same dataset's FLoRA baseline, which is the quantity comparable across datasets; held-out levels are not, since base-model losses differ (1.9352 on Alpaca, 2.2608 on Dolly-15k). Differences quoted in the text are computed from unrounded values and may differ from the displayed cells in the final digit. Methods: FLoRA \cite{wang2024flora}, FedIT \cite{zhang2024federatedgpt}, FFA-LoRA \cite{sun2024ffalora}. The MB column is total round-trip communication over 15 rounds}
 \label{tab:dolly}
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{@{}lrrrrr@{}}
 \toprule
 Method & MB & Final loss & Held-out $\Delta$ & Gap (Dolly) & Gap (Alpaca) \\
 \midrule
@@ -265,7 +263,7 @@ Two-Phase $K{=}8$ costs 0.0034 on Alpaca and 0.0043 on Dolly, a shift of 25.5\%.
 A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and reached the same 1533.13 MB, matching the IID behavior on both datasets. No Dolly FLoRA baseline was run under heterogeneity, so no quality cost is reported for that configuration.
 
 \subsection{Convergence and Switching Behavior}
-Figure~\ref{fig:convergence} shows mean $\pm$ std loss trajectories (left) and cumulative communication (right) across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
+Fig.~\ref{fig:convergence} shows mean $\pm$ std loss trajectories (left) and cumulative communication (right) across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
 
 The no-switch sanity baseline (ReverseAdaptive with \mbox{\texttt{switch\_threshold}}\,{=}\,{-}1.0, \mbox{\texttt{warmup\_rounds}}\,{=}\,999) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Appendix~\ref{app:perseed} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
 Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in Appendix~\ref{app:noswitch}.
@@ -287,13 +285,13 @@ At TinyLlama-1.1B (Table~\ref{tab:downstream_tiny}), all federated methods clust
 
 At LLaMA-3.2-3B scale, the three federated methods are statistically indistinguishable on downstream benchmarks. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and the per-method error bars overlap on every benchmark. Relative to the base model they are flat to slightly positive rather than regressing as at 1.1B (Section~\ref{sec:baseregression}); the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and federated methods either match or slightly exceed each of these. The within-method seed variance is also smaller at 3B than at TinyLlama.
 
-\begin{strip}
+\begin{table*}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
-\captionof{table}{Downstream zero-shot accuracy, TinyLlama-1.1B. MMLU omitted: base accuracy is at chance for 4-way multiple choice}
+\caption{Downstream zero-shot accuracy, TinyLlama-1.1B. MMLU omitted: base accuracy is at chance for 4-way multiple choice}
 \label{tab:downstream_tiny}
-\begin{tabular}{lrrrr}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
 Method & ARC-Easy & BoolQ & HellaSwag & $\Delta$ vs.\ base (BoolQ) \\
 \midrule
@@ -308,9 +306,9 @@ Spread (max--min) & 0.006 & 0.010 & 0.000 & -- \\
 
 \vspace{0.7em}
 
-\captionof{table}{Downstream zero-shot accuracy, LLaMA-3.2-3B. Mean $\pm$ 1 standard deviation across three random seeds (42, 123, 456). 500 examples per benchmark. Cross-method spread is at most 0.5 percentage points on any benchmark and the per-method error bars overlap}
+\caption{Downstream zero-shot accuracy, LLaMA-3.2-3B. Mean $\pm$ 1 standard deviation across three random seeds (42, 123, 456). 500 examples per benchmark. Cross-method spread is at most 0.5 percentage points on any benchmark and the per-method error bars overlap}
 \label{tab:downstream_llama}
-\begin{tabular}{lrrrr}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
 Method & MMLU & ARC-Easy & BoolQ & HellaSwag \\
 \midrule
@@ -320,11 +318,11 @@ Two-Phase $K{=}8$ & $0.558 \pm 0.002$ & $0.837 \pm 0.008$ & $0.738 \pm 0.010$ & 
 ReverseAdaptive   & $0.557 \pm 0.003$ & $0.839 \pm 0.008$ & $0.739 \pm 0.004$ & $0.538 \pm 0.004$ \\
 \bottomrule
 \end{tabular}
-\end{strip}
+\end{table*}
 
 \subsection{Threshold Ablation}
 \label{sec:ablation}
-Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} characterize how $\tau$ controls the savings-quality tradeoff. Since $\tau$ bounds a relative rather than an absolute loss improvement, the values below are fractions of the previous round's loss: $\tau{=}0.01$ requires the loss to fall by at least 1\% in a round for the FLoRA phase to continue. The method has a sensitive regime for $\tau \leq 0.002$: at $\tau{=}0.002$ the switch occurs at round 9, matching Two-Phase $K{=}8$; at $\tau{=}0.001$ the switch occurs at round 11, matching Two-Phase $K{=}10$. For $\tau \geq 0.005$ the method saturates: the switch fires at round 6, the first round after warmup. All rows for $\tau \in \{0.005, 0.010, 0.020, 0.050, 0.100, 0.200\}$ produce identical results.
+Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} characterize how $\tau$ controls the savings-quality tradeoff. Since $\tau$ bounds a relative rather than an absolute loss improvement, the values below are fractions of the previous round's loss: $\tau{=}0.01$ requires the loss to fall by at least 1\% in a round for the FLoRA phase to continue. The method has a sensitive regime for $\tau \leq 0.002$: at $\tau{=}0.002$ the switch occurs at round 9, matching Two-Phase $K{=}8$; at $\tau{=}0.001$ the switch occurs at round 11, matching Two-Phase $K{=}10$. For $\tau \geq 0.005$ the method saturates: the switch fires at round 6, the first round after warmup. All rows for $\tau \in \{0.005, 0.010, 0.020, 0.050, 0.100, 0.200\}$ produce identical results.
 
 A practitioner seeking maximum savings can set $\tau$ anywhere in $[0.005, 0.2]$ without precision loss. The $\tau{=}0.001$ and $\tau{=}0.002$ operating points show the switch round responding to the loss trajectory.
 
@@ -334,7 +332,6 @@ A practitioner seeking maximum savings can set $\tau$ anywhere in $[0.005, 0.2]$
 \setlength{\tabcolsep}{6pt}
 \caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus)}
 \label{tab:ablation}
-\setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 $\tau$ & Switch round & Final loss & Total comm.\ (MB) & Savings \\
@@ -346,15 +343,15 @@ $\tau$ & Switch round & Final loss & Total comm.\ (MB) & Savings \\
 \end{tabular}
 \end{table*}
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{figures/Fig5.pdf}
+\includegraphics[width=\columnwidth]{figures/Fig3.pdf}
 \caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus). Communication is backend-invariant; loss values are not comparable with the CUDA results in Table~\ref{tab:frontier}}
 \label{fig:ablation}
 \end{figure}
 
 \subsection{Scale Validation}
-Table~\ref{tab:llama_iid} and Figure~\ref{fig:scale} confirm that the Pareto structure observed at TinyLlama-1.1B is preserved at LLaMA-3.2-3B.
+Table~\ref{tab:llama_iid} and Fig.~\ref{fig:scale} confirm that the Pareto structure observed at TinyLlama-1.1B is preserved at LLaMA-3.2-3B.
 
 Three random seeds (42, 123, 456) were run for each of FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive, producing nine total runs. Final-round results (mean $\pm$ standard deviation): FLoRA reaches loss $1.3724 \pm 0.0009$ with 2625.0 MB total communication. Two-Phase $K{=}8$ reaches loss $1.3938 \pm 0.0011$ with 1942.5 MB (savings 26.0\%). ReverseAdaptive reaches loss $1.3938 \pm 0.0036$ with $1837.5 \pm 105.0$ MB (savings $30.0 \pm 4.0$\%). The protocol-deterministic communication for FLoRA and Two-Phase $K{=}8$ produces zero seed-to-seed variance; ReverseAdaptive's variance reflects across-seed differences in switch round (7, 8, 9 across the three seeds, mean $8.0 \pm 1.0$).
 
@@ -377,7 +374,7 @@ ReverseAdaptive & $1.3938 \pm 0.0036$ & $1837.5 \pm 105.0$ & $30.0 \pm 4.0$\% \\
 
 \begin{figure*}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/Fig6.pdf}
+\includegraphics[width=\textwidth]{figures/Fig4.pdf}
 \caption{Scale validation. Left: TinyLlama-1.1B, CUDA corpus (mean $\pm$ 1 standard deviation over three seeds). Right: LLaMA-3.2-3B, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Both panels show the three federated methods on the same axes. Dotted polyline connects the three method points on each panel. The Pareto structure (downward slope from FLoRA to ReverseAdaptive) is preserved across scales. Y-axis ranges differ between panels because absolute training loss is model-dependent; the relative Pareto shape is the invariant being validated. ReverseAdaptive's larger error bar at LLaMA-3.2-3B reflects across-seed variance in switch round (7, 8, 9)}
 \label{fig:scale}
 \end{figure*}
@@ -413,11 +410,11 @@ Federated LoRA work commonly reports communication savings as parameter-count ra
 
 Architectural choices such as GQA fix the B-only fraction in ways a naive parameter count does not anticipate. TinyLlama-1.1B's GQA makes B-only transmission save exactly 36\% rather than the 50\% a non-GQA count suggests, and LLaMA-3.2-3B's different GQA configuration yields exactly 40\%. A theoretical 50\% savings claim made for one model family does not transfer to another without architectural accounting.
 
-The transition round carries a cost that parameter-ratio analyses omit. At the FLoRA-to-FFA-LoRA boundary the upload is full while the broadcast is already B-only, so exactly one directional payload is upgraded from B-only to full. On TinyLlama this costs 55.0 MB, and the figure does not depend on the switch round: totals that ignore the transition would be 928.1, 1478.1, and 1808.1 MB for switch rounds 1, 6, and 9, against measured totals of 983.1, 1533.1, and 1863.1. What varies with the number of remaining rounds is the penalty's share of the total, not its size. A protocol upgrading both directions at the boundary would pay 110.0 MB; the look-ahead broadcast halves it.
+The transition round carries a cost that parameter-ratio analyses omit. At the FLoRA-to-FFA-LoRA boundary the upload is full while the broadcast is already B-only, so exactly one directional payload is upgraded from B-only to full. On TinyLlama this costs 55.0 MB, and the figure does not depend on the switch round: totals that ignore the transition would be 928.13, 1478.13, and 1808.13 MB for switch rounds 1, 6, and 9, against measured totals of 983.13, 1533.13, and 1863.13. What varies with the number of remaining rounds is the penalty's share of the total, not its size. A protocol upgrading both directions at the boundary would pay 110.0 MB; the look-ahead broadcast halves it.
 
-Total communication across the entire corpus is one closed-form expression in one discrete parameter. For a switching protocol with switch round $s$ over $N$ rounds, uploads are full for rounds $1 \ldots s$ and broadcasts for rounds $1 \ldots s{-}1$, so $2s-1$ directional payloads are full and the total is $55(2s-1) + 928.125$ MB on TinyLlama and $52.5(2s-1) + 1050$ MB on LLaMA-3.2-3B. FFA-LoRA is $s{=}1$, ReverseAdaptive $s{=}6$, Two-Phase $K{=}8$ is $s{=}9$, and Two-Phase $K{=}10$ is $s{=}11$; every measured total in this paper at full ten-client participation lands on that lattice to the byte; the two reduced-participation runs in Appendix~\ref{app:perseed} scale off the lattice in proportion to the active client count. The $2s-1$ arises from the harvest rule rather than from the protocol: an implementation that froze the server's existing global $A$ would upgrade no directional payload at the boundary and give $110(s-1) + 928.125$ instead. A non-switching protocol has all $2N$ directional payloads full and is not a point on the lattice: FLoRA is the separate endpoint at $55 \times 30 + 928.125 = 2578.125$ MB. The lattice spacing of 110 MB per round is also why no continuous $\tau$ reproduces a fixed-$K$ total robustly, as Section~\ref{sec:frontier} notes.
+Total communication across the entire corpus is one closed-form expression in one discrete parameter. For a switching protocol with switch round $s$ over $N$ rounds, uploads are full for rounds $1 \ldots s$ and broadcasts for rounds $1 \ldots s{-}1$, so $2s-1$ directional payloads are full and the total is $55(2s-1) + 928.125$ MB on TinyLlama and $52.5(2s-1) + 1050$ MB on LLaMA-3.2-3B, where $928.125$ and the non-switching endpoint $2578.125$ are exact. FFA-LoRA is $s{=}1$, ReverseAdaptive $s{=}6$, Two-Phase $K{=}8$ is $s{=}9$, and Two-Phase $K{=}10$ is $s{=}11$; every measured total in this paper at full ten-client participation lands on that lattice to the byte; the two reduced-participation runs in Appendix~\ref{app:perseed} scale off the lattice in proportion to the active client count. The $2s-1$ arises from the harvest rule rather than from the protocol: an implementation that froze the server's existing global $A$ would upgrade no directional payload at the boundary and give $110(s-1) + 928.125$ instead. A non-switching protocol has all $2N$ directional payloads full and is not a point on the lattice: FLoRA is the separate endpoint at $55 \times 30 + 928.125 = 2578.125$ MB. The lattice spacing of 110 MB per round is also why no continuous $\tau$ reproduces a fixed-$K$ total robustly, as Section~\ref{sec:frontier} notes.
 
-This implementation charges FFA-LoRA slightly more than its design requires. FFA-LoRA freezes $A$ at initialization, so every client's $A$ equals the shared initial value at every round and never needs transmitting. The measured 983.1 MB nonetheless includes the 55.0 MB seeding upload, because the server harvests $A$ from the first client's uploaded state rather than deriving it from the initialization (Section~\ref{sec:implementation}). An implementation faithful to the design reaches the floor of 928.1 MB, raising FFA-LoRA's savings from 61.87\% to 64.00\%, widening the ReverseAdaptive-to-FFA-LoRA segment from 21.3 to 23.5 percentage points, and moving the marginal cost ratio from 5.5 to 5.0. The knee conclusion is unchanged. The same harvest rule governs ReverseAdaptive and Two-Phase, where the seeding upload is likewise avoidable in principle, since the server already holds the aggregated global $A$ it broadcast in the preceding round; freezing that value instead is an untested alternative recorded in Section~\ref{sec:limitations}.
+This implementation charges FFA-LoRA slightly more than its design requires. FFA-LoRA freezes $A$ at initialization, so every client's $A$ equals the shared initial value at every round and never needs transmitting. The measured 983.13 MB nonetheless includes the 55.0 MB seeding upload, because the server harvests $A$ from the first client's uploaded state rather than deriving it from the initialization (Section~\ref{sec:implementation}). An implementation faithful to the design reaches the floor of 928.13 MB, raising FFA-LoRA's savings from 61.87\% to 64.00\%, widening the ReverseAdaptive-to-FFA-LoRA segment from 21.3 to 23.5 percentage points, and moving the marginal cost ratio from 5.5 to 5.0. The knee conclusion is unchanged. The same harvest rule governs ReverseAdaptive and Two-Phase, where the seeding upload is likewise avoidable in principle, since the server already holds the aggregated global $A$ it broadcast in the preceding round; freezing that value instead is an untested alternative recorded in Section~\ref{sec:limitations}.
 
 \subsection{Zero-Shot Benchmark Behavior and the Training Objective}
 \label{sec:baseregression}

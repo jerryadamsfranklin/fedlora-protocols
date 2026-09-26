@@ -12,8 +12,6 @@
 \usepackage[htt]{hyphenat}
 \usepackage{placeins}
 \usepackage{needspace}
-\usepackage{capt-of}
-\usepackage{cuted}
 \hyphenation{Tiny-Llama Re-verse-Adap-tive com-mu-ni-ca-tion in-struc-tion-fol-low-ing}
 % Allow more floats near their citations (class defaults starve the queue under [!t]).
 \setcounter{topnumber}{3}
@@ -26,13 +24,14 @@
 \renewcommand{\dbltopfraction}{0.9}
 \renewcommand{\dblfloatpagefraction}{0.7}
 % Force black, borderless links (class email macro otherwise forces blue)
-\hypersetup{hidelinks,colorlinks=false,pdfborder={0 0 0}}
-% Break DOIs/URLs at punctuation only
-\usepackage{url}
+\hypersetup{hidelinks}
+% Break DOIs/URLs at punctuation only (hyperref already loaded by the class)
 \makeatletter
 \def\UrlBreaks{\do\.\do\/\do\-\do\_\do\~\do\=\do\#\do\:\do\;\do\,\do\?\do\&\do\+\do\%}%
-% Class \ps@headings leaves running heads empty; restore short title / author
-% using the class's zero-height head box so \headheight stays valid.
+% Class \ps@headings already uses a zero-height head box at \vspace*{-48pt} but
+% leaves the head text empty (\hfill\relax\hfill) for production; filling
+% \leftmark / author here is required for a self-contained preprint PDF.
+% \markboth alone does not surface heads because the class never prints the marks.
 \def\ps@headings{%
   \let\@mkboth\markboth
   \def\@oddfoot{\hfill\thepage\hfill}%
@@ -46,7 +45,15 @@
       \hbox to \hsize{\hfill\footnotesize\itshape\leftmark}}\par
     \hspace*{-\textwidth}\hbox to \hsize{\hfill}}%
 }
-% Class \email prints blue text and a trailing semicolon; neutralize both.
+% Opening page: same centered folio as \ps@headings, no running head.
+% (Class \ps@titlepage uses a different footer box, which shifted the page-1 number.)
+\def\ps@firstpage{%
+  \let\@mkboth\markboth
+  \def\@oddfoot{\hfill\thepage\hfill}%
+  \let\@evenfoot\@oddfoot
+  \def\@oddhead{}\def\@evenhead{}}
+% Shadows class \email (blue text + trailing semicolon). Revert first if the
+% publisher's build complains about the redefinition.
 \def\email#1{\global\advance\emailcnt by 1\relax
   \if@corauemail
     \g@addto@macro\corrauthemail{%
@@ -69,13 +76,13 @@
 \author*{\fnm{Jerry Adams} \sur{Franklin}}\email{jerry.adamsf@gmail.com}
 \affil*{\orgname{Independent Researcher}, \orgaddress{\city{Fairport}, \state{NY}, \postcode{14450}, \country{USA}}}
 
-\abstract{Federated fine-tuning of large language models with low-rank adaptation reduces trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee: on TinyLlama-1.1B with Alpaca, savings beyond it cost roughly five times more held-out loss per percentage point than savings up to it. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at the knee, cutting measured round-trip communication by 40.5 percent relative to FLoRA at a held-out loss cost of 0.0063. With the same threshold it saves 30.0 percent at LLaMA-3.2-3B.}
+\abstract{Federated fine-tuning of large language models with low-rank adaptation reduces trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee: on TinyLlama-1.1B with Alpaca, savings beyond it cost roughly five times more held-out loss per percentage point than savings up to it. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at the knee, cutting measured round-trip communication by 40.5\% relative to FLoRA at a held-out loss cost of 0.0063. With the same threshold it saves 30.0\% at LLaMA-3.2-3B.}
 
 \keywords{federated learning, low-rank adaptation, communication efficiency, large language models, measurement}
 
 \maketitle
 \pagestyle{headings}
-\thispagestyle{titlepage}% suppress running head on the opening page (class sample)
+\thispagestyle{firstpage}
 
 \input{body.tex}
 
