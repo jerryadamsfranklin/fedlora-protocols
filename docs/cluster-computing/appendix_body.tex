@@ -9,9 +9,8 @@ Tables in this appendix are labeled with their corpus, which follows the corresp
 At $\alpha{=}0.5$, mean final loss is statistically indistinguishable from IID for every method in the released analysis CSVs, with differences of 0.001 to 0.007 against per-seed standard deviations near 0.02 over three seeds. Heterogeneity manifests instead as sensitivity to the partition draw: seed-to-seed standard deviation rises by roughly an order of magnitude, from $0.5$ to $1.6 \times 10^{-3}$ under IID in Table~\ref{tab:b1} to $18$ to $25 \times 10^{-3}$ at $\alpha{=}0.5$ across the methods in the released CSVs, which is also why the per-seed spread at $\alpha{=}0.1$ in Table~\ref{tab:b2} is wide.
 
 \begin{table*}[t]
-\caption{Per-seed TinyLlama-1.1B IID results, CUDA corpus, backing Table~\ref{tab:frontier}. Communication is deterministic across seeds. $\dagger$ For Two-Phase the column shows the predetermined phase boundary $K$, not an adaptive switch event; for FFA-LoRA, $A$ is frozen from initialization; for ReverseAdaptive it shows the round at which the plateau signal triggered.}
+\caption{Per-seed TinyLlama-1.1B IID results, CUDA corpus, backing Table~\ref{tab:frontier}. Communication is deterministic across seeds. $\dagger$ For Two-Phase the column shows the predetermined phase boundary $K$, not an adaptive switch event; for FFA-LoRA, $A$ is frozen from initialization; for ReverseAdaptive it shows the round at which the plateau signal triggered}
 \label{tab:b1}
-\begin{center}
 \small
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{llccc}
@@ -35,13 +34,11 @@ FFA-LoRA & 123 & 1.301738 & \phantom{0}983.13 & init$^\dagger$ \\
 FFA-LoRA & 456 & 1.303628 & \phantom{0}983.13 & init$^\dagger$ \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table*}
 
 \begin{table*}[t]
-\caption{Non-IID results, MPS corpus, five seeds at $\alpha{=}0.1$. This table documents partition sensitivity rather than comparing methods, so the larger MPS seed set is retained; Table~\ref{tab:b1} follows the CUDA corpus because it backs a method comparison. Seeds 42 and 1000 at $\alpha{=}0.1$ had 9 and 8 active clients due to empty Dirichlet partitions, which scales communication to $9/10$ and $8/10$ of the full value (1379.81 and 1226.50 MB against 1533.13). Cross-backend verification (Appendix~\ref{app:crossbackend}) covers seeds 42, 123, and 456; seeds 789 and 1000 were executed on MPS only.}
+\caption{Non-IID results, MPS corpus, five seeds at $\alpha{=}0.1$. This table documents partition sensitivity rather than comparing methods, so the larger MPS seed set is retained; Table~\ref{tab:b1} follows the CUDA corpus because it backs a method comparison. Seeds 42 and 1000 at $\alpha{=}0.1$ had 9 and 8 active clients due to empty Dirichlet partitions, which scales communication to $9/10$ and $8/10$ of the full value (1379.81 and 1226.50 MB against 1533.13). Cross-backend verification (Appendix~\ref{app:crossbackend}) covers seeds 42, 123, and 456; seeds 789 and 1000 were executed on MPS only}
 \label{tab:b2}
-\begin{center}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{llcccc}
@@ -58,13 +55,11 @@ ReverseAdaptive, $\alpha{=}0.1$ & 789 & 1.259200 & 1533.13 & 6 & 10 \\
 ReverseAdaptive, $\alpha{=}0.1$ & 1000 & 1.273046 & 1226.50 & 6 & 8 \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table*}
 
 \begin{table}[!t]
-\caption{Per-seed LLaMA-3.2-3B IID results, MPS corpus, backing Table~\ref{tab:llama_iid}. ReverseAdaptive uses $\tau{=}0.01$. Communication is deterministic given the switch round; the three ReverseAdaptive seeds occupy three adjacent lattice points.}
+\caption{Per-seed LLaMA-3.2-3B IID results, MPS corpus, backing Table~\ref{tab:llama_iid}. ReverseAdaptive uses $\tau{=}0.01$. Communication is deterministic given the switch round; the three ReverseAdaptive seeds occupy three adjacent lattice points}
 \label{tab:b3}
-\begin{center}
 \small
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{llccc}
@@ -82,13 +77,11 @@ ReverseAdaptive & 123 & 1.390265 & 1942.5 & 9 \\
 ReverseAdaptive & 456 & 1.397366 & 1732.5 & 7 \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table}
 
 \begin{table}[!t]
-\caption{Per-seed TinyLlama-1.1B Dolly-15k IID results, CUDA corpus, backing Table~\ref{tab:dolly}. Held-out $\Delta$ is tuned minus base on the Dolly-15k held-out slice; more negative is better.}
+\caption{Per-seed TinyLlama-1.1B Dolly-15k IID results, CUDA corpus, backing Table~\ref{tab:dolly}. Held-out $\Delta$ is tuned minus base on the Dolly-15k held-out slice; more negative is better}
 \label{tab:b4}
-\begin{center}
 \small
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{llccc}
@@ -106,7 +99,6 @@ ReverseAdaptive & 123 & 1.666995 & $-0.527418$ & 1533.13 \\
 ReverseAdaptive & 456 & 1.667699 & $-0.526547$ & 1533.13 \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table}
 
 
@@ -120,9 +112,8 @@ With three seeds these tests have very low power, so effect sizes should be read
 The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 95\% confidence interval of $[-0.0114, 0.0114]$, which contains the $0.0043$ difference observed between the same methods at TinyLlama-1.1B. The test therefore cannot distinguish equivalence from a difference of the magnitude seen at the smaller scale.
 
 \begin{table*}[t]
-\caption{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss. Held-out instruction-following loss was not computed for the LLaMA-3.2-3B corpus; quality at that scale is reported as final training loss and downstream zero-shot accuracy.}
+\caption{Paired $t$-tests, three seeds. TinyLlama-1.1B rows use the CUDA corpus; LLaMA-3.2-3B rows use MPS. Positive $\Delta$ indicates the first method has higher loss. Held-out instruction-following loss was not computed for the LLaMA-3.2-3B corpus; quality at that scale is reported as final training loss and downstream zero-shot accuracy}
 \label{tab:d1}
-\begin{center}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lcccc}
@@ -147,14 +138,11 @@ ReverseAdaptive vs.\ FLoRA & $+0.0215$ & $1.3 \times 10^{-2}$ & -- & -- \\
 ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table*}
 
 \begin{figure*}[!t]
-\begin{center}
-\includegraphics[width=\textwidth]{figures/fig4_downstream_accuracy.pdf}
-\end{center}
-\caption{Downstream zero-shot accuracy across two model scales (500 examples per benchmark). Left: TinyLlama-1.1B (seed 42 only; ARC-Easy, BoolQ, HellaSwag; MMLU omitted because base accuracy is at chance for 4-way multiple choice). Right: LLaMA-3.2-3B (mean across three seeds; MMLU, ARC-Easy, BoolQ, HellaSwag). Federated methods cluster within 1.0 percentage points at TinyLlama-1.1B, across the three informative benchmarks, and 0.5 percentage points at LLaMA-3.2-3B. TinyLlama accuracies are single-seed and from the MPS corpus; loss values elsewhere in this paper for the same configurations are three-seed and from the CUDA corpus.}
+\includegraphics[width=\textwidth]{figures/Fig4.pdf}
+\caption{Downstream zero-shot accuracy across two model scales (500 examples per benchmark). Left: TinyLlama-1.1B (seed 42 only; ARC-Easy, BoolQ, HellaSwag; MMLU omitted because base accuracy is at chance for 4-way multiple choice). Right: LLaMA-3.2-3B (mean across three seeds; MMLU, ARC-Easy, BoolQ, HellaSwag). Federated methods cluster within 1.0 percentage points at TinyLlama-1.1B, across the three informative benchmarks, and 0.5 percentage points at LLaMA-3.2-3B. TinyLlama accuracies are single-seed and from the MPS corpus; loss values elsewhere in this paper for the same configurations are three-seed and from the CUDA corpus}
 \label{fig:supp_downstream}
 \end{figure*}
 
@@ -176,9 +164,8 @@ ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 The primary corpus was produced on the MPS backend and subsequently re-executed on CUDA. Table~\ref{tab:n3a} summarizes the comparison; Table~\ref{tab:n3b} details every disagreement.
 
 \begin{table}[!t]
-\caption{Cross-backend verification summary, MPS against CUDA, 34 run pairs.}
+\caption{Cross-backend verification summary, MPS against CUDA, 34 run pairs}
 \label{tab:n3a}
-\begin{center}
 \small
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lc}
@@ -194,13 +181,11 @@ No valid MPS reference (CUDA reported) & \phantom{0}3 \\
 Total & 34 \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table}
 
 \begin{table}[!t]
-\caption{Cross-backend disagreements. Every communication difference is exactly one 110\,MB step of the switch-round lattice. Run 16 breached only the consecutive-spike rule, with no communication or switch-round difference.}
+\caption{Cross-backend disagreements. Every communication difference is exactly one 110\,MB step of the switch-round lattice. Run 16 breached only the consecutive-spike rule, with no communication or switch-round difference}
 \label{tab:n3b}
-\begin{center}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llp{0.16\columnwidth}p{0.16\columnwidth}p{0.30\columnwidth}@{}}
@@ -213,7 +198,6 @@ Run & Configuration & MPS (MB) & CUDA (MB) & Failing check \\
 17 & $\alpha{=}0.1$, seed 456 & 1533.13 & 1643.13 & communication, switch round 6 vs 7, loss \\
 \bottomrule
 \end{tabular}
-\end{center}
 \end{table}
 
 Tolerances are setting-aware. IID runs require per-round training loss to agree within $0.01$ absolute. Non-IID runs allow $0.025$, since heterogeneous partitions amplify per-round variation, but additionally require the switch round to match exactly and permit no more than two consecutive rounds exceeding $0.01$. Communication must agree within $0.01$ in all settings, which is effectively exact since totals are protocol-deterministic.

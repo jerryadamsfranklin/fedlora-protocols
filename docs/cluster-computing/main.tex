@@ -1,0 +1,64 @@
+% Cluster Computing submission (Springer Nature sn-jnl, two-column)
+% Version derived from docs/arxiv sources; see docs/PROVENANCE if present.
+\documentclass[iicol,pdflatex,sn-basic]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{url}
+\usepackage[title]{appendix}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\setlength{\emergencystretch}{2em}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Measured Communication-Quality Frontier for Federated LoRA]{A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning}
+
+\author*{\fnm{Jerry Adams} \sur{Franklin}}\email{jerry.adamsf@gmail.com}
+\affil*{\orgname{Independent Researcher}, \orgaddress{\city{Fairport}, \state{NY}, \postcode{14450}, \country{USA}}}
+
+\abstract{Federated fine-tuning of large language models with low-rank adaptation reduces trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee: on TinyLlama-1.1B with Alpaca, savings beyond it cost roughly five times more held-out loss per percentage point than savings up to it. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at the knee, cutting measured round-trip communication by 40.5 percent relative to FLoRA at a held-out loss cost of 0.0063. With the same threshold it saves 30.0 percent at LLaMA-3.2-3B.}
+
+\keywords{federated learning, low-rank adaptation, communication efficiency, large language models, measurement}
+
+\maketitle
+
+\noindent Corresponding author: Jerry Adams Franklin (jerry.adamsf@gmail.com). ORCID: \href{https://orcid.org/0009-0006-8470-8349}{0009-0006-8470-8349}.
+
+\input{body.tex}
+
+\backmatter
+
+\bmhead{Acknowledgements}
+
+All code, configuration files, and analysis scripts are publicly available at
+\url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are
+not released. The Alpaca and Dolly-15k datasets are publicly available from
+their respective sources.
+
+The author used Claude (Anthropic) for grammar and language editing of the manuscript and as a coding assistant for the released codebase. All technical content, analysis, and interpretations are the author's own.
+
+\bibliography{main}
+
+\section*{Statements and Declarations}
+
+\begin{itemize}
+\item \textbf{Funding:} The author received no funding for this work.
+\item \textbf{Competing interests:} The author declares no competing interests.
+\item \textbf{Author contributions:} The author performed all work associated with this study.
+\item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter weights are not included.
+\item \textbf{Code availability:} Source code is available in the same repository.
+\end{itemize}
+
+\begin{appendices}
+\input{appendix_body.tex}
+\end{appendices}
+
+\end{document}
