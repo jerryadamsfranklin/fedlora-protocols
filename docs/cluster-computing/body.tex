@@ -140,58 +140,42 @@ Alpaca carries no class labels, so non-IID partitions apply Dirichlet skew over 
 \label{sec:setup}
 Table~\ref{tab:setup} summarizes the experimental configuration. The corpus was executed on two hardware backends: 34 runs on Apple silicon (MPS), approximately 285 hours of compute, and their re-execution on NVIDIA GPUs, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the cross-backend comparison is reported in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baseline runs were produced on the same rented hardware. Both TinyLlama-1.1B and LLaMA-3.2-3B experiments use three seeds for IID training.
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Experimental setup}
 \label{tab:setup}
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-{
-\begin{tabular}{ll}
+\begin{tabular}{@{}lp{0.72\textwidth}@{}}
 \toprule
 Parameter & Value \\
 \midrule
-Base models & TinyLlama-1.1B-Chat-v1.0 \cite{zhang2024tinyllama}; \\
-            & LLaMA-3.2-3B \cite{dubey2024llama3} \\
-Datasets & Alpaca \cite{taori2023alpaca}; Dolly-15k \cite{dolly2023}; \\
-            & 3000 samples each \\
+Base models & TinyLlama-1.1B-Chat-v1.0 \cite{zhang2024tinyllama}; LLaMA-3.2-3B \cite{dubey2024llama3} \\
+Datasets & Alpaca \cite{taori2023alpaca}; Dolly-15k \cite{dolly2023}; 3000 samples each \\
 Data partitions & IID; Dirichlet $\alpha{=}0.5$; Dirichlet $\alpha{=}0.1$ \\
 Clients / round & 10 / 10 (full participation) \\
 Rounds & 15 \\
 Local epochs & 1 \\
 Batch size & 4 (TinyLlama), 2 (LLaMA-3.2-3B) \\
-Grad.\ accumulation & 4 (TinyLlama), 8 (LLaMA-3.2-3B); \\
-            & effective batch 16 \\
+Grad.\ accumulation & 4 (TinyLlama), 8 (LLaMA-3.2-3B); effective batch 16 \\
 Learning rate & $10^{-4}$ (AdamW \cite{loshchilov2019decoupled}) \\
 Max sequence length & 256 \\
 LoRA rank / alpha & 16 / 32 \\
 LoRA target modules & \texttt{q\_proj}, \texttt{v\_proj} \\
 LoRA dropout & 0.1 \\
-Hardware (primary) & Apple M4 Pro, 48\,GB unified memory, \\
-            & MPS \\
-Hardware (reproduction) & NVIDIA RTX 4090 (TinyLlama); \\
-            & A100 40\,GB (LLaMA-3.2-3B) \\
-Training dtype & float32 (TinyLlama-1.1B); \\
-            & float16 base + float32 LoRA \\
-            & (LLaMA-3.2-3B) \\
-Transmitted dtype & float32 (TinyLlama-1.1B); \\
-            & float16 (LLaMA-3.2-3B) \\
-Downstream eval & 500 examples/benchmark, seed 42, \\
-            & log-likelihood \\
-Held-out eval & 500 examples, train indices 3001--3500, \\
-            & seq.\ len.\ 256 \\
-Benchmarks & MMLU \cite{hendrycks2020measuring}, ARC-Easy \cite{clark2018arc}, \\
-            & BoolQ \cite{clark2019boolq}, HellaSwag \cite{zellers2019hellaswag} \\
+Hardware (primary) & Apple M4 Pro, 48\,GB unified memory, MPS \\
+Hardware (reproduction) & NVIDIA RTX 4090 (TinyLlama); A100 40\,GB (LLaMA-3.2-3B) \\
+Training dtype & float32 (TinyLlama-1.1B); float16 base + float32 LoRA (LLaMA-3.2-3B) \\
+Transmitted dtype & float32 (TinyLlama-1.1B); float16 (LLaMA-3.2-3B) \\
+Downstream eval & 500 examples/benchmark, seed 42, log-likelihood \\
+Held-out eval & 500 examples, train indices 3001--3500, seq.\ len.\ 256 \\
+Benchmarks & MMLU \cite{hendrycks2020measuring}, ARC-Easy \cite{clark2018arc}, BoolQ \cite{clark2019boolq}, HellaSwag \cite{zellers2019hellaswag} \\
 Seeds (TinyLlama IID) & \{42, 123, 456\} \\
 Seeds (LLaMA-3.2-3B) & \{42, 123, 456\} \\
-ReverseAdaptive defaults & \texttt{warmup\_rounds}=5, $\tau{=}0.01$, \\
-            & \texttt{stability\_threshold}=1.1, \\
-            & \texttt{transition\_rounds}=0 \\
-            & (instantaneous switch) \\
+ReverseAdaptive defaults & \texttt{warmup\_rounds}=5, $\tau{=}0.01$, \texttt{stability\_threshold}=1.1, \texttt{transition\_rounds}=0 (instantaneous switch) \\
 \bottomrule
 \end{tabular}
-}
-\end{table}
+\end{table*}
 
 \textbf{Baselines.} FFA-LoRA \cite{sun2024ffalora} and FedIT \cite{zhang2024federatedgpt} are reimplemented within this codebase rather than taken from the original authors' released code, which places all five protocols on one training loop and one byte-accounting path; their absolute results may differ from those of the original implementations. Following Sun et al., the FFA-LoRA implementation freezes $A$ at initialization: client-side $A$ parameters are set non-trainable before local optimization begins and are excluded from the optimizer parameter group, so clients train only $B$ from the first round. Clients transmit $B$ only, a measured 3{,}244{,}032 bytes per client per direction against 9{,}011{,}200 for full $A{+}B$ transmission. The former is $(32768 + 4096) \times 22$ parameters at 4 bytes each, exactly the B-only payload, and could not arise if $A$ were being transmitted. FedIT applies FedAvg independently to $A$ and $B$ and transmits full state in both directions, so its communication volume matches FLoRA's by construction.
 

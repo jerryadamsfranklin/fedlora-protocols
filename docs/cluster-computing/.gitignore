@@ -1,5 +1,5 @@
 *.aux
-*.bbl
+# *.bbl  # keep main.bbl for Springer upload
 *.blg
 *.log
 *.out
