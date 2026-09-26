@@ -493,7 +493,7 @@ def figure5_threshold_ablation() -> None:
         frameon=False,
     )
     ax1.text(
-        1.42,
+        1.55,
         0.5,
         "Final loss",
         transform=ax1.transAxes,
@@ -504,7 +504,7 @@ def figure5_threshold_ablation() -> None:
         fontsize=8,
         clip_on=False,
     )
-    fig.subplots_adjust(left=0.16, right=0.68, top=0.88, bottom=0.18)
+    fig.subplots_adjust(left=0.16, right=0.62, top=0.88, bottom=0.18)
     _save(fig, "fig5_threshold_ablation", tight=False)
 
 
