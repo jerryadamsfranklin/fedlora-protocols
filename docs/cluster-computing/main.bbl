@@ -94,8 +94,7 @@ In: \bbtitle{IEEE International Conference on Acoustics, Speech and Signal
   Processing (ICASSP)},
 pp. \bfpage{6915}--\blpage{6919}
 (\byear{2024}).
-\doiurl{10.1109/ICASSP48485.2024.10447454} .
-\burl{https://doi.org/10.1109/ICASSP48485.2024.10447454}
+\doiurl{10.1109/ICASSP48485.2024.10447454}
 \end{bchapter}
 \endbibitem
 
@@ -179,8 +178,7 @@ pp. \bfpage{14457}--\blpage{14483}
 In: \bbtitle{Proceedings of the ACM Web Conference 2026 (WWW '26)},
 pp. \bfpage{5087}--\blpage{5098}
 (\byear{2026}).
-\doiurl{10.1145/3774904.3792144} .
-\burl{https://doi.org/10.1145/3774904.3792144}
+\doiurl{10.1145/3774904.3792144}
 \end{bchapter}
 \endbibitem
 
@@ -410,8 +408,9 @@ Stanford CRFM Blog
 \oauthor{\bsnm{Zaharia}, \binits{M.}},
 \oauthor{\bsnm{Xin}, \binits{R.}}:
 Free Dolly: Introducing the World's First Truly Open Instruction-Tuned {LLM}.
+Databricks blog
+(2023).
 \url{https://www.databricks.com/blog/2023/04/12/dolly-first-open-commercially-viable-instruction-tuned-llm}
-(2023)
 \end{botherref}
 \endbibitem
 
@@ -464,8 +463,7 @@ arXiv:1803.05457
 In: \bbtitle{Proceedings of NAACL-HLT},
 pp. \bfpage{2924}--\blpage{2936}
 (\byear{2019}).
-\doiurl{10.18653/v1/N19-1300} .
-\burl{https://doi.org/10.18653/v1/N19-1300}
+\doiurl{10.18653/v1/N19-1300}
 \end{bchapter}
 \endbibitem
 
@@ -482,8 +480,7 @@ In: \bbtitle{Proceedings of the Association for Computational Linguistics
   (ACL)},
 pp. \bfpage{4791}--\blpage{4800}
 (\byear{2019}).
-\doiurl{10.18653/v1/P19-1472} .
-\burl{https://doi.org/10.18653/v1/P19-1472}
+\doiurl{10.18653/v1/P19-1472}
 \end{bchapter}
 \endbibitem
 

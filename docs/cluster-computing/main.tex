@@ -1,5 +1,4 @@
 % Cluster Computing submission (Springer Nature sn-jnl, two-column)
-% Version derived from docs/arxiv sources; see docs/PROVENANCE if present.
 \documentclass[iicol,pdflatex,sn-mathphys-num]{sn-jnl}
 
 \usepackage{graphicx}
@@ -9,13 +8,10 @@
 \usepackage{booktabs}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{url}
-\usepackage[title]{appendix}
-\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{xurl}
+\hyphenation{Tiny-Llama Re-verse-Adap-tive com-mu-ni-ca-tion in-struc-tion-fol-low-ing}
 \hypersetup{hidelinks}
-\setlength{\emergencystretch}{2em}
-
-\raggedbottom
 
 \begin{document}
 
@@ -30,7 +26,7 @@
 
 \maketitle
 
-\noindent Corresponding author: Jerry Adams Franklin (jerry.adamsf@gmail.com). ORCID: \href{https://orcid.org/0009-0006-8470-8349}{0009-0006-8470-8349}.
+\noindent ORCID: \href{https://orcid.org/0009-0006-8470-8349}{0009-0006-8470-8349}.
 
 \input{body.tex}
 
@@ -38,10 +34,7 @@
 
 \bmhead{Acknowledgements}
 
-All code, configuration files, and analysis scripts are publicly available at
-\url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are
-not released. The Alpaca and Dolly-15k datasets are publicly available from
-their respective sources.
+The Alpaca and Dolly-15k datasets are publicly available from their respective sources.
 
 The author used Claude (Anthropic) for grammar and language editing of the manuscript and as a coding assistant for the released codebase. All technical content, analysis, and interpretations are the author's own.
 
@@ -53,11 +46,13 @@ The author used Claude (Anthropic) for grammar and language editing of the manus
 \item \textbf{Funding:} The author received no funding for this work.
 \item \textbf{Competing interests:} The author declares no competing interests.
 \item \textbf{Author contributions:} The author performed all work associated with this study.
-\item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter weights are not included.
+\item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are not released.
 \item \textbf{Code availability:} Source code is available in the same repository.
 \end{itemize}
 
 \begin{appendices}
+\renewcommand{\thetable}{\thesection\arabic{table}}
+\renewcommand{\thefigure}{\thesection\arabic{figure}}
 \input{appendix_body.tex}
 \end{appendices}
 
