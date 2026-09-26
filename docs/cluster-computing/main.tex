@@ -9,9 +9,19 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{microtype}
-\usepackage{xurl}
+\usepackage{placeins}
+\usepackage{needspace}
+\usepackage{capt-of}
+\usepackage{cuted}
 \hyphenation{Tiny-Llama Re-verse-Adap-tive com-mu-ni-ca-tion in-struc-tion-fol-low-ing}
 \hypersetup{hidelinks}
+% Break DOIs/URLs at punctuation only (xurl's default breaks mid-number)
+\usepackage{url}
+\makeatletter
+\def\UrlBreaks{\do\.\do\/\do\-\do\_\do\~\do\=\do\#\do\:\do\;\do\,\do\?\do\&\do\+\do\%}%
+\makeatother
+% Ensure bibliography DOI macro uses \url
+\providecommand{\doiurl}[1]{\url{https://doi.org/#1}}
 
 \begin{document}
 
@@ -25,8 +35,6 @@
 \keywords{federated learning, low-rank adaptation, communication efficiency, large language models, measurement}
 
 \maketitle
-
-\noindent ORCID: \href{https://orcid.org/0009-0006-8470-8349}{0009-0006-8470-8349}.
 
 \input{body.tex}
 

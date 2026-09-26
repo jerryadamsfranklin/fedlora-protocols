@@ -409,6 +409,7 @@ At 3B the adaptive and hand-tuned configurations reach final losses differing by
 
 Where ReverseAdaptive sits on the frontier matters more than which fixed $K$ it happens to match. Moving from FLoRA to ReverseAdaptive buys 40.5 percentage points of communication savings at a held-out cost of 0.0063, or $1.56 \times 10^{-4}$ per point. Moving onward to FFA-LoRA buys a further 21.3 points at a cost of 0.0182, or $8.54 \times 10^{-4}$ per point, 5.5 times more expensive per point saved. The frontier has a knee and ReverseAdaptive sits at it. A practitioner who takes the first tranche of savings and declines the second is making the trade the measured data supports, and the value of the adaptive rule is that it locates that point without $K$ being guessed in advance.
 
+\needspace{4\baselineskip}
 \subsection{Measured Bytes and Theoretical Parameter Counts}
 \label{sec:measuredbytes}
 Federated LoRA work commonly reports communication savings as parameter-count ratios \cite{zhang2024federatedgpt,sun2024ffalora,wang2024flora,bai2024flexlora}, conflating how many parameters exist with how many bytes a protocol transmits. The practice is not universal: FedSRD \cite{yan2026fedsrd} and FLoRIST \cite{ramesh2026florist} both report measured per-round communication in megabytes. Aggregate megabyte totals, however, do not separate two quantities that govern switching protocols and that a parameter ratio cannot express.
