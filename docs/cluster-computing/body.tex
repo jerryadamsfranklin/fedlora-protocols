@@ -263,11 +263,6 @@ Two-Phase $K{=}8$ costs 0.0034 on Alpaca and 0.0043 on Dolly, a shift of 25.5\%.
 A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and reached the same 1533.13 MB, matching the IID behavior on both datasets. No Dolly FLoRA baseline was run under heterogeneity, so no quality cost is reported for that configuration.
 
 \subsection{Convergence and Switching Behavior}
-Fig.~\ref{fig:convergence} shows mean $\pm$ std loss trajectories (left) and cumulative communication (right) across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
-
-The no-switch sanity baseline (ReverseAdaptive with \mbox{\texttt{switch\_threshold}}\,{=}\,{-}1.0, \mbox{\texttt{warmup\_rounds}}\,{=}\,999) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Appendix~\ref{app:perseed} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
-Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in Appendix~\ref{app:noswitch}.
-
 \begin{figure*}[tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/Fig2.pdf}
@@ -275,15 +270,15 @@ Disabling the switch requires a negative threshold rather than a small positive 
 \label{fig:convergence}
 \label{fig:cumcomm}
 \end{figure*}
+Fig.~\ref{fig:convergence} shows mean $\pm$ std loss trajectories (left) and cumulative communication (right) across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
 
-
+The no-switch sanity baseline (ReverseAdaptive with \mbox{\texttt{switch\_threshold}}\,{=}\,{-}1.0, \mbox{\texttt{warmup\_rounds}}\,{=}\,999) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Appendix~\ref{app:perseed} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
+Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in Appendix~\ref{app:noswitch}.
 
 \subsection{Downstream Evaluation}
 Tables~\ref{tab:downstream_tiny}--\ref{tab:downstream_llama} present downstream results on MMLU \cite{hendrycks2020measuring}, ARC-Easy \cite{clark2018arc}, BoolQ \cite{clark2019boolq}, and HellaSwag \cite{zellers2019hellaswag}. MMLU is excluded from TinyLlama-1.1B comparisons: base accuracy of 0.250 on 4-way multiple choice indicates chance-level performance, making the benchmark uninformative at 1.1B scale.
 
 At TinyLlama-1.1B (Table~\ref{tab:downstream_tiny}), all federated methods cluster within 1.0 percentage points of each other across the three informative benchmarks and regress modestly relative to the base model (Section~\ref{sec:baseregression}).
-
-At LLaMA-3.2-3B scale, the three federated methods are statistically indistinguishable on downstream benchmarks. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and the per-method error bars overlap on every benchmark. Relative to the base model they are flat to slightly positive rather than regressing as at 1.1B (Section~\ref{sec:baseregression}); the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and federated methods either match or slightly exceed each of these. The within-method seed variance is also smaller at 3B than at TinyLlama.
 
 \begin{table*}[tbp]
 \centering
@@ -303,9 +298,14 @@ ReverseAdaptive   & 0.252 & 0.552 & 0.420 & $-7.4$ pp \\
 Spread (max--min) & 0.006 & 0.010 & 0.000 & -- \\
 \bottomrule
 \end{tabular}
+\end{table*}
 
-\vspace{0.7em}
+At LLaMA-3.2-3B scale, the three federated methods are statistically indistinguishable on downstream benchmarks. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and the per-method error bars overlap on every benchmark. Relative to the base model they are flat to slightly positive rather than regressing as at 1.1B (Section~\ref{sec:baseregression}); the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and federated methods either match or slightly exceed each of these. The within-method seed variance is also smaller at 3B than at TinyLlama.
 
+\begin{table*}[bp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{6pt}
 \caption{Downstream zero-shot accuracy, LLaMA-3.2-3B. Mean $\pm$ 1 standard deviation across three random seeds (42, 123, 456). 500 examples per benchmark. Cross-method spread is at most 0.5 percentage points on any benchmark and the per-method error bars overlap}
 \label{tab:downstream_llama}
 \begin{tabular}{@{}lrrrr@{}}
