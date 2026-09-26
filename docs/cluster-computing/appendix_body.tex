@@ -204,32 +204,30 @@ Total & 34 \\
 \end{tabular}
 \end{table}
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \scriptsize
 \renewcommand{\arraystretch}{0.85}
-\setlength{\tabcolsep}{6pt}
-\caption{Cross-backend disagreements. Every communication difference is exactly one 110\,MB step of the switch-round lattice. Run 16 breached only the consecutive-spike rule, with no communication or switch-round difference}
+\setlength{\tabcolsep}{3pt}
+\caption{Cross-backend disagreements. Every communication difference is one 110\,MB lattice step. Run 16 failed only the consecutive-spike rule}
 \label{tab:d2}
-\begin{tabular}{@{}llrrl@{}}
+\begin{tabular}{@{}llrrr@{}}
 \toprule
-Run & Configuration & MPS (MB) & CUDA (MB) & Failing check \\
+Run & Config. & MPS & CUDA & Note \\
 \midrule
-11 & $\tau{=}0.001$, IID & 2083.13 & 1973.13 & comm., one step ($s{=}11$ vs $10$) \\
-12 & $\tau{=}0.002$, IID & 1863.13 & 1753.13 & comm., one step ($s{=}9$ vs $8$) \\
-16 & $\alpha{=}0.1$, seed 123 & 1533.13 & 1533.13 & 3 consec.\ rounds $|\Delta|>0.01$ \\
-17 & $\alpha{=}0.1$, seed 456 & 1533.13 & 1643.13 & comm., switch 6 vs 7, loss \\
+11 & $\tau{=}0.001$, IID & 2083.13 & 1973.13 & $s{=}11$/$10$ \\
+12 & $\tau{=}0.002$, IID & 1863.13 & 1753.13 & $s{=}9$/$8$ \\
+16 & $\alpha{=}0.1$, 123 & 1533.13 & 1533.13 & spike rule \\
+17 & $\alpha{=}0.1$, 456 & 1533.13 & 1643.13 & $s{=}6$/$7$ \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
-Three of the four disagreements are the same phenomenon. Total communication is a step function of the discrete switch round with 110\,MB granularity (Section~\ref{sec:measuredbytes}), and every observed cross-backend communication difference is exactly one step: the MPS and CUDA totals in Table~\ref{tab:d2} are adjacent points on the same lattice. The backends do not disagree about the protocol, only about which round the plateau criterion fires, and only where that decision sits near a boundary. Two of the three are IID runs at tight thresholds ($\tau{=}0.001$ and $\tau{=}0.002$), where the criterion is nearly satisfied in either of two adjacent rounds; one is an $\alpha{=}0.1$ run, where heterogeneity produces a noisier loss trajectory. The fourth, run 16, shows no communication or switch-round difference at all: the backends agree on the protocol and on the switch round and differ only in the per-round loss trajectory, which breached the consecutive-spike rule. This is boundary sensitivity rather than heterogeneity sensitivity.
+Three of the four disagreements are the same phenomenon: every observed cross-backend communication difference is exactly one 110\,MB switch-round step (Section~\ref{sec:measuredbytes}), so Table~\ref{tab:d2} lists adjacent lattice points. The backends agree on the protocol and disagree only on which round the plateau fires, and only near a boundary---two tight-$\tau$ IID runs ($\tau{=}0.001$, $\tau{=}0.002$) and one $\alpha{=}0.1$ run. Run 16 has no communication or switch-round difference: only the consecutive-spike rule failed.
 
-Run 17 was investigated separately. Re-executing on CUDA with the data partition seed fixed at 456 and the training seed changed to 999 reproduced switch round 7 exactly, establishing that the one-round difference is a stable property of the backend and partition rather than run-to-run stochasticity. At $\alpha{=}0.1$, cross-backend agreement on the discrete switch round is therefore not guaranteed: one of three partitions with CUDA counterparts (seeds 42, 123, and 456) fired one round later on CUDA, and CUDA is reported as primary for that setting.
+Run 17 was re-executed on CUDA with partition seed 456 and training seed 999 and again switched at round 7, so the one-round gap is a stable backend/partition property rather than run noise. At $\alpha{=}0.1$, exact switch-round agreement is therefore not guaranteed (one of three CUDA counterparts fires one round later); CUDA is reported as primary. The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B ReverseAdaptive runs, supporting the cross-scale claim in Section~\ref{sec:choosing}.
 
-The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B ReverseAdaptive runs, which is what supports the cross-scale transfer claim in Section~\ref{sec:choosing}.
+\textbf{Byte accounting.} Transport-layer counts use \texttt{numel}$\times$\texttt{element\_size} on tensors actually sent; the FFA-LoRA \texttt{get\_communication\_cost} helper is unused.
 
-\textbf{Byte accounting.} Communication is instrumented at the transport layer, counting \texttt{numel} times \texttt{element\_size} on the tensors actually transmitted, rather than derived from parameter counts. The \texttt{get\_communication\_cost} helper in the FFA-LoRA aggregator is not used by this accounting.
-
-\textbf{Code revisions.} Runs were produced across more than one code revision, some including working-tree modifications that were not committed at run time, so reported numbers are reproduced from the released run records and the cross-backend replication documented here rather than from a single commit. The byte accounting is revision-invariant by direct measurement: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive were each executed under two different revisions within the CUDA corpus and produced identical totals of 2578.13, 1863.13 and 1533.13\,MB. Loss values carry revision uncertainty; the FLoRA and FedIT rows of Table~\ref{tab:frontier} span that boundary and differ by 0.0006, against a ReverseAdaptive-to-FFA-LoRA separation of 0.0282.
+\textbf{Code revisions.} Runs span multiple revisions (including uncommitted working-tree changes), so numbers come from released records and the replication here. Byte totals are revision-invariant: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive each matched under two CUDA revisions at 2578.13, 1863.13 and 1533.13\,MB. Loss carries revision uncertainty; the FLoRA and FedIT rows of Table~\ref{tab:frontier} differ by 0.0006 across that boundary, against a ReverseAdaptive-to-FFA-LoRA gap of 0.0282.
