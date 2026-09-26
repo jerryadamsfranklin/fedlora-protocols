@@ -216,15 +216,15 @@ Total & 34 \\
 \toprule
 Run & Config. & MPS & CUDA & Note \\
 \midrule
-11 & $\tau{=}0.001$, IID & 2083.13 & 1973.13 & $s{=}11$/$10$ \\
-12 & $\tau{=}0.002$, IID & 1863.13 & 1753.13 & $s{=}9$/$8$ \\
+11 & $\tau{=}0.001$, IID & 2083.13 & 1973.13 & $s$: 11 to 10 \\
+12 & $\tau{=}0.002$, IID & 1863.13 & 1753.13 & $s$: 9 to 8 \\
 16 & $\alpha{=}0.1$, 123 & 1533.13 & 1533.13 & spike rule \\
-17 & $\alpha{=}0.1$, 456 & 1533.13 & 1643.13 & $s{=}6$/$7$ \\
+17 & $\alpha{=}0.1$, 456 & 1533.13 & 1643.13 & $s$: 6 to 7 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Three of the four disagreements are the same phenomenon: every observed cross-backend communication difference is exactly one 110\,MB switch-round step (Section~\ref{sec:measuredbytes}), so Table~\ref{tab:d2} lists adjacent lattice points. The backends agree on the protocol and disagree only on which round the plateau fires, and only near a boundary---two tight-$\tau$ IID runs ($\tau{=}0.001$, $\tau{=}0.002$) and one $\alpha{=}0.1$ run. Run 16 has no communication or switch-round difference: only the consecutive-spike rule failed.
+Three of the four disagreements are the same phenomenon: every observed cross-backend communication difference is exactly one 110\,MB switch-round step (Section~\ref{sec:measuredbytes}), so Table~\ref{tab:d2} lists adjacent lattice points. The backends agree on the protocol and disagree only on which round the plateau fires, and only near a boundary, two tight-$\tau$ IID runs ($\tau{=}0.001$, $\tau{=}0.002$) and one $\alpha{=}0.1$ run. Run 16 has no communication or switch-round difference: only the consecutive-spike rule failed.
 
 Run 17 was re-executed on CUDA with partition seed 456 and training seed 999 and again switched at round 7, so the one-round gap is a stable backend/partition property rather than run noise. At $\alpha{=}0.1$, exact switch-round agreement is therefore not guaranteed (one of three CUDA counterparts fires one round later); CUDA is reported as primary. The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all three LLaMA-3.2-3B ReverseAdaptive runs, supporting the cross-scale claim in Section~\ref{sec:choosing}.
 
