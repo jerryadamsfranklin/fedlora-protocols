@@ -21,6 +21,7 @@ Two-Phase $K{=}8$ saves 27.7\% (TinyLlama-1.1B) and 26.0\% (LLaMA-3.2-3B) over F
 
 Code, configuration files, and scripts to reproduce every figure and table are publicly released; see Appendix~\ref{app:repro}.
 
+\needspace{5\baselineskip}
 \section{Related Work}
 \label{sec:related}
 
@@ -42,6 +43,7 @@ Communication efficiency in federated learning has been a central concern since 
 \subsection{Adaptive Aggregation and Scheduling}
 Several federated learning methods adapt their behavior based on observed training dynamics. FedProx \cite{li2020fedprox} adds an adaptive proximal term to the local objective, controlling deviation from the global model. FedNova \cite{wang2020fednova} normalizes local gradients by effective step count, adaptively correcting for heterogeneous local training. FedAdam and FedYogi \cite{reddi2020adaptive} apply adaptive moment estimation at the server level, treating the aggregated pseudo-gradient as input to Adam-style updates. To the author's knowledge, no prior federated LoRA work uses a loss-plateau signal to switch between distinct aggregation modes during training.
 
+\needspace{5\baselineskip}
 \section{Method}
 \label{sec:method}
 
@@ -76,13 +78,13 @@ Algorithm~\ref{alg:bonly} specifies the server-side decision logic per round.
 \If{$r \leq K$} \Comment{FLoRA phase}
     \State upload $\leftarrow$ full state $(A, B)$
     \State broadcast $\leftarrow$ full state
-\ElsIf{$r = K+1$} \Comment{transition: full upload seeds $A_{\text{frozen}}$}
+\ElsIf{$r = K+1$} \Comment{transition: seed $A_{\mathrm{fr}}$}
     \State upload $\leftarrow$ full state $(A, B)$
     \State $A_{\text{frozen}} \leftarrow$ $A$ from the first client's uploaded state
-    \State broadcast $\leftarrow$ $B$ only \Comment{clients retain $A$ from round $K$}
+    \State broadcast $\leftarrow$ $B$ only \Comment{clients keep round-$K$ $A$}
 \Else \Comment{FFA-LoRA steady state}
     \State upload $\leftarrow$ $B$ only \Comment{server prepends $A_{\text{frozen}}$}
-    \State broadcast $\leftarrow$ $B$ only \Comment{clients retain $A_{\text{frozen}}$ locally}
+    \State broadcast $\leftarrow$ $B$ only \Comment{clients keep $A_{\text{frozen}}$}
 \EndIf
 \end{algorithmic}
 \end{algorithm}
@@ -105,11 +107,11 @@ Algorithm~\ref{alg:reverseadaptive} specifies the aggregator's per-round decisio
 \Require round $r$, current loss $\ell_r$, prior loss $\ell_{r-1}$,
          warmup $W$, threshold $\tau$, current mode $m$, \texttt{client\_states}
 \Ensure \texttt{global\_state}, updated mode $m$
-\State $\rho_r \leftarrow (\ell_{r-1} - \ell_r) \,/\, \ell_{r-1}$ \Comment{relative improvement; $\tau$ dimensionless}
+\State $\rho_r \leftarrow (\ell_{r-1} - \ell_r) \,/\, \ell_{r-1}$ \Comment{relative improvement}
 \If{$m = \text{FLoRA}$ \textbf{and} $r > W$ \textbf{and} $\rho_r < \tau$}
     \State $m \leftarrow \text{FFA-LoRA}$
     \State log event $(r, \texttt{switch\_to\_ffa})$
-\ElsIf{$m = \text{FFA-LoRA}$ \textbf{and} $\ell_r > 1.1 \cdot \ell_{r-1}$} \Comment{stability revert}
+\ElsIf{$m = \text{FFA-LoRA}$ \textbf{and} $\ell_r > 1.1 \cdot \ell_{r-1}$} \Comment{revert}
     \State $m \leftarrow \text{FLoRA}$
     \State reset $A_{\text{frozen}}$
     \State log event $(r, \texttt{revert\_to\_flora})$
@@ -175,7 +177,7 @@ Held-out eval & 500 examples, train indices 3001--3500, seq.\ len.\ 256 \\
 Benchmarks & MMLU \cite{hendrycks2020measuring}, ARC-Easy \cite{clark2018arc}, BoolQ \cite{clark2019boolq}, HellaSwag \cite{zellers2019hellaswag} \\
 Seeds (TinyLlama IID) & \{42, 123, 456\} \\
 Seeds (LLaMA-3.2-3B) & \{42, 123, 456\} \\
-ReverseAdaptive defaults & \texttt{warmup\_rounds}=5, $\tau{=}0.01$, \texttt{stability\_threshold}=1.1, \texttt{transition\_rounds}=0 (instantaneous switch) \\
+ReverseAdaptive defaults & \texttt{warmup\_rounds}=5, $\tau{=}0.01$, \texttt{stability\_threshold}=1.1, \texttt{transition\_rounds}=0 (instantaneous) \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -241,7 +243,21 @@ Two-Phase $K{=}8$ costs 0.0034 on Alpaca and 0.0043 on Dolly, a shift of 25.5\%.
 
 A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and reached the same 1533.13 MB, matching the IID behavior on both datasets. No Dolly FLoRA baseline was run under heterogeneity, so no quality cost is reported for that configuration.
 
-\begin{table*}[t]
+\subsection{Convergence and Switching Behavior}
+Figure~\ref{fig:convergence} shows mean $\pm$ std loss trajectories (left) and cumulative communication (right) across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{figures/Fig2.pdf}
+\caption{Left: training loss trajectories on TinyLlama-1.1B IID, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Vertical dashed lines mark ReverseAdaptive's switch (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, with full upload, is round 9). Right: cumulative communication on TinyLlama-1.1B (seed 42, deterministic across seeds). Slope changes mark phase transitions; look-ahead download accounting moves the broadcast slope one round before the upload slope}
+\label{fig:convergence}
+\label{fig:cumcomm}
+\end{figure*}
+
+The no-switch sanity baseline (ReverseAdaptive with \texttt{switch\_threshold}\,{=}\,{-}1.0, \texttt{warmup\_rounds}\,{=}\,999) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Appendix~\ref{app:perseed} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
+Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in Appendix~\ref{app:noswitch}.
+
+\begin{table*}[!b]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -258,28 +274,6 @@ ReverseAdaptive ($\tau{=}0.01$) & 1533.13 & $1.6686 \pm 0.0022$ & $-0.5268 \pm 0
 \bottomrule
 \end{tabular}
 \end{table*}
-
-\subsection{Convergence and Switching Behavior}
-Figure~\ref{fig:convergence} shows mean $\pm$ std loss trajectories across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/Fig2.pdf}
-\caption{Training loss trajectories on TinyLlama-1.1B IID, MPS corpus. Mean $\pm$ 1 standard deviation over three seeds. Per-round trajectories were logged on the MPS corpus; final-round values elsewhere in this paper are from CUDA. Vertical dashed lines mark ReverseAdaptive's switch round (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, in which the upload is still full, is round 9). All three methods converge similarly through the FLoRA phase; the loss gap accumulates gradually after the switch}
-\label{fig:convergence}
-\end{figure}
-
-Figure~\ref{fig:cumcomm} shows cumulative communication in megabytes against round number for TinyLlama-1.1B. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/Fig3.pdf}
-\caption{Cumulative communication on TinyLlama-1.1B (seed 42, deterministic across seeds). Slope changes mark phase transitions: ReverseAdaptive at round 6, Two-Phase $K{=}8$ at round 9. The look-ahead download accounting causes the broadcast slope to change one round before the upload slope changes}
-\label{fig:cumcomm}
-\end{figure}
-
-The no-switch sanity baseline (ReverseAdaptive with \texttt{switch\_threshold} $= -1.0$, \texttt{warmup\_rounds} $= 999$) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Appendix~\ref{app:perseed} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
-Disabling the switch requires a negative threshold rather than a small positive one, for reasons set out in Appendix~\ref{app:noswitch}.
 
 \subsection{Downstream Evaluation}
 Tables~\ref{tab:downstream_tiny}--\ref{tab:downstream_llama} present downstream results on MMLU \cite{hendrycks2020measuring}, ARC-Easy \cite{clark2018arc}, BoolQ \cite{clark2019boolq}, and HellaSwag \cite{zellers2019hellaswag}. MMLU is excluded from TinyLlama-1.1B comparisons: base accuracy of 0.250 on 4-way multiple choice indicates chance-level performance, making the benchmark uninformative at 1.1B scale.
@@ -370,7 +364,7 @@ Table~\ref{tab:llama_iid} and Figure~\ref{fig:scale} confirm that the Pareto str
 
 The communication savings are slightly lower at 3B than at 1.1B: 26.0\% vs.\ 27.7\% for Two-Phase $K{=}8$, and 30.0\% vs.\ 40.5\% for ReverseAdaptive. The B-only fraction of the full state is 40\% at LLaMA-3.2-3B (vs.\ 36\% for TinyLlama) due to different GQA configurations, meaning each B-only round saves a smaller fraction of the full payload at 3B scale.
 
-At LLaMA-3.2-3B, ReverseAdaptive and Two-Phase $K{=}8$ reach final losses differing by $1.25 \times 10^{-5}$, roughly 350 times smaller than the 0.0043 separating them at TinyLlama-1.1B. A paired $t$-test over three seeds gives $p = 0.997$ with a 95\% confidence interval of $[-0.0114, 0.0114]$. That interval contains the 1.1B effect size, so the test cannot distinguish no difference from a difference as large as the one observed at 1.1B, and the result is reported as a statement about effect size rather than as evidence of equivalence. ReverseAdaptive also saves 4.0 percentage points more mean communication than the hand-tuned configuration (30.0\% against 26.0\%), because it switches at round 7 on one of three seeds. The same threshold $\tau{=}0.01$ used at TinyLlama-1.1B produced this behavior with no scale-specific tuning.
+At LLaMA-3.2-3B, ReverseAdaptive and Two-Phase $K{=}8$ reach final losses differing by $1.25 \times 10^{-5}$, roughly 350 times smaller than the 0.0043 separating them at TinyLlama-1.1B. A paired $t$-test over three seeds gives $p = 0.997$ with a 95\% confidence interval of $[{-}0.0114, 0.0114]$. That interval contains the 1.1B effect size, so the test cannot distinguish no difference from a difference as large as the one observed at 1.1B, and the result is reported as a statement about effect size rather than as evidence of equivalence. ReverseAdaptive also saves 4.0 percentage points more mean communication than the hand-tuned configuration (30.0\% against 26.0\%), because it switches at round 7 on one of three seeds. The same threshold $\tau{=}0.01$ used at TinyLlama-1.1B produced this behavior with no scale-specific tuning.
 
 \begin{table*}[!t]
 \centering
