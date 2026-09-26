@@ -90,7 +90,6 @@ docs/drafts/
 figures/**/*.tif
 figures/**/*.psd
 dist/
-docs/ojcs-submission/portal-package/
 docs/arxiv/package/
 docs/arxiv/*.aux
 docs/arxiv/*.log

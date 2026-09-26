@@ -49,6 +49,9 @@ back any number in the paper and in places disagree with it. In particular
 `legacy/neuro_part2_baselines_holdout.csv` were produced under the superseded
 four-projection target set and report held-out values that differ from Table 3.
 Use `neuro_part12_qvonly_holdout_strict24.csv` instead.
+The `neuro_` prefix in these filenames is a batch tag from the original
+evaluation campaign and is preserved so that filenames match the run
+tags recorded in `results/MANIFEST.csv`.
 
 ## Run provenance
 
