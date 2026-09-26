@@ -190,27 +190,27 @@ def build(d: Data) -> list[tuple]:
 
     base_comm = d.comm(FLORA)
 
-    # -- T-N1: communication ------------------------------------------------
+    # -- Table 2: communication ------------------------------------------------
     for exp, label in FRONTIER:
         expected = {FLORA: 2578.125, FEDIT: 2578.125, TP8: 1863.125,
                     RA: 1533.125, FFA: 983.125}[exp]
         add(f"comm.{label}", "T-N1 col 2", expected, 1e-6,
             lambda e=exp: d.comm(e))
 
-    # -- T-N1: savings ------------------------------------------------------
+    # -- Table 2: savings ------------------------------------------------------
     for exp, label, pct in [(TP8, "Two-Phase K=8", 27.7), (RA, "ReverseAdaptive", 40.5),
                             (FFA, "FFA-LoRA", 61.9)]:
         add(f"savings.{label}", "T-N1 col 3, Abstract", pct, 0.05,
             lambda e=exp: (base_comm - d.comm(e)) / base_comm * 100)
 
-    # -- T-N1: final loss ---------------------------------------------------
+    # -- Table 2: final loss ---------------------------------------------------
     for exp, label, mean in [(FLORA, "FLoRA", 1.2608), (FEDIT, "FedIT", 1.2602),
                              (TP8, "Two-Phase K=8", 1.2705), (RA, "ReverseAdaptive", 1.2749),
                              (FFA, "FFA-LoRA", 1.3031)]:
         add(f"loss.{label}", "T-N1 col 4", mean, 5e-5, lambda e=exp: d.final_loss(e)[0])
         add(f"loss.{label}.n", "T-N1 caption (3 seeds)", 3, 0, lambda e=exp: d.final_loss(e)[2])
 
-    # -- T-N1: held-out -----------------------------------------------------
+    # -- Table 2: held-out -----------------------------------------------------
     for exp, label, mean in [(FLORA, "FLoRA", -0.5992), (FEDIT, "FedIT", -0.5990),
                              (TP8, "Two-Phase K=8", -0.5958), (RA, "ReverseAdaptive", -0.5929),
                              (FFA, "FFA-LoRA", -0.5746)]:
@@ -220,11 +220,11 @@ def build(d: Data) -> list[tuple]:
     # -- Abstract / Section 5.2 derived quantities --------------------------
     add("gap.RA_vs_FLoRA.heldout", "Abstract, Sec 5.2", 0.006306, 5e-6,
         lambda: d.heldout(RA)[0] - d.heldout(FLORA)[0])
-    add("gap.FFA_vs_RA.heldout", "Abstract, Sec 5.2, T-N1 discussion", 0.018220, 5e-6,
+    add("gap.FFA_vs_RA.heldout", "Abstract, Sec 5.2, Table 2 discussion", 0.018220, 5e-6,
         lambda: d.heldout(FFA)[0] - d.heldout(RA)[0])
-    add("gap.FFA_vs_RA.loss", "Sec 4.2 (G5 point 3)", 0.028246, 5e-6,
+    add("gap.FFA_vs_RA.loss", "Sec 4.3 (G5 point 3)", 0.028246, 5e-6,
         lambda: d.final_loss(FFA)[0] - d.final_loss(RA)[0])
-    add("gap.FedIT_vs_FLoRA.loss", "Sec 4.2 (G5 point 4, within 0.0006)", 0.000566, 5e-6,
+    add("gap.FedIT_vs_FLoRA.loss", "Sec 4.3 (G5 point 4, within 0.0006)", 0.000566, 5e-6,
         lambda: abs(d.final_loss(FEDIT)[0] - d.final_loss(FLORA)[0]))
     add("segment.RA_to_FFA.pp", "Abstract, Sec 5.2 (21.3 pp)", 21.34, 0.05,
         lambda: (d.comm(RA) - d.comm(FFA)) / base_comm * 100)
@@ -256,7 +256,7 @@ def build(d: Data) -> list[tuple]:
         add(f"ptest.{label}", "Appendix C Table 9", p, abs(p) * 0.02 + 1e-9,
             lambda x=a, y=b, m=metric: d.paired_p(x, y, m))
 
-    # T-N1 p-value column: paired tests against FLoRA on final loss.
+    # Table 2 p-value column: paired tests against FLoRA on final loss.
     for exp, label, pv in [(FEDIT, "FedIT", 0.5879), (TP8, "Two-Phase K=8", 4.182e-5),
                            (RA, "ReverseAdaptive", 1.087e-5), (FFA, "FFA-LoRA", 1.71e-4)]:
         add(f"tn1.pcol.{label}", "T-N1 col 6 (p vs FLoRA)", pv, abs(pv) * 0.02 + 1e-9,
@@ -271,15 +271,15 @@ def build(d: Data) -> list[tuple]:
         collapse = lambda L: [("FLoRA_FedIT" if x in (FLORA, FEDIT) else x) for x in L]
         return 1 if collapse(by_loss) == collapse(by_held) and by_loss != by_held else 0
 
-    add("g5.metric_ranking_agrees_on_distinct_points", "Sec 4.2 G5.5 paragraph 1", 1, 0,
+    add("g5.metric_ranking_agrees_on_distinct_points", "Sec 4.3 G5.5 paragraph 1", 1, 0,
         ranking_agrees_except_flora_fedit)
-    add("g5.RA_minus_FFA_MB", "Sec 4.2 G5.5 (550 MB)", 550.0, 1e-6,
+    add("g5.RA_minus_FFA_MB", "Sec 4.3 G5.5 (550 MB)", 550.0, 1e-6,
         lambda: d.comm(RA) - d.comm(FFA))
-    add("g5.max_seed_sd_loss", "Sec 4.2 G5.5 (at most 0.0016)", 0.0016, 5e-5,
+    add("g5.max_seed_sd_loss", "Sec 4.3 G5.5 (at most 0.0016)", 0.0016, 5e-5,
         lambda: max(d.final_loss(e)[1] for e, _ in FRONTIER))
-    add("g5.max_seed_sd_heldout", "Sec 4.2 G5.5 (at most 0.0008)", 0.0008, 5e-5,
+    add("g5.max_seed_sd_heldout", "Sec 4.3 G5.5 (at most 0.0008)", 0.0008, 5e-5,
         lambda: max(d.heldout(e)[1] for e, _ in FRONTIER))
-    add("g5.spread_ratio", "Sec 4.2 G5.7 (roughly 25x)", 25.02, 0.3,
+    add("g5.spread_ratio", "Sec 4.3 G5.7 (roughly 25x)", 25.02, 0.3,
         lambda: (d.final_loss(RA)[0] - d.final_loss(FLORA)[0]) / d.final_loss(RA)[1])
 
     # Bonferroni disclosure: the one cell that must fail at 6 comparisons.
@@ -287,12 +287,12 @@ def build(d: Data) -> list[tuple]:
         lambda: 1 if d.paired_p(RA, TP8, "heldout") > 0.05 / 6 else 0)
 
     # -- T-N2: Dolly replication -------------------------------------------
-    add("dolly.comm.FLoRA", "T-N2", 2578.125, 1e-6, lambda: d.comm(D_FLORA))
-    add("dolly.comm.TP8", "T-N2", 1863.125, 1e-6, lambda: d.comm(D_TP8))
-    add("dolly.comm.RA", "T-N2", 1533.125, 1e-6, lambda: d.comm(D_RA))
-    add("dolly.gap.RA_vs_FLoRA", "T-N2, Abstract (0.0061)", 0.006119, 5e-6,
+    add("dolly.comm.FLoRA", "Table 3", 2578.125, 1e-6, lambda: d.comm(D_FLORA))
+    add("dolly.comm.TP8", "Table 3", 1863.125, 1e-6, lambda: d.comm(D_TP8))
+    add("dolly.comm.RA", "Table 3", 1533.125, 1e-6, lambda: d.comm(D_RA))
+    add("dolly.gap.RA_vs_FLoRA", "Table 3, Abstract (0.0061)", 0.006119, 5e-6,
         lambda: d.heldout(D_RA)[0] - d.heldout(D_FLORA)[0])
-    add("dolly.gap_vs_alpaca_delta", "Sec 4.x cross-dataset stability", 0.000187, 5e-6,
+    add("dolly.gap_vs_alpaca_delta", "Sec 4.4 cross-dataset stability", 0.000187, 5e-6,
         lambda: abs((d.heldout(RA)[0] - d.heldout(FLORA)[0])
                     - (d.heldout(D_RA)[0] - d.heldout(D_FLORA)[0])))
 
@@ -309,19 +309,19 @@ def build(d: Data) -> list[tuple]:
         add(f"tn2.loss.{label}", "T-N2 col 3", loss, 5e-5, lambda e=exp: d.final_loss(e)[0])
         add(f"tn2.heldout.{label}", "T-N2 col 4", held, 5e-5, lambda e=exp: d.heldout(e)[0])
 
-    add("tn2.gap.TP8.dolly", "T-N2 col 5", 0.004265, 5e-6,
+    add("tn2.gap.TP8.dolly", "Table 3 col 5", 0.004265, 5e-6,
         lambda: d.heldout(D_TP8)[0] - d.heldout(D_FLORA)[0])
-    add("tn2.gap.TP8.alpaca", "T-N2 col 6", 0.003399, 5e-6,
+    add("tn2.gap.TP8.alpaca", "Table 3 col 6", 0.003399, 5e-6,
         lambda: d.heldout(TP8)[0] - d.heldout(FLORA)[0])
-    add("tn2.relshift.RA", "Sec 4.3 G6.1 (3.0%)", 3.0, 0.05,
+    add("tn2.relshift.RA", "Sec 4.4 G6.1 (3.0%)", 3.0, 0.05,
         lambda: abs((d.heldout(D_RA)[0] - d.heldout(D_FLORA)[0])
                     - (d.heldout(RA)[0] - d.heldout(FLORA)[0]))
                 / (d.heldout(RA)[0] - d.heldout(FLORA)[0]) * 100)
-    add("tn2.relshift.TP8", "Sec 4.3 G6.1 (25.5%)", 25.5, 0.05,
+    add("tn2.relshift.TP8", "Sec 4.4 G6.1 (25.5%)", 25.5, 0.05,
         lambda: abs((d.heldout(D_TP8)[0] - d.heldout(D_FLORA)[0])
                     - (d.heldout(TP8)[0] - d.heldout(FLORA)[0]))
                 / (d.heldout(TP8)[0] - d.heldout(FLORA)[0]) * 100)
-    add("tn2.dolly_noniid_comm", "Sec 4.3 G6.1 (non-IID Dolly = 1533.13)", 1533.125, 1e-6,
+    add("tn2.dolly_noniid_comm", "Sec 4.4 G6.1 (non-IID Dolly = 1533.13)", 1533.125, 1e-6,
         lambda: d.comm("exp_dolly_reverse_adaptive_noniid_alpha05"))
     for a, b, m, label, pv in [
         (D_TP8, D_FLORA, "loss", "dolly.TP8_vs_FLoRA.loss", 7.822e-5),
@@ -332,16 +332,16 @@ def build(d: Data) -> list[tuple]:
         add(f"ptest.{label}", "Appendix C Table 9 (Dolly)", pv, abs(pv) * 0.02 + 1e-9,
             lambda x=a, y=b, mm=m: d.paired_p(x, y, mm))
 
-    add("l3.comm.FLoRA", "Sec 4.4, Table 6", 2625.0, 1e-6, lambda: d.l3_comm("flora")[0])
-    add("l3.comm.FLoRA.n", "Sec 4.4 (3 seeds, smoke tests excluded)", 3, 0,
+    add("l3.comm.FLoRA", "Sec 4.8, Table 7", 2625.0, 1e-6, lambda: d.l3_comm("flora")[0])
+    add("l3.comm.FLoRA.n", "Sec 4.8 (3 seeds, smoke tests excluded)", 3, 0,
         lambda: d.l3_comm("flora")[2])
-    add("l3.comm.RA", "Sec 4.4, Table 6", 1837.5, 1e-6, lambda: d.l3_comm("reverse_adaptive")[0])
-    add("l3.comm.TP8", "Sec 4.4, Table 6", 1942.5, 1e-6, lambda: d.l3_comm("two_phase")[0])
-    add("l3.savings.mean", "Abstract, Sec 4.4 (30.0%)", 30.0, 0.05,
+    add("l3.comm.RA", "Sec 4.8, Table 7", 1837.5, 1e-6, lambda: d.l3_comm("reverse_adaptive")[0])
+    add("l3.comm.TP8", "Sec 4.8, Table 7", 1942.5, 1e-6, lambda: d.l3_comm("two_phase")[0])
+    add("l3.savings.mean", "Abstract, Sec 4.8 (30.0%)", 30.0, 0.05,
         lambda: d.l3_savings_pct()[0])
-    add("l3.savings.sd", "Abstract, Sec 4.4 (+/- 4.0)", 4.0, 0.05,
+    add("l3.savings.sd", "Abstract, Sec 4.8 (+/- 4.0)", 4.0, 0.05,
         lambda: d.l3_savings_pct()[1])
-    add("l3.ptest.RA_vs_TP8", "Abstract, Sec 4.4, Sec 5.2 (p=0.997)", 0.997, 0.002,
+    add("l3.ptest.RA_vs_TP8", "Abstract, Sec 4.8, Sec 5.2 (p=0.997)", 0.997, 0.002,
         lambda: d.l3_paired_p("reverse_adaptive", "two_phase"))
 
     # -- G7: Section 5.2 claims --------------------------------------------
@@ -415,7 +415,7 @@ def build(d: Data) -> list[tuple]:
         lambda: tl_total(7) - tl_total(6))
     add("stepfn.k10_equals_s11", "Sec 5.3 (K=10 total = 2083.125)", 2083.125, 1e-6,
         lambda: tl_total(11))
-    add("stepfn.l3_RA", "Sec 4.4 (3B on same step function, s=8)", l3_total(8), 1e-6,
+    add("stepfn.l3_RA", "Sec 4.8 (3B on same step function, s=8)", l3_total(8), 1e-6,
         lambda: d.l3_comm("reverse_adaptive")[0])
 
     # -- G8b: benchmark insensitivity (Sec 5.5) ----------------------------
@@ -439,18 +439,18 @@ def build(d: Data) -> list[tuple]:
     # C22: the clustering figure must exclude MMLU, which the text excludes as
     # chance-level. Including it gives 1.4 pp; the three informative benchmarks
     # give 1.0 pp.
-    add("g8b.cluster_pp_informative_only", "Table 3 caption, Sec 4.3, Conclusion (1.0 pp)",
+    add("g8b.cluster_pp_informative_only", "Table 4 caption, Sec 4.6, Conclusion (1.0 pp)",
         1.0, 0.05,
         lambda: max((max(tiny_bench(c)) - min(tiny_bench(c))) * 100 for c in BENCH_BASE))
     add("g8b.cluster_pp_would_be_with_mmlu", "C22 guard (must NOT be quoted)", 1.4, 0.05,
         lambda: (max(tiny_bench("mmlu_acc")) - min(tiny_bench("mmlu_acc"))) * 100)
-    add("g8b.tiny_bench_is_single_seed", "Sec 5.5, Table 3 caption (C21)", 1, 0,
+    add("g8b.tiny_bench_is_single_seed", "Sec 5.4, Table 4 caption (C21)", 1, 0,
         lambda: 1 if set(d.final[(d.final.scale == "tinyllama_1b")
                                  & d.final.boolq_acc.notna()].seed) == {42} else 0)
-    add("g8b.tuned_heldout_loss_lo", "Sec 5.5 (1.3349)", 1.3349, 5e-5,
+    add("g8b.tuned_heldout_loss_lo", "Sec 5.4 (1.3349)", 1.3349, 5e-5,
         lambda: d.hold.loc[d.hold.dataset.astype(str).str.contains("alpaca", case=False,
                                                                    na=False), "tuned_loss"].min())
-    add("g8b.tuned_heldout_loss_hi", "Sec 5.5 (1.3608)", 1.3608, 5e-5,
+    add("g8b.tuned_heldout_loss_hi", "Sec 5.4 (1.3608)", 1.3608, 5e-5,
         lambda: d.hold.loc[d.hold.dataset.astype(str).str.contains("alpaca", case=False,
                                                                    na=False), "tuned_loss"].max())
 
@@ -482,16 +482,16 @@ def build(d: Data) -> list[tuple]:
 
     # -- G17 / G19: the 3B CI contains the 1.1B effect ----------------------
     # This is why p=0.997 cannot establish equivalence.
-    add("g17.l3_ci_halfwidth", "Sec 4.6, Appendix C (+/-0.0114)", 0.0114, 5e-5,
+    add("g17.l3_ci_halfwidth", "Sec 4.8, Appendix C (+/-0.0114)", 0.0114, 5e-5,
         lambda: 4.303 * (d.l3("reverse_adaptive").set_index("seed").final_loss
                          - d.l3("two_phase").set_index("seed").final_loss).std(ddof=1) / 3 ** 0.5)
-    add("g17.ci_contains_1b_effect", "Sec 4.6 (CI contains the 1.1B difference)", 1, 0,
+    add("g17.ci_contains_1b_effect", "Sec 4.8 (CI contains the 1.1B difference)", 1, 0,
         lambda: 1 if 4.303 * (d.l3("reverse_adaptive").set_index("seed").final_loss
                               - d.l3("two_phase").set_index("seed").final_loss).std(ddof=1) / 3 ** 0.5
                      > (d.final_loss(RA)[0] - d.final_loss(TP8)[0]) else 0)
 
     # -- G10 / C23: commit provenance --------------------------------------
-    # T-N1 spans two run batches: FLoRA, Two-Phase K=8 and ReverseAdaptive from
+    # Table 2 spans two run batches: FLoRA, Two-Phase K=8 and ReverseAdaptive from
     # phase1_cuda_rerun (commit 7b957752); FedIT and FFA-LoRA from
     # neuro_part12_qvonly (commit cae4c328). The FLoRA/FedIT pair straddles that
     # boundary and is statistically indistinguishable, which bounds the
@@ -509,7 +509,7 @@ def build(d: Data) -> list[tuple]:
         lambda: 1 if batch_of(FLORA) != batch_of(FEDIT) else 0)
     add("c23.revision_effect_bound", "Limitations (bounded at ~0.0006)", 0.000566, 5e-6,
         lambda: abs(d.final_loss(FEDIT)[0] - d.final_loss(FLORA)[0]))
-    add("c23.tn2_single_batch", "T-N2 is single-revision", 1, 0,
+    add("c23.tn2_single_batch", "Table 3 is single-revision", 1, 0,
         lambda: 1 if len({batch_of(e) for e in (D_FLORA, D_TP8, D_RA)}) == 1 else 0)
 
     # -- G11 / G13: byte accounting is revision-invariant by measurement ----
@@ -544,7 +544,7 @@ def build(d: Data) -> list[tuple]:
         lambda: d.heldout(FFA)[0] - d.heldout(RA)[0])
 
     # -- G13: every cross-backend value lands on the switch lattice ---------
-    # Table N3b. If these stop matching, the "one step" claim is wrong.
+    # Table D2. If these stop matching, the "one step" claim is wrong.
     for run, mps_s, cuda_s, mps_mb, cuda_mb in [
         (11, 11, 10, 2083.125, 1973.125),
         (12, 9, 8, 1863.125, 1753.125),
@@ -558,9 +558,9 @@ def build(d: Data) -> list[tuple]:
             lambda a=mps_mb, b=cuda_mb: abs(a - b))
 
     # The three absent MPS references recorded the full FLoRA volume.
-    add("g13.absent_ref_is_flora_volume", "Appendix E (2578.13, never switched)",
+    add("g13.absent_ref_is_flora_volume", "Appendix D (2578.13, never switched)",
         2578.125, 1e-6, lambda: d.comm(FLORA))
-    add("g13.denominator", "Appendix E, Table N3a (27 + 4 = 31 comparable)", 31, 0,
+    add("g13.denominator", "Appendix D, Table D1 (27 + 4 = 31 comparable)", 31, 0,
         lambda: 27 + 4)
 
     # -- G11: Appendix B corpora ------------------------------------------
@@ -642,14 +642,14 @@ def build(d: Data) -> list[tuple]:
         return 1 if checked >= 38 else 0
 
     add("g11.ra_no_revert_all_reported",
-        "Sec III-C (no revert in any reported ReverseAdaptive run)",
+        "Sec 3.3 (no revert in any reported ReverseAdaptive run)",
         1, 0, _ra_rows_all_zero_reverts)
     add("g11.ra_no_revert_cuda_corpus_n",
-        "Sec III-C (CUDA reverse_adaptive rows checked)",
+        "Sec 3.3 (CUDA reverse_adaptive rows checked)",
         12, 0,
         lambda: int((d.runs.method == "reverse_adaptive").sum()))
     add("g11.ra_no_revert_final_corpus_n",
-        "Sec III-C (final_results reverse_adaptive rows checked)",
+        "Sec 3.3 (final_results reverse_adaptive rows checked)",
         26, 0,
         lambda: int((d.final.method == "reverse_adaptive").sum()))
 
@@ -681,15 +681,15 @@ def build(d: Data) -> list[tuple]:
             lambda t=tau: reconstruct_switch(t))
 
     # tau = 0 does NOT disable the switch: the loss rises once, at round 11.
-    add("g9.tau_zero_still_fires", "Sec 5.4 (tau=0 fires at round 11)", 11, 0,
+    add("g9.tau_zero_still_fires", "Sec 4.7 (tau=0 fires at round 11)", 11, 0,
         lambda: reconstruct_switch(0.0))
-    add("g9.most_negative_rho", "Sec 5.4 (approx -0.0009)", -0.000903, 5e-6,
+    add("g9.most_negative_rho", "Sec 4.7 (approx -0.0009)", -0.000903, 5e-6,
         lambda: min(_rho()[5:]))
-    add("g9.negative_tau_disables", "Sec 5.4 (tau below min rho disables)", 1, 0,
+    add("g9.negative_tau_disables", "Sec 4.7 (tau below min rho disables)", 1, 0,
         lambda: 1 if reconstruct_switch(-0.001) is None else 0)
 
     # -- Switch-round claims -----------------------------------------------
-    add("switch.TinyLlama_all_round6", "Sec 4.5, G7 saturation disclosure", 1, 0,
+    add("switch.TinyLlama_all_round6", "Sec 4.7, G7 saturation disclosure", 1, 0,
         lambda: 1 if set(
             d.runs.loc[d.runs.exp_name.isin([RA, D_RA]), "switch_round"].astype(str)
         ) == {"6"} else 0)

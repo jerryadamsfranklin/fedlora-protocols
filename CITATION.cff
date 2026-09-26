@@ -11,7 +11,7 @@ preferred-citation:
   authors:
     - family-names: Franklin
       given-names: Jerry Adams
-  title: "Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning"
+  title: "A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning"
   year: 2026
-  journal: "IEEE Open Journal of the Computer Society"
+  journal: "Cluster Computing"
   notes: "Manuscript under review."

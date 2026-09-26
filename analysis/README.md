@@ -4,8 +4,8 @@ Which file backs which table and figure in the paper.
 
 | File | Backs |
 |---|---|
-| `final_results_table.csv` | Table 7 (LLaMA-3.2-3B), Table S3; input to `generate_paper_figures.py` |
-| `qv_only_cuda_per_seed_runs.csv` | Table 2, Table 3, Table S1, Table S4 (loss and communication) |
+| `final_results_table.csv` | Table 7 (LLaMA-3.2-3B), Table B3; input to `generate_paper_figures.py` |
+| `qv_only_cuda_per_seed_runs.csv` | Table 2, Table 3, Table B1, Table B4 (loss and communication) |
 | `neuro_part12_qvonly_holdout_strict24.csv` | Held-out deltas for FedIT, FFA-LoRA, and all Dolly-15k rows |
 | `neuro_existing_alpaca_holdout_phase1_only.csv` | Held-out deltas for FLoRA, Two-Phase, and ReverseAdaptive on Alpaca |
 
@@ -38,7 +38,7 @@ Note that `communication_mb`, `upload_mb`, and `download_mb` in
 `results/raw/**/results.json` are cumulative across rounds, not per-round. The
 final round's value is the run total.
 
-The 36 percent B-only fraction derived in Section III-D likewise holds only for
+The 36 percent B-only fraction derived in Section 3.4 likewise holds only for
 `q_proj` and `v_proj`.
 
 ## Superseded files
