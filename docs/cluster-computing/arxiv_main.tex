@@ -41,25 +41,7 @@
 \authornote{This work received no external funding. The author declares no competing financial interests. This manuscript has been submitted to the IEEE Open Journal of the Computer Society for peer review.}
 
 \begin{abstract}
-Federated fine-tuning of large language models with low-rank adaptation
-reduces per-client trainable parameters, but client-to-server communication
-remains the dominant cost. Existing accounting for federated LoRA protocols
-omits the asymmetric transition round when a protocol changes aggregation
-mode, and reports savings that ignore grouped-query attention shapes. This
-paper measures per-round upload and download bytes for a bidirectional
-B-only federated LoRA protocol and places five methods, three from prior work,
-on a single
-communication-quality frontier. The frontier has a knee, which an adaptive
-phase-switching aggregator, ReverseAdaptive, locates by monitoring the relative improvement in global training loss against
-a dimensionless threshold rather than by fixing a phase boundary in advance.
-On TinyLlama-1.1B-Chat with Alpaca, ReverseAdaptive attains 40.5 percent
-measured round-trip savings over FLoRA at a held-out instruction-following
-loss cost of 0.0063. It outperforms FFA-LoRA, which freezes the first of the
-two LoRA factors at initialization, by 0.0182 in held-out loss, more than
-twenty times the largest per-method seed standard deviation on that metric,
-so learning that factor before freezing it produces better adapters. The same
-threshold transfers across model scales without retuning, and the quality cost
-of the transition is stable across the two datasets tested.
+Federated fine-tuning of large language models with low-rank adaptation reduces trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee: on TinyLlama-1.1B with Alpaca, savings beyond it cost roughly five times more held-out loss per percentage point than savings up to it. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at the knee, cutting measured round-trip communication by 40.5 percent relative to FLoRA at a held-out loss cost of 0.0063. With the same threshold it saves 30.0 percent at LLaMA-3.2-3B.
 \end{abstract}
 
 \begin{IEEEkeywords}

@@ -162,6 +162,8 @@ ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 \label{app:repro}
 \textbf{Code:} Full source code is publicly released, including all configuration YAML files, training scripts, evaluation scripts, and scripts to reproduce every figure and table from the analysis CSVs.
 
+\textbf{Verification:} A script in the repository checks every number reported in this paper against the released run records.
+
 \textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in Table~\ref{tab:b2} of this appendix. Per-seed results are in Appendix~\ref{app:perseed}.
 
 \textbf{Hardware:} The primary corpus of 34 runs was produced on a single Apple M4 Pro workstation with 48\,GB unified memory using the MPS backend, approximately 285 hours of compute, with no institutional cluster. Those runs were re-executed on commercially rented NVIDIA hardware, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the comparison is in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baselines were produced on the rented hardware only.
@@ -226,7 +228,7 @@ The switch round matched exactly for every IID run at $\tau{=}0.01$ and for all 
 
 \textbf{Byte accounting.} Communication is instrumented at the transport layer, counting \texttt{numel} times \texttt{element\_size} on the tensors actually transmitted, rather than derived from parameter counts. The \texttt{get\_communication\_cost} helper in the FFA-LoRA aggregator is not used by this accounting.
 
-\textbf{Code revisions.} Runs were produced across multiple code revisions with uncommitted working-tree modifications, so no reported number is recoverable by checking out a single commit. Reproducibility rests instead on the cross-backend replication documented here. The byte accounting is revision-invariant by direct measurement: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive were each executed under two different revisions within the CUDA corpus and produced identical totals of 2578.13, 1863.13 and 1533.13\,MB. Loss values carry revision uncertainty; the FLoRA and FedIT rows of Table~\ref{tab:frontier} span that boundary and differ by 0.0006, against a ReverseAdaptive-to-FFA-LoRA separation of 0.0282.
+\textbf{Code revisions.} Runs were produced across more than one code revision, some including working-tree modifications that were not committed at run time, so reported numbers are reproduced from the released run records and the cross-backend replication documented here rather than from a single commit. The byte accounting is revision-invariant by direct measurement: FLoRA, Two-Phase $K{=}8$ and ReverseAdaptive were each executed under two different revisions within the CUDA corpus and produced identical totals of 2578.13, 1863.13 and 1533.13\,MB. Loss values carry revision uncertainty; the FLoRA and FedIT rows of Table~\ref{tab:frontier} span that boundary and differ by 0.0006, against a ReverseAdaptive-to-FFA-LoRA separation of 0.0282.
 
 \section{Downstream Accuracy Figure}
 \label{app:downstream_figure}
