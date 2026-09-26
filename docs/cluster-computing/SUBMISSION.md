@@ -5,8 +5,9 @@ plus the full LaTeX source set). Build the flat source first:
 
 ```bash
 cd docs/cluster-computing
-./flatten.sh          # syncs Fig1–Fig4 from ../../figures/ and writes main_flat.tex
-latexmk -pdf main.tex # or compile main_flat.tex as main_flat_build.pdf
+./flatten.sh                    # syncs Fig1–Fig4 from ../../figures/ and writes main_flat.tex
+latexmk -pdf main_flat.tex      # produces the PDF you upload
+latexmk -pdf main.tex           # optional, split-source build for editing
 ```
 
 ## Files to upload
@@ -19,7 +20,7 @@ latexmk -pdf main.tex # or compile main_flat.tex as main_flat_build.pdf
 | `main.bib` | Bibliography database |
 | `main.bbl` | Pre-generated bibliography (submit with the source) |
 | `figures/Fig1.pdf` … `figures/Fig4.pdf` | Manuscript figures |
-| `main.pdf` | Compiled PDF (19 pages) |
+| `main_flat.pdf` | Compiled PDF from `main_flat.tex` (19 pages; this is the PDF to upload) |
 
 ## Submission-interface notes
 
