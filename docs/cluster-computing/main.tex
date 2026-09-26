@@ -98,19 +98,26 @@ The author used Claude (Anthropic) for grammar and language editing of the manus
 \bibliography{main}
 }
 
-\section*{Statements and Declarations}
+\section*{Declarations}
 
 \begin{itemize}
 \item \textbf{Funding:} The author received no funding for this work.
 \item \textbf{Competing interests:} The author declares no competing interests.
-\item \textbf{Author contributions:} The author performed all work associated with this study.
+\item \textbf{Ethics approval and consent to participate:} Not applicable.
+\item \textbf{Consent for publication:} Not applicable.
 \item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Adapter checkpoints are not released.
+\item \textbf{Materials availability:} Not applicable.
 \item \textbf{Code availability:} Source code is available in the same repository.
+\item \textbf{Author contributions:} The author performed all work associated with this study.
 \end{itemize}
 
 \begin{appendices}
-\renewcommand{\thetable}{\thesection\arabic{table}}
-\renewcommand{\thefigure}{\thesection\arabic{figure}}
+% sn-jnl already sets Alph-section table/figure labels inside appendices;
+% attach those counters to section so each appendix restarts at 1 (B1, C1, D1).
+\makeatletter
+\@addtoreset{table}{section}%
+\@addtoreset{figure}{section}%
+\makeatother
 \input{appendix_body.tex}
 \end{appendices}
 

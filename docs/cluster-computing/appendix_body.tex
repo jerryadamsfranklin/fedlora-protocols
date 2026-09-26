@@ -1,7 +1,5 @@
 \section{Experimental Details}
 \label{app:hyper}
-\setcounter{table}{0}
-\setcounter{figure}{0}
 All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^{-4}$, $\beta_1{=}0.9$, $\beta_2{=}0.999$. No learning rate schedule is applied. Gradients are clipped to a maximum $\ell_2$ norm of 1.0 at every optimizer step. Maximum sequence length is 256 tokens. See Table~\ref{tab:setup} for the complete configuration including ReverseAdaptive defaults.
 
 \subsection{Reproducibility Checklist}
@@ -25,8 +23,6 @@ Disabling the switch requires care. Setting $\tau$ to a small positive value doe
 \needspace{3\baselineskip}
 \section{Per-Seed Full Results}
 \label{app:perseed}
-\setcounter{table}{0}
-\setcounter{figure}{0}
 Tables in this appendix are labeled with their corpus, which follows the corresponding table in the main text. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~\ref{tab:llama_iid}; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
 
 \begin{table*}[tbp]
@@ -132,8 +128,6 @@ ReverseAdaptive & 456 & 1.667699 & $-0.526547$ & 1533.13 \\
 
 \section{Statistical Tests}
 \label{app:stats}
-\setcounter{table}{0}
-\setcounter{figure}{0}
 Paired $t$-tests over three seeds on final-round training loss and on held-out instruction-following loss. TinyLlama-1.1B results use the CUDA corpus, matching Table~\ref{tab:frontier}; LLaMA-3.2-3B results use the MPS corpus.
 
 With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values. No multiplicity correction is applied in the main results tables. Applying a Bonferroni correction across the six TinyLlama-1.1B Alpaca IID comparisons gives a threshold of $0.0083$, which the ReverseAdaptive vs.\ Two-Phase $K{=}8$ comparison on held-out loss ($p = 0.026$) does not meet. That comparison is secondary under the frontier framing of Section~\ref{sec:discussion}; the load-bearing comparison is ReverseAdaptive vs.\ FFA-LoRA, which holds at $p < 10^{-3}$ on both metrics with a difference roughly twenty times the largest per-method standard deviation.
@@ -173,8 +167,6 @@ ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 
 \section{Cross-Backend Verification}
 \label{app:crossbackend}
-\setcounter{table}{0}
-\setcounter{figure}{0}
 
 The primary corpus was produced on the MPS backend and subsequently re-executed on CUDA. Table~\ref{tab:d1} summarizes the comparison; Table~\ref{tab:d2} details every disagreement.
 
