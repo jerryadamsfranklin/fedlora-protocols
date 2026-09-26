@@ -194,28 +194,28 @@ def build(d: Data) -> list[tuple]:
     for exp, label in FRONTIER:
         expected = {FLORA: 2578.125, FEDIT: 2578.125, TP8: 1863.125,
                     RA: 1533.125, FFA: 983.125}[exp]
-        add(f"comm.{label}", "T-N1 col 2", expected, 1e-6,
+        add(f"comm.{label}", "Table 2 col 2", expected, 1e-6,
             lambda e=exp: d.comm(e))
 
     # -- Table 2: savings ------------------------------------------------------
     for exp, label, pct in [(TP8, "Two-Phase K=8", 27.7), (RA, "ReverseAdaptive", 40.5),
                             (FFA, "FFA-LoRA", 61.9)]:
-        add(f"savings.{label}", "T-N1 col 3, Abstract", pct, 0.05,
+        add(f"savings.{label}", "Table 2 col 3, Abstract", pct, 0.05,
             lambda e=exp: (base_comm - d.comm(e)) / base_comm * 100)
 
     # -- Table 2: final loss ---------------------------------------------------
     for exp, label, mean in [(FLORA, "FLoRA", 1.2608), (FEDIT, "FedIT", 1.2602),
                              (TP8, "Two-Phase K=8", 1.2705), (RA, "ReverseAdaptive", 1.2749),
                              (FFA, "FFA-LoRA", 1.3031)]:
-        add(f"loss.{label}", "T-N1 col 4", mean, 5e-5, lambda e=exp: d.final_loss(e)[0])
-        add(f"loss.{label}.n", "T-N1 caption (3 seeds)", 3, 0, lambda e=exp: d.final_loss(e)[2])
+        add(f"loss.{label}", "Table 2 col 4", mean, 5e-5, lambda e=exp: d.final_loss(e)[0])
+        add(f"loss.{label}.n", "Table 2 caption (3 seeds)", 3, 0, lambda e=exp: d.final_loss(e)[2])
 
     # -- Table 2: held-out -----------------------------------------------------
     for exp, label, mean in [(FLORA, "FLoRA", -0.5992), (FEDIT, "FedIT", -0.5990),
                              (TP8, "Two-Phase K=8", -0.5958), (RA, "ReverseAdaptive", -0.5929),
                              (FFA, "FFA-LoRA", -0.5746)]:
-        add(f"heldout.{label}", "T-N1 col 5", mean, 5e-5, lambda e=exp: d.heldout(e)[0])
-        add(f"heldout.{label}.n", "T-N1 caption (3 seeds)", 3, 0, lambda e=exp: d.heldout(e)[2])
+        add(f"heldout.{label}", "Table 2 col 5", mean, 5e-5, lambda e=exp: d.heldout(e)[0])
+        add(f"heldout.{label}.n", "Table 2 caption (3 seeds)", 3, 0, lambda e=exp: d.heldout(e)[2])
 
     # -- Abstract / Section 5.2 derived quantities --------------------------
     add("gap.RA_vs_FLoRA.heldout", "Abstract, Sec 5.2", 0.006306, 5e-6,
@@ -253,13 +253,13 @@ def build(d: Data) -> list[tuple]:
         (FFA, FLORA, "heldout", "FFA_vs_FLoRA.heldout", 1.13e-4),
         (FEDIT, FLORA, "heldout", "FedIT_vs_FLoRA.heldout", 0.425),
     ]:
-        add(f"ptest.{label}", "Appendix C Table 9", p, abs(p) * 0.02 + 1e-9,
+        add(f"ptest.{label}", "Appendix C Table C1", p, abs(p) * 0.02 + 1e-9,
             lambda x=a, y=b, m=metric: d.paired_p(x, y, m))
 
     # Table 2 p-value column: paired tests against FLoRA on final loss.
     for exp, label, pv in [(FEDIT, "FedIT", 0.5879), (TP8, "Two-Phase K=8", 4.182e-5),
                            (RA, "ReverseAdaptive", 1.087e-5), (FFA, "FFA-LoRA", 1.71e-4)]:
-        add(f"tn1.pcol.{label}", "T-N1 col 6 (p vs FLoRA)", pv, abs(pv) * 0.02 + 1e-9,
+        add(f"tn1.pcol.{label}", "Table 2 col 6 (p vs FLoRA)", pv, abs(pv) * 0.02 + 1e-9,
             lambda e=exp: d.paired_p(e, FLORA, "loss"))
 
     # Metric-agreement claim in G5.5: identical ranking on the four distinct
@@ -286,7 +286,7 @@ def build(d: Data) -> list[tuple]:
     add("ptest.bonferroni_failing_cell", "Appendix C text (disclosed failure)", 1, 0,
         lambda: 1 if d.paired_p(RA, TP8, "heldout") > 0.05 / 6 else 0)
 
-    # -- T-N2: Dolly replication -------------------------------------------
+    # -- Table 3: Dolly replication -------------------------------------------
     add("dolly.comm.FLoRA", "Table 3", 2578.125, 1e-6, lambda: d.comm(D_FLORA))
     add("dolly.comm.TP8", "Table 3", 1863.125, 1e-6, lambda: d.comm(D_TP8))
     add("dolly.comm.RA", "Table 3", 1533.125, 1e-6, lambda: d.comm(D_RA))
@@ -300,14 +300,14 @@ def build(d: Data) -> list[tuple]:
     # -- LLaMA-3.2-3B -------------------------------------------------------
 
 
-    # -- T-N2 detail (G6) --------------------------------------------------
+    # -- Table 3 detail (G6) --------------------------------------------------
     for exp, label, loss, held in [
         (D_FLORA, "FLoRA", 1.6544, -0.5330),
         (D_TP8, "Two-Phase K=8", 1.6643, -0.5287),
         (D_RA, "ReverseAdaptive", 1.6686, -0.5268),
     ]:
-        add(f"tn2.loss.{label}", "T-N2 col 3", loss, 5e-5, lambda e=exp: d.final_loss(e)[0])
-        add(f"tn2.heldout.{label}", "T-N2 col 4", held, 5e-5, lambda e=exp: d.heldout(e)[0])
+        add(f"tn2.loss.{label}", "Table 3 col 3", loss, 5e-5, lambda e=exp: d.final_loss(e)[0])
+        add(f"tn2.heldout.{label}", "Table 3 col 4", held, 5e-5, lambda e=exp: d.heldout(e)[0])
 
     add("tn2.gap.TP8.dolly", "Table 3 col 5", 0.004265, 5e-6,
         lambda: d.heldout(D_TP8)[0] - d.heldout(D_FLORA)[0])
@@ -329,7 +329,7 @@ def build(d: Data) -> list[tuple]:
         (D_TP8, D_FLORA, "heldout", "dolly.TP8_vs_FLoRA.heldout", 2.406e-6),
         (D_RA, D_FLORA, "heldout", "dolly.RA_vs_FLoRA.heldout", 7.597e-3),
     ]:
-        add(f"ptest.{label}", "Appendix C Table 9 (Dolly)", pv, abs(pv) * 0.02 + 1e-9,
+        add(f"ptest.{label}", "Appendix C Table C1 (Dolly)", pv, abs(pv) * 0.02 + 1e-9,
             lambda x=a, y=b, mm=m: d.paired_p(x, y, mm))
 
     add("l3.comm.FLoRA", "Sec 4.8, Table 7", 2625.0, 1e-6, lambda: d.l3_comm("flora")[0])
@@ -418,7 +418,7 @@ def build(d: Data) -> list[tuple]:
     add("stepfn.l3_RA", "Sec 4.8 (3B on same step function, s=8)", l3_total(8), 1e-6,
         lambda: d.l3_comm("reverse_adaptive")[0])
 
-    # -- G8b: benchmark insensitivity (Sec 5.5) ----------------------------
+    # -- G8b: benchmark insensitivity (Sec 5.4) ----------------------------
     BENCH_BASE = {"arc_easy_acc": 0.274, "boolq_acc": 0.626, "hellaswag_acc": 0.448}
 
     def tiny_bench(col):
@@ -428,11 +428,11 @@ def build(d: Data) -> list[tuple]:
     for col, lo, hi in [("arc_easy_acc", -2.8, -2.2), ("boolq_acc", -7.4, -6.4),
                         ("hellaswag_acc", -2.8, -2.8)]:
         v = None
-        add(f"g8b.regress_lo.{col}", "Sec 5.5 regression range", lo, 0.05,
+        add(f"g8b.regress_lo.{col}", "Sec 5.4 regression range", lo, 0.05,
             lambda c=col: (min(tiny_bench(c)) - BENCH_BASE[c]) * 100)
-        add(f"g8b.regress_hi.{col}", "Sec 5.5 regression range", hi, 0.05,
+        add(f"g8b.regress_hi.{col}", "Sec 5.4 regression range", hi, 0.05,
             lambda c=col: (max(tiny_bench(c)) - BENCH_BASE[c]) * 100)
-        add(f"g8b.spread.{col}", "Sec 5.5 cross-method spread",
+        add(f"g8b.spread.{col}", "Sec 5.4 cross-method spread",
             {"arc_easy_acc": 0.006, "boolq_acc": 0.010, "hellaswag_acc": 0.0}[col], 5e-4,
             lambda c=col: max(tiny_bench(c)) - min(tiny_bench(c)))
 
@@ -550,11 +550,11 @@ def build(d: Data) -> list[tuple]:
         (12, 9, 8, 1863.125, 1753.125),
         (17, 6, 7, 1533.125, 1643.125),
     ]:
-        add(f"g13.n3b.run{run}.mps_on_lattice", "Table N3b", mps_mb, 1e-6,
+        add(f"g13.n3b.run{run}.mps_on_lattice", "Table D2", mps_mb, 1e-6,
             lambda x=mps_s: tl_total(x))
-        add(f"g13.n3b.run{run}.cuda_on_lattice", "Table N3b", cuda_mb, 1e-6,
+        add(f"g13.n3b.run{run}.cuda_on_lattice", "Table D2", cuda_mb, 1e-6,
             lambda x=cuda_s: tl_total(x))
-        add(f"g13.n3b.run{run}.one_step", "Appendix E (exactly one 110 MB step)", 110.0, 1e-6,
+        add(f"g13.n3b.run{run}.one_step", "Appendix D (exactly one 110 MB step)", 110.0, 1e-6,
             lambda a=mps_mb, b=cuda_mb: abs(a - b))
 
     # The three absent MPS references recorded the full FLoRA volume.
@@ -582,7 +582,7 @@ def build(d: Data) -> list[tuple]:
         lambda: 1 if set(round(x, 4) for x in a01().total_mb)
                      <= {1533.125, 1379.8125, 1226.5} else 0)
 
-    # Sec III-C: no stability revert in any reported ReverseAdaptive run.
+    # Sec 3.3: no stability revert in any reported ReverseAdaptive run.
     # Checked via results.json for every reverse_adaptive row in both the
     # MPS final_results_table.csv and the CUDA qv_only corpus CSV.
     repo_root = Path(__file__).resolve().parents[1]
