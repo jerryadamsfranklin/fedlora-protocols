@@ -15,6 +15,16 @@
 \usepackage{capt-of}
 \usepackage{cuted}
 \hyphenation{Tiny-Llama Re-verse-Adap-tive com-mu-ni-ca-tion in-struc-tion-fol-low-ing}
+% Allow more floats near their citations (class defaults starve the queue under [!t]).
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.7}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.7}
 % Force black, borderless links (class email macro otherwise forces blue)
 \hypersetup{hidelinks,colorlinks=false,pdfborder={0 0 0}}
 % Break DOIs/URLs at punctuation only
@@ -54,7 +64,7 @@
 
 \begin{document}
 
-\title[Measured Comm.-Quality Frontier for Federated LoRA]{A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning}
+\title[Measured Comm.\ Frontier for Federated LoRA]{A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning}
 
 \author*{\fnm{Jerry Adams} \sur{Franklin}}\email{jerry.adamsf@gmail.com}
 \affil*{\orgname{Independent Researcher}, \orgaddress{\city{Fairport}, \state{NY}, \postcode{14450}, \country{USA}}}
@@ -65,6 +75,7 @@
 
 \maketitle
 \pagestyle{headings}
+\thispagestyle{titlepage}% suppress running head on the opening page (class sample)
 
 \input{body.tex}
 

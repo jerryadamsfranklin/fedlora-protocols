@@ -120,10 +120,13 @@ def _merge_downstream_jsons(dir_path: Path) -> Dict[str, float]:
     return acc
 
 
-def _save(fig: Figure, name: str) -> None:
+def _save(fig: Figure, name: str, tight: bool = True) -> None:
     OUTDIR.mkdir(parents=True, exist_ok=True)
     pdf = OUTDIR / f"{name}.pdf"
-    fig.savefig(pdf, bbox_inches="tight")
+    if tight:
+        fig.savefig(pdf, bbox_inches="tight")
+    else:
+        fig.savefig(pdf)
     plt.close(fig)
     print(f"Saved {pdf}")
 
@@ -219,14 +222,16 @@ def figure1_frontier() -> None:
         )
 
     kx, (ky, _, _) = comm[FIG1_KNEE], hold[FIG1_KNEE]
+    # Short label just below the ReverseAdaptive marker (no long diagonal leader)
     ax.annotate(
         "knee",
         xy=(kx, ky),
-        xytext=(kx - 280, ky - 0.012),
-        arrowprops=dict(arrowstyle="->", linewidth=1.0, color="0.3"),
+        xytext=(0, -11),
+        textcoords="offset points",
         fontsize=7,
         color="0.3",
-        ha="left",
+        ha="center",
+        va="top",
     )
 
     ax.set_xlabel("Total round-trip communication (MB)")
@@ -293,8 +298,8 @@ def figure2_convergence() -> None:
     ax0.set_xlabel("Round")
     ax0.set_ylabel("Training loss")
     ax0.set_xlim(1, 15)
-    # Legend outside the early-round band
-    ax0.legend(loc="lower left", fontsize=6.5, framealpha=0.92, borderpad=0.3)
+    # Upper-right: away from early-round curves
+    ax0.legend(loc="upper right", fontsize=6.5, framealpha=0.92, borderpad=0.3)
     ax0.grid(True, alpha=0.25)
     ax0.set_title("Loss trajectories", fontsize=8)
 
@@ -472,7 +477,7 @@ def figure5_threshold_ablation() -> None:
     ax0.minorticks_off()
     ax0.set_xlabel("switch_threshold τ (log scale)")
     ax0.set_ylabel("Switch round", color=_COLORS[0])
-    ax1.set_ylabel("Final loss", color=_COLORS[3])
+    ax1.tick_params(axis="y", pad=2)
     ax0.grid(True, alpha=0.25)
 
     h0, l0 = ax0.get_legend_handles_labels()
@@ -487,8 +492,20 @@ def figure5_threshold_ablation() -> None:
         fontsize=6.5,
         frameon=False,
     )
-    fig.tight_layout()
-    _save(fig, "fig5_threshold_ablation")
+    ax1.text(
+        1.42,
+        0.5,
+        "Final loss",
+        transform=ax1.transAxes,
+        color=_COLORS[3],
+        rotation=90,
+        va="center",
+        ha="center",
+        fontsize=8,
+        clip_on=False,
+    )
+    fig.subplots_adjust(left=0.16, right=0.68, top=0.88, bottom=0.18)
+    _save(fig, "fig5_threshold_ablation", tight=False)
 
 
 def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
