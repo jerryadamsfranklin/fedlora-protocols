@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{27}
+\begin{thebibliography}{25}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -197,36 +197,6 @@ In: \bbtitle{Proceedings of the Ninth Conference on Machine Learning and
 \endbibitem
 
 %%% 10
-\bibitem[\protect\citeauthoryear{Houlsby et~al.}{2019}]{houlsby2019parameter}
-\begin{bchapter}
-\bauthor{\bsnm{Houlsby}, \binits{N.}},
-\bauthor{\bsnm{Giurgiu}, \binits{A.}},
-\bauthor{\bsnm{Jastrzebski}, \binits{S.}},
-\bauthor{\bsnm{Morrone}, \binits{B.}},
-\bauthor{\bsnm{Laroussilhe}, \binits{Q.}},
-\bauthor{\bsnm{Gesmundo}, \binits{A.}},
-\bauthor{\bsnm{Attariyan}, \binits{M.}},
-\bauthor{\bsnm{Gelly}, \binits{S.}}:
-\bctitle{Parameter-efficient transfer learning for {NLP}}.
-In: \bbtitle{International Conference on Machine Learning (ICML)}
-(\byear{2019})
-\end{bchapter}
-\endbibitem
-
-%%% 11
-\bibitem[\protect\citeauthoryear{Dettmers et~al.}{2023}]{dettmers2023qlora}
-\begin{bchapter}
-\bauthor{\bsnm{Dettmers}, \binits{T.}},
-\bauthor{\bsnm{Pagnoni}, \binits{A.}},
-\bauthor{\bsnm{Holtzman}, \binits{A.}},
-\bauthor{\bsnm{Zettlemoyer}, \binits{L.}}:
-\bctitle{{QLoRA}: Efficient finetuning of quantized {LLMs}}.
-In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)}
-(\byear{2023})
-\end{bchapter}
-\endbibitem
-
-%%% 12
 \bibitem[\protect\citeauthoryear{Guo et~al.}{2025}]{guo2025fedsalora}
 \begin{bchapter}
 \bauthor{\bsnm{Guo}, \binits{P.}},
@@ -242,7 +212,7 @@ In: \bbtitle{International Conference on Learning Representations (ICLR)}
 \end{bchapter}
 \endbibitem
 
-%%% 13
+%%% 11
 \bibitem[\protect\citeauthoryear{Alistarh et~al.}{2017}]{alistarh2017qsgd}
 \begin{bchapter}
 \bauthor{\bsnm{Alistarh}, \binits{D.}},
@@ -257,7 +227,7 @@ In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)}
 \end{bchapter}
 \endbibitem
 
-%%% 14
+%%% 12
 \bibitem[\protect\citeauthoryear{Lin et~al.}{2018}]{lin2017deep}
 \begin{bchapter}
 \bauthor{\bsnm{Lin}, \binits{Y.}},
@@ -272,7 +242,7 @@ In: \bbtitle{International Conference on Learning Representations (ICLR)}
 \end{bchapter}
 \endbibitem
 
-%%% 15
+%%% 13
 \bibitem[\protect\citeauthoryear{Reisizadeh
   et~al.}{2020}]{reisizadeh2020fedpaq}
 \begin{bchapter}
@@ -289,7 +259,7 @@ In: \bbtitle{International Conference on Artificial Intelligence and Statistics
 \end{bchapter}
 \endbibitem
 
-%%% 16
+%%% 14
 \bibitem[\protect\citeauthoryear{Li et~al.}{2020}]{li2020fedprox}
 \begin{bchapter}
 \bauthor{\bsnm{Li}, \binits{T.}},
@@ -304,7 +274,7 @@ In: \bbtitle{Proceedings of Machine Learning and Systems (MLSys)}
 \end{bchapter}
 \endbibitem
 
-%%% 17
+%%% 15
 \bibitem[\protect\citeauthoryear{Wang et~al.}{2020}]{wang2020fednova}
 \begin{bchapter}
 \bauthor{\bsnm{Wang}, \binits{J.}},
@@ -319,7 +289,7 @@ In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)}
 \end{bchapter}
 \endbibitem
 
-%%% 18
+%%% 16
 \bibitem[\protect\citeauthoryear{Reddi et~al.}{2021}]{reddi2020adaptive}
 \begin{bchapter}
 \bauthor{\bsnm{Reddi}, \binits{S.}},
@@ -336,7 +306,7 @@ In: \bbtitle{International Conference on Learning Representations (ICLR)}
 \end{bchapter}
 \endbibitem
 
-%%% 19
+%%% 17
 \bibitem[\protect\citeauthoryear{Loshchilov and
   Hutter}{2019}]{loshchilov2019decoupled}
 \begin{bchapter}
@@ -348,7 +318,7 @@ In: \bbtitle{International Conference on Learning Representations (ICLR)}
 \end{bchapter}
 \endbibitem
 
-%%% 20
+%%% 18
 \bibitem[\protect\citeauthoryear{Zhang et~al.}{2024}]{zhang2024tinyllama}
 \begin{botherref}
 \oauthor{\bsnm{Zhang}, \binits{P.}},
@@ -362,7 +332,7 @@ arXiv:2401.02385
 \end{botherref}
 \endbibitem
 
-%%% 21
+%%% 19
 \bibitem[\protect\citeauthoryear{Dubey et~al.}{2024}]{dubey2024llama3}
 \begin{botherref}
 \oauthor{\bsnm{Dubey}, \binits{A.}},
@@ -377,7 +347,7 @@ arXiv:2407.21783
 \end{botherref}
 \endbibitem
 
-%%% 22
+%%% 20
 \bibitem[\protect\citeauthoryear{Taori et~al.}{2023}]{taori2023alpaca}
 \begin{botherref}
 \oauthor{\bsnm{Taori}, \binits{R.}},
@@ -394,7 +364,7 @@ Stanford CRFM Blog
 \end{botherref}
 \endbibitem
 
-%%% 23
+%%% 21
 \bibitem[\protect\citeauthoryear{Conover et~al.}{2023}]{dolly2023}
 \begin{botherref}
 \oauthor{\bsnm{Conover}, \binits{M.}},
@@ -414,7 +384,7 @@ Databricks blog
 \end{botherref}
 \endbibitem
 
-%%% 24
+%%% 22
 \bibitem[\protect\citeauthoryear{Hendrycks
   et~al.}{2021}]{hendrycks2020measuring}
 \begin{bchapter}
@@ -431,7 +401,7 @@ In: \bbtitle{International Conference on Learning Representations (ICLR)}
 \end{bchapter}
 \endbibitem
 
-%%% 25
+%%% 23
 \bibitem[\protect\citeauthoryear{Clark et~al.}{2018}]{clark2018arc}
 \begin{botherref}
 \oauthor{\bsnm{Clark}, \binits{P.}},
@@ -449,7 +419,7 @@ arXiv:1803.05457
 \end{botherref}
 \endbibitem
 
-%%% 26
+%%% 24
 \bibitem[\protect\citeauthoryear{Clark et~al.}{2019}]{clark2019boolq}
 \begin{bchapter}
 \bauthor{\bsnm{Clark}, \binits{C.}},
@@ -467,7 +437,7 @@ pp. \bfpage{2924}--\blpage{2936}
 \end{bchapter}
 \endbibitem
 
-%%% 27
+%%% 25
 \bibitem[\protect\citeauthoryear{Zellers et~al.}{2019}]{zellers2019hellaswag}
 \begin{bchapter}
 \bauthor{\bsnm{Zellers}, \binits{R.}},
