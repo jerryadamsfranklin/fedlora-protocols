@@ -8,3 +8,5 @@
 *.synctex.gz
 springer-template/
 main_flat_build.*
+# Split-source PDF only; the tracked upload artifact is main_flat.pdf.
+main.pdf

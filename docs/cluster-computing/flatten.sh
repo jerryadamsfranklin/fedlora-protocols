@@ -1,9 +1,38 @@
 #!/usr/bin/env bash
 # Sync Springer figures from the repo figures/ source of truth, then flatten
 # main.tex + body.tex + appendix_body.tex into one submission .tex.
-# Keep the split sources for editing; upload main_flat.tex to Springer.
+# Keep the split sources for editing; upload main_flat.tex / main_flat.pdf.
+#
+# Usage:
+#   ./flatten.sh           # sync figures and rewrite main_flat.tex
+#   ./flatten.sh --check   # fail if split sources are newer than main_flat.tex
 set -euo pipefail
 cd "$(dirname "$0")"
+
+SOURCES=(main.tex body.tex appendix_body.tex)
+FLAT=main_flat.tex
+
+if [[ "${1:-}" == "--check" ]]; then
+  if [[ ! -f "$FLAT" ]]; then
+    echo "error: $FLAT missing; run ./flatten.sh first" >&2
+    exit 1
+  fi
+  flat_mtime=$(stat -f %m "$FLAT" 2>/dev/null || stat -c %Y "$FLAT")
+  stale=()
+  for src in "${SOURCES[@]}"; do
+    src_mtime=$(stat -f %m "$src" 2>/dev/null || stat -c %Y "$src")
+    if (( src_mtime > flat_mtime )); then
+      stale+=("$src")
+    fi
+  done
+  if ((${#stale[@]} > 0)); then
+    echo "error: $FLAT is stale relative to: ${stale[*]}" >&2
+    echo "run ./flatten.sh then latexmk -pdf main_flat.tex before uploading" >&2
+    exit 1
+  fi
+  echo "ok: $FLAT is at least as new as ${SOURCES[*]}"
+  exit 0
+fi
 
 # Figure mapping (checksum-verified against the current manuscript build):
 #   figures/fig1_frontier.pdf          -> Fig1.pdf  (Fig. 1)

@@ -6,8 +6,9 @@ plus the full LaTeX source set). Build the flat source first:
 ```bash
 cd docs/cluster-computing
 ./flatten.sh                    # syncs Fig1–Fig4 from ../../figures/ and writes main_flat.tex
-latexmk -pdf main_flat.tex      # produces the PDF you upload
-latexmk -pdf main.tex           # optional, split-source build for editing
+latexmk -pdf main_flat.tex      # produces main_flat.pdf (the PDF you upload)
+./flatten.sh --check            # fails if split sources are newer than main_flat.tex
+latexmk -pdf main.tex           # optional local edit build; main.pdf is gitignored
 ```
 
 ## Files to upload
@@ -31,6 +32,6 @@ latexmk -pdf main.tex           # optional, split-source build for editing
 ## Do not upload
 
 - `body.tex`, `appendix_body.tex` (already inlined in `main_flat.tex`)
-- `arxiv_main.tex` (removed; arXiv sources live under `docs/arxiv/`)
+- `main.pdf` (optional split-source build; gitignored so it cannot drift from `main_flat.pdf` in the repo)
 - Intermediate LaTeX auxiliaries (`.aux`, `.log`, `.out`, …)
 - Unused figure generators under repo-root `figures/` (`fig3_cumulative_comm`, `fig4_downstream_accuracy`)
