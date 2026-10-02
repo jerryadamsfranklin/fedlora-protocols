@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{25}
+\begin{thebibliography}{26}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -359,8 +359,10 @@ arXiv:2407.21783
 \oauthor{\bsnm{Liang}, \binits{P.}},
 \oauthor{\bsnm{Hashimoto}, \binits{T.B.}}:
 Alpaca: A Strong, Replicable Instruction-Following Model.
-Stanford CRFM Blog
-(2023)
+Stanford CRFM Blog.
+Accessed 2 October 2026
+(2023).
+\url{https://crfm.stanford.edu/2023/03/13/alpaca.html}
 \end{botherref}
 \endbibitem
 
@@ -378,7 +380,8 @@ Stanford CRFM Blog
 \oauthor{\bsnm{Zaharia}, \binits{M.}},
 \oauthor{\bsnm{Xin}, \binits{R.}}:
 Free Dolly: Introducing the World's First Truly Open Instruction-Tuned {LLM}.
-Databricks blog
+Databricks blog.
+Accessed 2 October 2026
 (2023).
 \url{https://www.databricks.com/blog/2023/04/12/dolly-first-open-commercially-viable-instruction-tuned-llm}
 \end{botherref}
@@ -452,6 +455,18 @@ pp. \bfpage{4791}--\blpage{4800}
 (\byear{2019}).
 \doiurl{10.18653/v1/P19-1472}
 \end{bchapter}
+\endbibitem
+
+%%% 26
+\bibitem[\protect\citeauthoryear{Franklin}{2026}]{franklin2026fedloraprotocols}
+\begin{botherref}
+\oauthor{\bsnm{Franklin}, \binits{J.A.}}:
+fedlora-protocols: Communication-efficient federated {LoRA} fine-tuning,
+  release v1.0.1.
+Zenodo
+(2026).
+\doiurl{10.5281/zenodo.23111915}
+\end{botherref}
 \endbibitem
 
 \end{thebibliography}
