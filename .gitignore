@@ -90,3 +90,8 @@ docs/drafts/
 figures/**/*.tif
 figures/**/*.psd
 dist/
+docs/arxiv/package/
+docs/arxiv/*.aux
+docs/arxiv/*.log
+docs/arxiv/*.out
+docs/arxiv/*.blg

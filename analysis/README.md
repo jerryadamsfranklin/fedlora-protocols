@@ -4,8 +4,8 @@ Which file backs which table and figure in the paper.
 
 | File | Backs |
 |---|---|
-| `final_results_table.csv` | Table 7 (LLaMA-3.2-3B), Table S3; input to `generate_paper_figures.py` |
-| `qv_only_cuda_per_seed_runs.csv` | Table 2, Table 3, Table S1, Table S4 (loss and communication) |
+| `final_results_table.csv` | Table 7 (LLaMA-3.2-3B), Table B3; input to `generate_paper_figures.py` |
+| `qv_only_cuda_per_seed_runs.csv` | Table 2, Table 3, Table B1, Table B4 (loss and communication) |
 | `neuro_part12_qvonly_holdout_strict24.csv` | Held-out deltas for FedIT, FFA-LoRA, and all Dolly-15k rows |
 | `neuro_existing_alpaca_holdout_phase1_only.csv` | Held-out deltas for FLoRA, Two-Phase, and ReverseAdaptive on Alpaca |
 
@@ -20,7 +20,11 @@ python3 scripts/verify_numbers.py --analysis-dir analysis
 ## LoRA target modules
 
 All results reported in the paper use `q_proj` and `v_proj`, as stated in
-Table 1 of the manuscript and in `config/base_config.yaml`.
+Table 1 of the manuscript. The shipped configs resolve to `q_proj` and
+`v_proj` for every experiment; before release, `base_config_4layers.yaml` and
+`base_config_llama3_3b.yaml` listed four projections, a value earlier
+revisions of the runner did not apply. Those earlier values remain in git
+history.
 
 Some run records under `results/raw/` and some rows of
 `qv_only_cuda_per_seed_runs.csv` carry a `target_modules` field of
@@ -38,8 +42,9 @@ Note that `communication_mb`, `upload_mb`, and `download_mb` in
 `results/raw/**/results.json` are cumulative across rounds, not per-round. The
 final round's value is the run total.
 
-The 36 percent B-only fraction derived in Section III-D likewise holds only for
-`q_proj` and `v_proj`.
+The 36 percent B-only fraction derived in Section 3.4 holds for `q_proj` and
+`v_proj` and for the four-projection attention set, but not for target sets
+that break the q/o and k/v shape pairing.
 
 ## Superseded files
 
@@ -49,6 +54,9 @@ back any number in the paper and in places disagree with it. In particular
 `legacy/neuro_part2_baselines_holdout.csv` were produced under the superseded
 four-projection target set and report held-out values that differ from Table 3.
 Use `neuro_part12_qvonly_holdout_strict24.csv` instead.
+The `neuro_` prefix in these filenames is a batch tag from the original
+evaluation campaign and is preserved so that filenames match the run
+tags recorded in `results/MANIFEST.csv`.
 
 ## Run provenance
 

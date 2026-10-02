@@ -1,0 +1,12 @@
+*.aux
+# *.bbl is ignored at repo root; main_flat.bbl is force-tracked for upload
+*.blg
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+springer-template/
+main_flat_build.*
+# Split-source PDF only; the tracked upload artifact is main_flat.pdf.
+main.pdf

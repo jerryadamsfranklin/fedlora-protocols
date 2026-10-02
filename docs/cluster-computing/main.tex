@@ -1,0 +1,124 @@
+% Cluster Computing submission (Springer Nature sn-jnl, two-column)
+\documentclass[iicol,pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{microtype}
+\usepackage[htt]{hyphenat}
+\usepackage{placeins}
+\usepackage{needspace}
+\hyphenation{Tiny-Llama Re-verse-Adap-tive com-mu-ni-ca-tion in-struc-tion-fol-low-ing}
+% Allow more floats near their citations (class defaults starve the queue under [!t]).
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.7}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.7}
+% Force black, borderless links (class email macro otherwise forces blue)
+\hypersetup{hidelinks}
+% Break DOIs/URLs at punctuation only (hyperref already loaded by the class)
+\makeatletter
+\def\UrlBreaks{\do\.\do\/\do\-\do\_\do\~\do\=\do\#\do\:\do\;\do\,\do\?\do\&\do\+\do\%}%
+% Class \ps@headings already uses a zero-height head box at \vspace*{-48pt} but
+% leaves the head text empty (\hfill\relax\hfill) for production; filling
+% \leftmark / author here is required for a self-contained preprint PDF.
+% \markboth alone does not surface heads because the class never prints the marks.
+\def\ps@headings{%
+  \let\@mkboth\markboth
+  \def\@oddfoot{\hfill\thepage\hfill}%
+  \let\@evenfoot\@oddfoot
+  \def\@evenhead{%
+    \vbox to 0pt{\vspace*{-48pt}%
+      \hbox to \hsize{\footnotesize\itshape Jerry Adams Franklin\hfill}}\par
+    \hspace*{-\textwidth}\hbox to \hsize{\hfill}}%
+  \def\@oddhead{%
+    \vbox to 0pt{\vspace*{-48pt}%
+      \hbox to \hsize{\hfill\footnotesize\itshape\leftmark}}\par
+    \hspace*{-\textwidth}\hbox to \hsize{\hfill}}%
+}
+% Opening page: same centered folio as \ps@headings, no running head.
+% (Class \ps@titlepage uses a different footer box, which shifted the page-1 number.)
+\def\ps@firstpage{%
+  \let\@mkboth\markboth
+  \def\@oddfoot{\hfill\thepage\hfill}%
+  \let\@evenfoot\@oddfoot
+  \def\@oddhead{}\def\@evenhead{}}
+% Shadows class \email (blue text + trailing semicolon). Revert first if the
+% publisher's build complains about the redefinition.
+\def\email#1{\global\advance\emailcnt by 1\relax
+  \if@corauemail
+    \g@addto@macro\corrauthemail{%
+      \setcounter{footnote}{0}%
+      \textcolor{black}{#1}%
+    }%
+  \else
+    \g@addto@macro\authemail{%
+      \setcounter{footnote}{0}%
+      \textcolor{black}{#1}%
+    }%
+  \fi}
+\makeatother
+\providecommand{\doiurl}[1]{\url{https://doi.org/#1}}
+
+\begin{document}
+
+\title[Measured Comm.\ Frontier for Federated LoRA]{A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching}
+
+\author*{\fnm{Jerry Adams} \sur{Franklin}}\email{jerry.adamsf@gmail.com}
+\affil*{\orgname{Independent Researcher}, \orgaddress{\city{Fairport}, \state{NY}, \postcode{14450}, \country{USA}}}
+
+\abstract{Federated fine-tuning of large language models with low-rank adaptation reduces the number of trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at that knee: it cuts measured round-trip communication by 40.5\% relative to FLoRA at a held-out loss cost of 0.0063, and beats FFA-LoRA, which freezes that factor at initialization, by 0.0182 in held-out loss, more than twenty times the largest per-method seed standard deviation. The same threshold carries to LLaMA-3.2-3B without retuning, where it saves 30.0\%.}
+
+\keywords{federated learning, low-rank adaptation, communication efficiency, large language models, measurement}
+
+\maketitle
+\pagestyle{headings}
+\thispagestyle{firstpage}
+
+\input{body.tex}
+
+\backmatter
+
+\bmhead{Acknowledgements}
+
+The Alpaca and Dolly-15k datasets are publicly available from their respective sources.
+
+The author used Claude (Anthropic) for grammar and language editing of the manuscript and as a coding assistant for the released codebase. All technical content, analysis, and interpretations are the author's own.
+
+{\tolerance=2000\emergencystretch=1.5em
+\bibliography{main}
+}
+
+\section*{Declarations}
+
+\begin{itemize}
+\item \textbf{Funding:} The author received no funding for this work.
+\item \textbf{Competing interests:} The author declares no competing interests.
+\item \textbf{Ethics approval and consent to participate:} Not applicable.
+\item \textbf{Consent for publication:} Not applicable.
+\item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols}. Final adapter states for the three seed-42 TinyLlama-1.1B runs evaluated in Table~\ref{tab:downstream_tiny} are included; other adapter checkpoints are not. A verification script in the repository recomputes the paper's principal quantitative claims from the released records.
+\item \textbf{Materials availability:} Not applicable.
+\item \textbf{Code availability:} Source code is available in the same repository.
+\item \textbf{Author contributions:} The author performed all work associated with this study.
+\end{itemize}
+
+\begin{appendices}
+% sn-jnl already sets Alph-section table/figure labels inside appendices;
+% attach those counters to section so each appendix restarts at 1 (B1, C1, D1).
+\makeatletter
+\@addtoreset{table}{section}%
+\@addtoreset{figure}{section}%
+\makeatother
+\input{appendix_body.tex}
+\end{appendices}
+
+\end{document}

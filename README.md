@@ -4,7 +4,7 @@ Communication-efficient federated fine-tuning for large language models, with me
 
 ## Overview
 
-This repository accompanies the paper *Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning*. It implements six federated LoRA aggregation methods and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Five protocols, three of them from prior work, are placed on a single measured communication-quality frontier at TinyLlama-1.1B scale on Alpaca-3k; three of the five are replicated on Dolly-15k and at LLaMA-3.2-3B.
+This repository accompanies the paper *A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching*. It implements six federated LoRA aggregation methods and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Five protocols, three of them from prior work, are placed on a single measured communication-quality frontier at TinyLlama-1.1B scale on Alpaca-3k; three of the five are replicated on Dolly-15k and at LLaMA-3.2-3B.
 
 ### Headline results
 
@@ -41,7 +41,7 @@ fedlora-protocols/
 ├── results/                # Run manifest, raw per-round records (raw/), downstream eval (downstream/)
 ├── analysis/               # Master CSVs and statistical tests
 ├── figures/                # Paper-ready PDFs
-└── docs/                   # Submission materials (docs/ojcs-submission/)
+└── docs/                   # Submission materials (docs/cluster-computing/)
 ```
 
 ## Quick start
@@ -57,9 +57,11 @@ python3 scripts/run_experiment.py \
     --seed 42 \
     --tag my_run
 
-# Evaluate a checkpoint you produced above on downstream benchmarks.
-# Adapter checkpoints are not distributed with this repository; run an
-# experiment first and point --checkpoint at the state file it writes.
+# Evaluate a checkpoint on downstream benchmarks. Only the three seed-42
+# TinyLlama-1.1B adapters behind Table 4 are included
+# (results/raw/*/*/seed_42/stage3_checkpoint/*/final_adapter_state.pt).
+# For anything else, run an experiment first and point --checkpoint at the
+# state file it writes.
 python3 scripts/evaluate_checkpoint.py \
     --checkpoint <path printed by run_experiment.py> \
     --num-examples 500 \
@@ -71,8 +73,10 @@ python3 scripts/evaluate_checkpoint.py \
 ```bash
 python3 scripts/build_results_table.py
 python3 scripts/generate_paper_figures.py
-ls figures/  # fig1-3 are paper Figures 1-3; fig4 is supplement Figure S1;
-             # fig5 is paper Figure 4; fig6 is paper Figure 5
+ls figures/  # fig1_frontier -> Fig. 1; fig2_convergence -> Fig. 2;
+             # fig5_threshold_ablation -> Fig. 3; fig6_scale_validation -> Fig. 4.
+             # fig3_cumulative_comm and fig4_downstream_accuracy are generated but
+             # not used in the current manuscript.
 ```
 
 ## Hardware
@@ -85,11 +89,12 @@ If you use this codebase, please cite the paper:
 
 ```
 @article{franklin2026fedlora,
-  title  = {Adaptive Phase-Switching for Communication-Efficient Federated LoRA Fine-Tuning},
-  author = {Franklin, Jerry Adams},
-  year   = {2026},
-  journal = {IEEE Open Journal of the Computer Society},
-  note   = {Manuscript under review}
+  title   = {A Measured Communication-Quality Frontier for Federated
+             LoRA Fine-Tuning with Adaptive Phase-Switching},
+  author  = {Franklin, Jerry Adams},
+  year    = {2026},
+  journal = {Cluster Computing},
+  note    = {Manuscript under review}
 }
 ```
 

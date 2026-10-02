@@ -25,20 +25,19 @@ OUTDIR = REPO / "figures"
 TABLE_PATH = REPO / "analysis" / "final_results_table.csv"
 ANALYSIS_DIR = REPO / "analysis"
 
-# IEEE figure widths: one column 3.5in, page wide 7.16in (OJ template, Sec. VI-L).
-# Figures are authored at final output size so no downscaling occurs on
-# inclusion and in-figure lettering stays legible in print.
-COL_W = 3.5    # inches, IEEE single-column figure width
-FULL_W = 7.16  # inches, IEEE page-wide figure width
+# Springer two-column: 84 mm single column, 174 mm double column.
+COL_W = 84 / 25.4    # inches
+FULL_W = 174 / 25.4  # inches
 
 plt.rcParams.update(
     {
+        "font.family": "serif",
         "font.size": 8,
         "axes.labelsize": 8,
         "axes.titlesize": 8,
         "xtick.labelsize": 7,
         "ytick.labelsize": 7,
-        "legend.fontsize": 7,
+        "legend.fontsize": 6.5,
         "figure.dpi": 300,
         "savefig.dpi": 300,
     }
@@ -121,10 +120,13 @@ def _merge_downstream_jsons(dir_path: Path) -> Dict[str, float]:
     return acc
 
 
-def _save(fig: Figure, name: str) -> None:
+def _save(fig: Figure, name: str, tight: bool = True) -> None:
     OUTDIR.mkdir(parents=True, exist_ok=True)
     pdf = OUTDIR / f"{name}.pdf"
-    fig.savefig(pdf, bbox_inches="tight")
+    if tight:
+        fig.savefig(pdf, bbox_inches="tight")
+    else:
+        fig.savefig(pdf)
     plt.close(fig)
     print(f"Saved {pdf}")
 
@@ -206,6 +208,11 @@ def figure1_frontier() -> None:
     for i, k in enumerate(order):
         mean, sd, _ = hold[k]
         savings = (baseline - comm[k]) / baseline * 100
+        label = f"{FIG1_METHODS[k][0]} ({savings:.1f}%)"
+        if k == "exp_flora_iid":
+            # Drawn after FedIT as an open ring so the coincident point stays
+            # visible (same coordinates; do not offset).
+            continue
         ax.errorbar(
             comm[k],
             mean,
@@ -216,24 +223,70 @@ def figure1_frontier() -> None:
             linestyle="none",
             color=_COLORS[i],
             zorder=3,
-            label=f"{FIG1_METHODS[k][0]} ({savings:.1f}%)",
+            label=label,
         )
 
+    # FLoRA last: larger unfilled circle around FedIT's filled square.
+    flora_k = "exp_flora_iid"
+    flora_i = FIG1_METHODS[flora_k][1]
+    flora_mean, flora_sd, _ = hold[flora_k]
+    flora_savings = (baseline - comm[flora_k]) / baseline * 100
+    ax.errorbar(
+        comm[flora_k],
+        flora_mean,
+        yerr=flora_sd,
+        marker="o",
+        markersize=8,
+        markerfacecolor="none",
+        markeredgewidth=1.5,
+        markeredgecolor=_COLORS[flora_i],
+        ecolor=_COLORS[flora_i],
+        capsize=4,
+        linestyle="none",
+        color=_COLORS[flora_i],
+        zorder=4,
+        label=f"{FIG1_METHODS[flora_k][0]} ({flora_savings:.1f}%)",
+    )
+
     kx, (ky, _, _) = comm[FIG1_KNEE], hold[FIG1_KNEE]
+    # Short label just below the ReverseAdaptive marker (no long diagonal leader)
     ax.annotate(
         "knee",
         xy=(kx, ky),
-        xytext=(kx + 90, ky - 0.0085),
-        arrowprops=dict(arrowstyle="->", linewidth=1.0, color="0.3"),
+        xytext=(0, -11),
+        textcoords="offset points",
         fontsize=7,
         color="0.3",
+        ha="center",
+        va="top",
     )
 
     ax.set_xlabel("Total round-trip communication (MB)")
     ax.set_ylabel(r"Held-out $\Delta$loss")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.42), ncol=2,
-              frameon=False, handletextpad=0.4, columnspacing=1.0)
+    # Restore legend order to FIG1_METHODS (FLoRA first) despite draw order.
+    handles, labels = ax.get_legend_handles_labels()
+    preferred = [f"{FIG1_METHODS[k][0]} (" for k in order]
+    ordered = []
+    for prefix in preferred:
+        for h, lab in zip(handles, labels):
+            if lab.startswith(prefix):
+                ordered.append((h, lab))
+                break
+    if ordered:
+        handles, labels = zip(*ordered)
+    # Upper-right empty region of the frontier plot
+    ax.legend(
+        handles,
+        labels,
+        loc="upper right",
+        fontsize=6,
+        frameon=True,
+        framealpha=0.92,
+        borderpad=0.3,
+        labelspacing=0.25,
+        handletextpad=0.35,
+    )
     ax.set_xlim(900, 2625)
     ax.set_ylim(-0.605, -0.57)
     ax.yaxis.set_major_locator(plt.MultipleLocator(0.01))
@@ -242,6 +295,7 @@ def figure1_frontier() -> None:
 
 
 def figure2_convergence() -> None:
+    """Two-panel full-width figure: loss trajectories (left) and cumulative MB (right)."""
     flora = _latest_per_seed("results/raw/exp_flora_iid/flora/seed_*/run_*/*/results.json")
     tp = _latest_per_seed("results/raw/exp_two_phase_k8/two_phase/seed_*/stage1_bidirectional/*/results.json")
     ra = _latest_per_seed("results/raw/exp_reverse_adaptive_iid/reverse_adaptive/seed_*/stage2_adaptive/*/results.json")
@@ -264,27 +318,59 @@ def figure2_convergence() -> None:
     r2, m2, s2 = curve(tp)
     r3, m3, s3 = curve(ra)
 
-    fig, ax = plt.subplots(figsize=(COL_W, 2.05))
-    ax.plot(r1, m1, label="FLoRA", color=_COLORS[0])
-    ax.fill_between(r1, m1 - s1, m1 + s1, color=_COLORS[0], alpha=0.2)
-    ax.plot(r2, m2, label="Two-Phase K=8", color=_COLORS[1])
-    ax.fill_between(r2, m2 - s2, m2 + s2, color=_COLORS[1], alpha=0.2)
-    ax.plot(r3, m3, label="ReverseAdaptive", color=_COLORS[2])
-    ax.fill_between(r3, m3 - s3, m3 + s3, color=_COLORS[2], alpha=0.2)
+    # Also keep a seed-42 cumulative panel
+    seed = 42
+    cum_paths = {
+        "FLoRA": _latest_per_seed(
+            f"results/raw/exp_flora_iid/flora/seed_{seed}/run_*/*/results.json"
+        ).get(seed),
+        "Two-Phase K=8": _latest_per_seed(
+            f"results/raw/exp_two_phase_k8/two_phase/seed_{seed}/stage1_bidirectional/*/results.json"
+        ).get(seed),
+        "ReverseAdaptive": _latest_per_seed(
+            f"results/raw/exp_reverse_adaptive_iid/reverse_adaptive/seed_{seed}/stage2_adaptive/*/results.json"
+        ).get(seed),
+    }
 
-    ax.axvline(8, color="gray", linestyle=":", linewidth=1.0, label="Two-Phase switch (round 8)")
-    ax.axvline(6, color="black", linestyle="--", linewidth=1.0, label="ReverseAdaptive switch (round 6)")
+    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(FULL_W, 2.35))
 
-    ax.set_xlabel("Round")
-    ax.set_ylabel("Training loss")
-    ax.set_xlim(1, 15)
-    ax.legend(loc="upper right", fontsize=7, framealpha=0.92)
-    ax.grid(True, alpha=0.25)
+    ax0.plot(r1, m1, label="FLoRA", color=_COLORS[0])
+    ax0.fill_between(r1, m1 - s1, m1 + s1, color=_COLORS[0], alpha=0.2)
+    ax0.plot(r2, m2, label="Two-Phase K=8", color=_COLORS[1])
+    ax0.fill_between(r2, m2 - s2, m2 + s2, color=_COLORS[1], alpha=0.2)
+    ax0.plot(r3, m3, label="ReverseAdaptive", color=_COLORS[2])
+    ax0.fill_between(r3, m3 - s3, m3 + s3, color=_COLORS[2], alpha=0.2)
+    ax0.axvline(8, color="gray", linestyle=":", linewidth=1.0)
+    ax0.axvline(6, color="black", linestyle="--", linewidth=1.0)
+    ax0.set_xlabel("Round")
+    ax0.set_ylabel("Training loss")
+    ax0.set_xlim(1, 15)
+    # Upper-right: away from early-round curves
+    ax0.legend(loc="upper right", fontsize=6.5, framealpha=0.92, borderpad=0.3)
+    ax0.grid(True, alpha=0.25)
+    ax0.set_title("Loss trajectories", fontsize=8)
+
+    if all(cum_paths.values()):
+        for label, path in cum_paths.items():
+            assert path is not None
+            rd = _load_rounds(path)
+            xs = np.arange(1, len(rd) + 1)
+            ys = [float(x["communication_mb"]) for x in rd]
+            ax1.plot(xs, ys, label=label, linewidth=1.8)
+    ax1.set_xlabel("Round")
+    ax1.set_ylabel("Cumulative MB")
+    ax1.set_xlim(1, 15)
+    ax1.set_ylim(0, 2600)
+    ax1.legend(loc="lower right", fontsize=6.5, framealpha=0.92)
+    ax1.grid(True, alpha=0.25)
+    ax1.set_title("Cumulative communication", fontsize=8)
+
     fig.tight_layout()
     _save(fig, "fig2_convergence")
 
 
 def figure3_cumulative_comm() -> None:
+    """Retained single-panel export for archival; main paper uses the combined Fig. 2."""
     seed = 42
     paths = {
         "FLoRA": _latest_per_seed(
@@ -313,7 +399,7 @@ def figure3_cumulative_comm() -> None:
     ax.set_ylabel("Cumulative MB")
     ax.set_xlim(1, 15)
     ax.set_ylim(0, 2600)
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower right", fontsize=6.5, framealpha=0.92)
     ax.grid(True, alpha=0.25)
     fig.tight_layout()
     _save(fig, "fig3_cumulative_comm")
@@ -438,14 +524,35 @@ def figure5_threshold_ablation() -> None:
     ax0.minorticks_off()
     ax0.set_xlabel("switch_threshold τ (log scale)")
     ax0.set_ylabel("Switch round", color=_COLORS[0])
-    ax1.set_ylabel("Final loss", color=_COLORS[3])
+    ax1.tick_params(axis="y", pad=2)
     ax0.grid(True, alpha=0.25)
 
     h0, l0 = ax0.get_legend_handles_labels()
     h1, l1 = ax1.get_legend_handles_labels()
-    ax0.legend(h0 + h1, l0 + l1, loc="center right", fontsize=7)
-    fig.tight_layout()
-    _save(fig, "fig5_threshold_ablation")
+    # Place combined legend above the axes so it does not cover the dashed loss line
+    ax0.legend(
+        h0 + h1,
+        l0 + l1,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.02),
+        ncol=2,
+        fontsize=6.5,
+        frameon=False,
+    )
+    ax1.text(
+        1.55,
+        0.5,
+        "Final loss",
+        transform=ax1.transAxes,
+        color=_COLORS[3],
+        rotation=90,
+        va="center",
+        ha="center",
+        fontsize=8,
+        clip_on=False,
+    )
+    fig.subplots_adjust(left=0.16, right=0.62, top=0.88, bottom=0.18)
+    _save(fig, "fig5_threshold_ablation", tight=False)
 
 
 def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
