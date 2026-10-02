@@ -1,0 +1,457 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{25}
+% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\bibcommenthead
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem[\protect\citeauthoryear{Kairouz et~al.}{2021}]{kairouz2021advances}
+\begin{barticle}
+\bauthor{\bsnm{Kairouz}, \binits{P.}},
+\bauthor{\bsnm{McMahan}, \binits{H.B.}},
+\bauthor{\bsnm{Avent}, \binits{B.}},
+\bauthor{\bsnm{Bellet}, \binits{A.}},
+\bauthor{\bsnm{Bennis}, \binits{M.}},
+\bauthor{\bsnm{Bhagoji}, \binits{A.N.}}, \betal:
+\batitle{Advances and open problems in federated learning}.
+\bjtitle{Found. Trends Mach. Learn.}
+\bvolume{14}(\bissue{1--2}),
+\bfpage{1}--\blpage{210}
+(\byear{2021})
+\doiurl{10.1561/2200000083}
+\end{barticle}
+\endbibitem
+
+%%% 2
+\bibitem[\protect\citeauthoryear{Hu et~al.}{2022}]{hu2022lora}
+\begin{bchapter}
+\bauthor{\bsnm{Hu}, \binits{E.J.}},
+\bauthor{\bsnm{Shen}, \binits{Y.}},
+\bauthor{\bsnm{Wallis}, \binits{P.}},
+\bauthor{\bsnm{Allen-Zhu}, \binits{Z.}},
+\bauthor{\bsnm{Li}, \binits{Y.}},
+\bauthor{\bsnm{Wang}, \binits{S.}},
+\bauthor{\bsnm{Wang}, \binits{L.}},
+\bauthor{\bsnm{Chen}, \binits{W.}}:
+\bctitle{{LoRA}: Low-rank adaptation of large language models}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2022})
+\end{bchapter}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Zhang et~al.}{2024}]{zhang2024federatedgpt}
+\begin{bchapter}
+\bauthor{\bsnm{Zhang}, \binits{J.}},
+\bauthor{\bsnm{Vahidian}, \binits{S.}},
+\bauthor{\bsnm{Kuo}, \binits{M.}},
+\bauthor{\bsnm{Li}, \binits{C.}},
+\bauthor{\bsnm{Zhang}, \binits{R.}},
+\bauthor{\bsnm{Yu}, \binits{T.}},
+\bauthor{\bsnm{Wang}, \binits{G.}},
+\bauthor{\bsnm{Chen}, \binits{Y.}}:
+\bctitle{Towards building the {FederatedGPT}: Federated instruction tuning}.
+In: \bbtitle{IEEE International Conference on Acoustics, Speech and Signal
+  Processing (ICASSP)},
+pp. \bfpage{6915}--\blpage{6919}
+(\byear{2024}).
+\doiurl{10.1109/ICASSP48485.2024.10447454}
+\end{bchapter}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{McMahan
+  et~al.}{2017}]{mcmahan2017communication}
+\begin{bchapter}
+\bauthor{\bsnm{McMahan}, \binits{B.}},
+\bauthor{\bsnm{Moore}, \binits{E.}},
+\bauthor{\bsnm{Ramage}, \binits{D.}},
+\bauthor{\bsnm{Hampson}, \binits{S.}},
+\bauthor{\bsnm{Arcas}, \binits{B.}}:
+\bctitle{Communication-efficient learning of deep networks from decentralized
+  data}.
+In: \bbtitle{International Conference on Artificial Intelligence and Statistics
+  (AISTATS)}
+(\byear{2017})
+\end{bchapter}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Sun et~al.}{2024}]{sun2024ffalora}
+\begin{bchapter}
+\bauthor{\bsnm{Sun}, \binits{Y.}},
+\bauthor{\bsnm{Li}, \binits{Z.}},
+\bauthor{\bsnm{Li}, \binits{Y.}},
+\bauthor{\bsnm{Ding}, \binits{B.}}:
+\bctitle{Improving {LoRA} in privacy-preserving federated learning}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2024}).
+\bcomment{arXiv:2403.12313}
+\end{bchapter}
+\endbibitem
+
+%%% 6
+\bibitem[\protect\citeauthoryear{Wang et~al.}{2024}]{wang2024flora}
+\begin{bchapter}
+\bauthor{\bsnm{Wang}, \binits{Z.}},
+\bauthor{\bsnm{Shen}, \binits{Z.}},
+\bauthor{\bsnm{He}, \binits{Y.}},
+\bauthor{\bsnm{Sun}, \binits{G.}},
+\bauthor{\bsnm{Wang}, \binits{H.}},
+\bauthor{\bsnm{Lyu}, \binits{L.}},
+\bauthor{\bsnm{Li}, \binits{A.}}:
+\bctitle{{FLoRA}: Federated fine-tuning large language models with
+  heterogeneous low-rank adaptations}.
+In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)},
+pp. \bfpage{22513}--\blpage{22533}
+(\byear{2024}).
+\bcomment{arXiv:2409.05976}
+\end{bchapter}
+\endbibitem
+
+%%% 7
+\bibitem[\protect\citeauthoryear{Bai et~al.}{2024}]{bai2024flexlora}
+\begin{bchapter}
+\bauthor{\bsnm{Bai}, \binits{J.}},
+\bauthor{\bsnm{Chen}, \binits{D.}},
+\bauthor{\bsnm{Qian}, \binits{B.}},
+\bauthor{\bsnm{Yao}, \binits{L.}},
+\bauthor{\bsnm{Li}, \binits{Y.}}:
+\bctitle{Federated fine-tuning of large language models under heterogeneous
+  tasks and client resources}.
+In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)},
+pp. \bfpage{14457}--\blpage{14483}
+(\byear{2024}).
+\bcomment{arXiv:2402.11505}
+\end{bchapter}
+\endbibitem
+
+%%% 8
+\bibitem[\protect\citeauthoryear{Yan et~al.}{2026}]{yan2026fedsrd}
+\begin{bchapter}
+\bauthor{\bsnm{Yan}, \binits{G.}},
+\bauthor{\bsnm{Xie}, \binits{L.}},
+\bauthor{\bsnm{Shen}, \binits{Q.}},
+\bauthor{\bsnm{Fang}, \binits{Y.}},
+\bauthor{\bsnm{Wu}, \binits{Z.}}:
+\bctitle{{FedSRD}: Sparsify-reconstruct-decompose for communication-efficient
+  federated large language models fine-tuning}.
+In: \bbtitle{Proceedings of the ACM Web Conference 2026 (WWW '26)},
+pp. \bfpage{5087}--\blpage{5098}
+(\byear{2026}).
+\doiurl{10.1145/3774904.3792144}
+\end{bchapter}
+\endbibitem
+
+%%% 9
+\bibitem[\protect\citeauthoryear{Ramesh and Dass}{2026}]{ramesh2026florist}
+\begin{bchapter}
+\bauthor{\bsnm{Ramesh}, \binits{H.}},
+\bauthor{\bsnm{Dass}, \binits{J.}}:
+\bctitle{{FLoRIST}: Singular value thresholding for efficient and accurate
+  federated fine-tuning of large language models}.
+In: \bbtitle{Proceedings of the Ninth Conference on Machine Learning and
+  Systems (MLSys)}
+(\byear{2026}).
+\bcomment{arXiv:2506.09199v2}
+\end{bchapter}
+\endbibitem
+
+%%% 10
+\bibitem[\protect\citeauthoryear{Guo et~al.}{2025}]{guo2025fedsalora}
+\begin{bchapter}
+\bauthor{\bsnm{Guo}, \binits{P.}},
+\bauthor{\bsnm{Zeng}, \binits{S.}},
+\bauthor{\bsnm{Wang}, \binits{Y.}},
+\bauthor{\bsnm{Fan}, \binits{H.}},
+\bauthor{\bsnm{Wang}, \binits{F.}},
+\bauthor{\bsnm{Qu}, \binits{L.}}:
+\bctitle{Selective aggregation for low-rank adaptation in federated learning}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2025}).
+\bcomment{arXiv:2410.01463}
+\end{bchapter}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Alistarh et~al.}{2017}]{alistarh2017qsgd}
+\begin{bchapter}
+\bauthor{\bsnm{Alistarh}, \binits{D.}},
+\bauthor{\bsnm{Grubic}, \binits{D.}},
+\bauthor{\bsnm{Li}, \binits{J.}},
+\bauthor{\bsnm{Tomioka}, \binits{R.}},
+\bauthor{\bsnm{Vojnovic}, \binits{M.}}:
+\bctitle{{QSGD}: Communication-efficient {SGD} via gradient quantization and
+  encoding}.
+In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)}
+(\byear{2017})
+\end{bchapter}
+\endbibitem
+
+%%% 12
+\bibitem[\protect\citeauthoryear{Lin et~al.}{2018}]{lin2017deep}
+\begin{bchapter}
+\bauthor{\bsnm{Lin}, \binits{Y.}},
+\bauthor{\bsnm{Han}, \binits{S.}},
+\bauthor{\bsnm{Mao}, \binits{H.}},
+\bauthor{\bsnm{Wang}, \binits{Y.}},
+\bauthor{\bsnm{Dally}, \binits{W.J.}}:
+\bctitle{Deep gradient compression: Reducing the communication bandwidth for
+  distributed training}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2018})
+\end{bchapter}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Reisizadeh
+  et~al.}{2020}]{reisizadeh2020fedpaq}
+\begin{bchapter}
+\bauthor{\bsnm{Reisizadeh}, \binits{A.}},
+\bauthor{\bsnm{Mokhtari}, \binits{A.}},
+\bauthor{\bsnm{Hassani}, \binits{H.}},
+\bauthor{\bsnm{Jadbabaie}, \binits{A.}},
+\bauthor{\bsnm{Pedarsani}, \binits{R.}}:
+\bctitle{{FedPAQ}: A communication-efficient federated learning method with
+  periodic averaging and quantization}.
+In: \bbtitle{International Conference on Artificial Intelligence and Statistics
+  (AISTATS)}
+(\byear{2020})
+\end{bchapter}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{Li et~al.}{2020}]{li2020fedprox}
+\begin{bchapter}
+\bauthor{\bsnm{Li}, \binits{T.}},
+\bauthor{\bsnm{Sahu}, \binits{A.K.}},
+\bauthor{\bsnm{Zaheer}, \binits{M.}},
+\bauthor{\bsnm{Sanjabi}, \binits{M.}},
+\bauthor{\bsnm{Talwalkar}, \binits{A.}},
+\bauthor{\bsnm{Smith}, \binits{V.}}:
+\bctitle{Federated optimization in heterogeneous networks}.
+In: \bbtitle{Proceedings of Machine Learning and Systems (MLSys)}
+(\byear{2020})
+\end{bchapter}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Wang et~al.}{2020}]{wang2020fednova}
+\begin{bchapter}
+\bauthor{\bsnm{Wang}, \binits{J.}},
+\bauthor{\bsnm{Liu}, \binits{Q.}},
+\bauthor{\bsnm{Liang}, \binits{H.}},
+\bauthor{\bsnm{Joshi}, \binits{G.}},
+\bauthor{\bsnm{Poor}, \binits{H.V.}}:
+\bctitle{Tackling the objective inconsistency problem in heterogeneous
+  federated optimization}.
+In: \bbtitle{Advances in Neural Information Processing Systems (NeurIPS)}
+(\byear{2020})
+\end{bchapter}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{Reddi et~al.}{2021}]{reddi2020adaptive}
+\begin{bchapter}
+\bauthor{\bsnm{Reddi}, \binits{S.}},
+\bauthor{\bsnm{Charles}, \binits{Z.}},
+\bauthor{\bsnm{Zaheer}, \binits{M.}},
+\bauthor{\bsnm{Garrett}, \binits{Z.}},
+\bauthor{\bsnm{Rush}, \binits{K.}},
+\bauthor{\bsnm{Kone\v{c}n\'{y}}, \binits{J.}},
+\bauthor{\bsnm{Kumar}, \binits{S.}},
+\bauthor{\bsnm{McMahan}, \binits{H.B.}}:
+\bctitle{Adaptive federated optimization}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2021})
+\end{bchapter}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{Loshchilov and
+  Hutter}{2019}]{loshchilov2019decoupled}
+\begin{bchapter}
+\bauthor{\bsnm{Loshchilov}, \binits{I.}},
+\bauthor{\bsnm{Hutter}, \binits{F.}}:
+\bctitle{Decoupled weight decay regularization}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2019})
+\end{bchapter}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Zhang et~al.}{2024}]{zhang2024tinyllama}
+\begin{botherref}
+\oauthor{\bsnm{Zhang}, \binits{P.}},
+\oauthor{\bsnm{Zeng}, \binits{G.}},
+\oauthor{\bsnm{Wang}, \binits{T.}},
+\oauthor{\bsnm{Lu}, \binits{W.}}:
+{TinyLlama}: An open-source small language model.
+arXiv preprint
+(2024).
+arXiv:2401.02385
+\end{botherref}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Dubey et~al.}{2024}]{dubey2024llama3}
+\begin{botherref}
+\oauthor{\bsnm{Dubey}, \binits{A.}},
+\oauthor{\bsnm{Jauhri}, \binits{A.}},
+\oauthor{\bsnm{Pandey}, \binits{A.}},
+\oauthor{\bsnm{Kadian}, \binits{A.}},
+\oauthor{\bsnm{Al-Dahle}, \binits{A.}}, et al.:
+The {Llama} 3 herd of models.
+arXiv preprint
+(2024).
+arXiv:2407.21783
+\end{botherref}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{Taori et~al.}{2023}]{taori2023alpaca}
+\begin{botherref}
+\oauthor{\bsnm{Taori}, \binits{R.}},
+\oauthor{\bsnm{Gulrajani}, \binits{I.}},
+\oauthor{\bsnm{Zhang}, \binits{T.}},
+\oauthor{\bsnm{Dubois}, \binits{Y.}},
+\oauthor{\bsnm{Li}, \binits{X.}},
+\oauthor{\bsnm{Guestrin}, \binits{C.}},
+\oauthor{\bsnm{Liang}, \binits{P.}},
+\oauthor{\bsnm{Hashimoto}, \binits{T.B.}}:
+Alpaca: A Strong, Replicable Instruction-Following Model.
+Stanford CRFM Blog
+(2023)
+\end{botherref}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{Conover et~al.}{2023}]{dolly2023}
+\begin{botherref}
+\oauthor{\bsnm{Conover}, \binits{M.}},
+\oauthor{\bsnm{Hayes}, \binits{M.}},
+\oauthor{\bsnm{Mathur}, \binits{A.}},
+\oauthor{\bsnm{Xie}, \binits{J.}},
+\oauthor{\bsnm{Wan}, \binits{J.}},
+\oauthor{\bsnm{Shah}, \binits{S.}},
+\oauthor{\bsnm{Ghodsi}, \binits{A.}},
+\oauthor{\bsnm{Wendell}, \binits{P.}},
+\oauthor{\bsnm{Zaharia}, \binits{M.}},
+\oauthor{\bsnm{Xin}, \binits{R.}}:
+Free Dolly: Introducing the World's First Truly Open Instruction-Tuned {LLM}.
+Databricks blog
+(2023).
+\url{https://www.databricks.com/blog/2023/04/12/dolly-first-open-commercially-viable-instruction-tuned-llm}
+\end{botherref}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{Hendrycks
+  et~al.}{2021}]{hendrycks2020measuring}
+\begin{bchapter}
+\bauthor{\bsnm{Hendrycks}, \binits{D.}},
+\bauthor{\bsnm{Burns}, \binits{C.}},
+\bauthor{\bsnm{Basart}, \binits{S.}},
+\bauthor{\bsnm{Zou}, \binits{A.}},
+\bauthor{\bsnm{Mazeika}, \binits{M.}},
+\bauthor{\bsnm{Song}, \binits{D.}},
+\bauthor{\bsnm{Steinhardt}, \binits{J.}}:
+\bctitle{Measuring massive multitask language understanding}.
+In: \bbtitle{International Conference on Learning Representations (ICLR)}
+(\byear{2021})
+\end{bchapter}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{Clark et~al.}{2018}]{clark2018arc}
+\begin{botherref}
+\oauthor{\bsnm{Clark}, \binits{P.}},
+\oauthor{\bsnm{Cowhey}, \binits{I.}},
+\oauthor{\bsnm{Etzioni}, \binits{O.}},
+\oauthor{\bsnm{Khot}, \binits{T.}},
+\oauthor{\bsnm{Sabharwal}, \binits{A.}},
+\oauthor{\bsnm{Schoenick}, \binits{C.}},
+\oauthor{\bsnm{Tafjord}, \binits{O.}}:
+Think you have solved question answering? {Try ARC}, the {AI2} reasoning
+  challenge.
+arXiv preprint
+(2018).
+arXiv:1803.05457
+\end{botherref}
+\endbibitem
+
+%%% 24
+\bibitem[\protect\citeauthoryear{Clark et~al.}{2019}]{clark2019boolq}
+\begin{bchapter}
+\bauthor{\bsnm{Clark}, \binits{C.}},
+\bauthor{\bsnm{Lee}, \binits{K.}},
+\bauthor{\bsnm{Chang}, \binits{M.-W.}},
+\bauthor{\bsnm{Kwiatkowski}, \binits{T.}},
+\bauthor{\bsnm{Collins}, \binits{M.}},
+\bauthor{\bsnm{Toutanova}, \binits{K.}}:
+\bctitle{{BoolQ}: Exploring the surprising difficulty of natural yes/no
+  questions}.
+In: \bbtitle{Proceedings of NAACL-HLT},
+pp. \bfpage{2924}--\blpage{2936}
+(\byear{2019}).
+\doiurl{10.18653/v1/N19-1300}
+\end{bchapter}
+\endbibitem
+
+%%% 25
+\bibitem[\protect\citeauthoryear{Zellers et~al.}{2019}]{zellers2019hellaswag}
+\begin{bchapter}
+\bauthor{\bsnm{Zellers}, \binits{R.}},
+\bauthor{\bsnm{Holtzman}, \binits{A.}},
+\bauthor{\bsnm{Bisk}, \binits{Y.}},
+\bauthor{\bsnm{Farhadi}, \binits{A.}},
+\bauthor{\bsnm{Choi}, \binits{Y.}}:
+\bctitle{{HellaSwag}: Can a machine really finish your sentence?}
+In: \bbtitle{Proceedings of the Association for Computational Linguistics
+  (ACL)},
+pp. \bfpage{4791}--\blpage{4800}
+(\byear{2019}).
+\doiurl{10.18653/v1/P19-1472}
+\end{bchapter}
+\endbibitem
+
+\end{thebibliography}
