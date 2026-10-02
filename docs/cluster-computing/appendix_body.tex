@@ -1,18 +1,18 @@
 \section{Experimental Details}
 \label{app:hyper}
-All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^{-4}$, $\beta_1{=}0.9$, $\beta_2{=}0.999$. No learning rate schedule is applied. Gradients are clipped to a maximum $\ell_2$ norm of 1.0 at every optimizer step. Maximum sequence length is 256 tokens. See Table~\ref{tab:setup} for the complete configuration including ReverseAdaptive defaults.
+All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^{-4}$, $\beta_1{=}0.9$, $\beta_2{=}0.999$, and weight decay 0.01 (the PyTorch default). No learning rate schedule is applied. Gradients are clipped to a maximum $\ell_2$ norm of 1.0 at every optimizer step. Maximum sequence length is 256 tokens. See Table~\ref{tab:setup} for the complete configuration including ReverseAdaptive defaults.
 
 \subsection{Reproducibility Checklist}
 \label{app:repro}
 \textbf{Code:} Full source code is publicly released, including all configuration YAML files, training scripts, evaluation scripts, and scripts to reproduce every figure and table from the analysis CSVs.
 
-\textbf{Verification:} A script in the repository checks every number reported in this paper against the released run records.
+\textbf{Verification:} A script in the repository (\texttt{scripts/verify\_numbers.py}) recomputes the paper's principal quantitative claims from the released analysis files and run records with 179 automated assertions.
 
 \textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in Table~\ref{tab:b2}. Per-seed results are in Appendix~\ref{app:perseed}.
 
 \textbf{Hardware:} 34 runs were executed on Apple silicon (MPS), a single Apple M4 Pro workstation with 48\,GB unified memory, approximately 285 hours of compute, and re-executed on commercially rented NVIDIA hardware, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the comparison is in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baselines were produced on the rented hardware only.
 
-\textbf{Data:} Alpaca \cite{taori2023alpaca} via \texttt{tatsu-lab/alpaca} on HuggingFace, 3000-sample subset, and Dolly-15k \cite{dolly2023} via \texttt{databricks/databricks-dolly-15k}, matched subset. Adapter checkpoints are not released; reproduction scripts are sufficient.
+\textbf{Data:} Alpaca \cite{taori2023alpaca} via \texttt{tatsu-lab/alpaca} on HuggingFace, 3000-sample subset, and Dolly-15k \cite{dolly2023} via \texttt{databricks/databricks-dolly-15k}, matched subset. Adapter checkpoints are not released, except the final adapter states of the three seed-42 TinyLlama-1.1B runs evaluated in Table~\ref{tab:downstream_tiny}.
 
 \subsection{Disabling the Switch}
 \label{app:noswitch}
