@@ -208,6 +208,11 @@ def figure1_frontier() -> None:
     for i, k in enumerate(order):
         mean, sd, _ = hold[k]
         savings = (baseline - comm[k]) / baseline * 100
+        label = f"{FIG1_METHODS[k][0]} ({savings:.1f}%)"
+        if k == "exp_flora_iid":
+            # Drawn after FedIT as an open ring so the coincident point stays
+            # visible (same coordinates; do not offset).
+            continue
         ax.errorbar(
             comm[k],
             mean,
@@ -218,8 +223,30 @@ def figure1_frontier() -> None:
             linestyle="none",
             color=_COLORS[i],
             zorder=3,
-            label=f"{FIG1_METHODS[k][0]} ({savings:.1f}%)",
+            label=label,
         )
+
+    # FLoRA last: larger unfilled circle around FedIT's filled square.
+    flora_k = "exp_flora_iid"
+    flora_i = FIG1_METHODS[flora_k][1]
+    flora_mean, flora_sd, _ = hold[flora_k]
+    flora_savings = (baseline - comm[flora_k]) / baseline * 100
+    ax.errorbar(
+        comm[flora_k],
+        flora_mean,
+        yerr=flora_sd,
+        marker="o",
+        markersize=8,
+        markerfacecolor="none",
+        markeredgewidth=1.5,
+        markeredgecolor=_COLORS[flora_i],
+        ecolor=_COLORS[flora_i],
+        capsize=4,
+        linestyle="none",
+        color=_COLORS[flora_i],
+        zorder=4,
+        label=f"{FIG1_METHODS[flora_k][0]} ({flora_savings:.1f}%)",
+    )
 
     kx, (ky, _, _) = comm[FIG1_KNEE], hold[FIG1_KNEE]
     # Short label just below the ReverseAdaptive marker (no long diagonal leader)
@@ -237,9 +264,29 @@ def figure1_frontier() -> None:
     ax.set_xlabel("Total round-trip communication (MB)")
     ax.set_ylabel(r"Held-out $\Delta$loss")
     ax.grid(True, alpha=0.3)
+    # Restore legend order to FIG1_METHODS (FLoRA first) despite draw order.
+    handles, labels = ax.get_legend_handles_labels()
+    preferred = [f"{FIG1_METHODS[k][0]} (" for k in order]
+    ordered = []
+    for prefix in preferred:
+        for h, lab in zip(handles, labels):
+            if lab.startswith(prefix):
+                ordered.append((h, lab))
+                break
+    if ordered:
+        handles, labels = zip(*ordered)
     # Upper-right empty region of the frontier plot
-    ax.legend(loc="upper right", fontsize=6, frameon=True, framealpha=0.92,
-              borderpad=0.3, labelspacing=0.25, handletextpad=0.35)
+    ax.legend(
+        handles,
+        labels,
+        loc="upper right",
+        fontsize=6,
+        frameon=True,
+        framealpha=0.92,
+        borderpad=0.3,
+        labelspacing=0.25,
+        handletextpad=0.35,
+    )
     ax.set_xlim(900, 2625)
     ax.set_ylim(-0.605, -0.57)
     ax.yaxis.set_major_locator(plt.MultipleLocator(0.01))

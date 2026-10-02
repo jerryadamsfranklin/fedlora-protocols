@@ -4,7 +4,7 @@ Communication-efficient federated fine-tuning for large language models, with me
 
 ## Overview
 
-This repository accompanies the paper *A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning*. It implements six federated LoRA aggregation methods and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Five protocols, three of them from prior work, are placed on a single measured communication-quality frontier at TinyLlama-1.1B scale on Alpaca-3k; three of the five are replicated on Dolly-15k and at LLaMA-3.2-3B.
+This repository accompanies the paper *A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching*. It implements six federated LoRA aggregation methods and reports per-round byte-tracked communication costs together with held-out instruction-following loss. Five protocols, three of them from prior work, are placed on a single measured communication-quality frontier at TinyLlama-1.1B scale on Alpaca-3k; three of the five are replicated on Dolly-15k and at LLaMA-3.2-3B.
 
 ### Headline results
 
@@ -88,7 +88,7 @@ If you use this codebase, please cite the paper:
 ```
 @article{franklin2026fedlora,
   title   = {A Measured Communication-Quality Frontier for Federated
-             LoRA Fine-Tuning},
+             LoRA Fine-Tuning with Adaptive Phase-Switching},
   author  = {Franklin, Jerry Adams},
   year    = {2026},
   journal = {Cluster Computing},

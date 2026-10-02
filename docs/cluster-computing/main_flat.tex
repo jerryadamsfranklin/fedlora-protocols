@@ -71,7 +71,7 @@
 
 \begin{document}
 
-\title[Measured Comm.\ Frontier for Federated LoRA]{A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning}
+\title[Measured Comm.\ Frontier for Federated LoRA]{A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching}
 
 \author*{\fnm{Jerry Adams} \sur{Franklin}}\email{jerry.adamsf@gmail.com}
 \affil*{\orgname{Independent Researcher}, \orgaddress{\city{Fairport}, \state{NY}, \postcode{14450}, \country{USA}}}
@@ -305,7 +305,7 @@ FFA-LoRA                             & 983.13 & 61.87\% & $1.3031 \pm 0.0012$ & 
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/Fig1.pdf}
-\caption{Measured communication-quality frontier on Alpaca-3k, TinyLlama-1.1B, IID, CUDA corpus. Five protocols, three from prior work, at four distinct operating points; error bars are one sample standard deviation over three seeds, and communication is identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice defined in Section~\ref{sec:heldout}; more negative is better. FLoRA and FedIT coincide at lower right. The segment from ReverseAdaptive to FFA-LoRA is markedly steeper than the segment preceding it, which Section~\ref{sec:measuredbytes} quantifies}
+\caption{Measured communication-quality frontier on Alpaca-3k, TinyLlama-1.1B, IID, CUDA corpus. Five protocols, three from prior work, at four distinct operating points; error bars are one sample standard deviation over three seeds, and communication is identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice defined in Section~\ref{sec:heldout}; more negative is better. FLoRA (open circle) and FedIT (filled square) coincide at lower right. The segment from ReverseAdaptive to FFA-LoRA is markedly steeper than the segment preceding it, which Section~\ref{sec:measuredbytes} quantifies}
 \label{fig:frontier}
 \end{figure}
 
@@ -329,7 +329,7 @@ Table~\ref{tab:dolly} repeats the three-method comparison on Databricks Dolly-15
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
-\caption{Dolly-15k replication. TinyLlama-1.1B, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Gap is the held-out $\Delta$loss difference against the same dataset's FLoRA baseline, which is the quantity comparable across datasets; held-out levels are not, since base-model losses differ (1.9352 on Alpaca, 2.2608 on Dolly-15k). Differences quoted in the text are computed from unrounded values and may differ from the displayed cells in the final digit. Methods: FLoRA \cite{wang2024flora}, FedIT \cite{zhang2024federatedgpt}, FFA-LoRA \cite{sun2024ffalora}. The MB column is total round-trip communication over 15 rounds}
+\caption{Dolly-15k replication. TinyLlama-1.1B, IID, CUDA corpus, three seeds, mean $\pm$ one sample standard deviation. Gap is the held-out $\Delta$loss difference against the same dataset's FLoRA baseline, which is the quantity comparable across datasets; held-out levels are not, since base-model losses differ (1.9352 on Alpaca, 2.2608 on Dolly-15k). Differences quoted in the text are computed from unrounded values and may differ from the displayed cells in the final digit. Method: FLoRA \cite{wang2024flora}. Two-Phase and ReverseAdaptive are defined in Section~\ref{sec:method}. The MB column is total round-trip communication over 15 rounds}
 \label{tab:dolly}
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule

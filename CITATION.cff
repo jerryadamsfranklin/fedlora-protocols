@@ -11,7 +11,7 @@ preferred-citation:
   authors:
     - family-names: Franklin
       given-names: Jerry Adams
-  title: "A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning"
+  title: "A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching"
   year: 2026
   journal: "Cluster Computing"
   notes: "Manuscript under review."

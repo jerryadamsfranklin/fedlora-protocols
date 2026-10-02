@@ -1,7 +1,7 @@
 To: Professor Yaser Jararweh, Editor-in-Chief
 Cluster Computing
 
-Manuscript: A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning
+Manuscript: A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching
 Author: Jerry Adams Franklin, Independent Researcher
 
 Dear Professor Jararweh,
