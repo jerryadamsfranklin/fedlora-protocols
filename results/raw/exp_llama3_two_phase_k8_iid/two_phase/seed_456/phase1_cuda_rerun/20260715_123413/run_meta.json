@@ -1,0 +1,21 @@
+{
+  "experiment": "exp_llama3_two_phase_k8_iid",
+  "method": "two_phase",
+  "seed": 456,
+  "timestamp": "20260715_123413",
+  "device": "cuda",
+  "output_dir": "results/raw/exp_llama3_two_phase_k8_iid/two_phase/seed_456/phase1_cuda_rerun/20260715_123413",
+  "git_commit": "e004f856517687dad3388e90f889671074902569",
+  "git_branch": "neurocomputing/phase-1-cuda-reruns",
+  "git_dirty": true,
+  "python": "3.12.13",
+  "platform": "Linux-6.8.0-107-generic-x86_64-with-glibc2.39",
+  "overrides": {
+    "lora_r": null,
+    "num_clients": null,
+    "switch_threshold": null,
+    "device": "cuda",
+    "save_every": 10,
+    "resume": null
+  }
+}
