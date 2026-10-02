@@ -1,17 +1,15 @@
 # Shared training-protocol base used by most TinyLlama experiment configs.
-# Historical note: `target_modules` from config inheritance was not passed into
-# model construction in all paths in earlier revisions of this codebase.
-# Reported runs in the manuscript adapt q_proj and v_proj only.
-# The measured byte totals in run artifacts are the source-of-truth evidence.
-# Four attention LoRA targets (q,k,v,o) for meaningful per-layer / hybrid experiments.
+# target_modules is q_proj, v_proj, matching every run reported in the
+# manuscript (verified by measured byte totals). Earlier revisions listed
+# q,k,v,o here but did not pass target_modules into model construction;
+# the current runner does, so the value was corrected to keep these configs
+# reproducing the reported runs. See analysis/README.md.
 _inherit: base_config.yaml
 
 lora:
   target_modules:
     - "q_proj"
-    - "k_proj"
     - "v_proj"
-    - "o_proj"
 
 data:
   dataset_name: "tatsu-lab/alpaca"

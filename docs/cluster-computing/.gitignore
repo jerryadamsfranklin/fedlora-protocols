@@ -1,5 +1,5 @@
 *.aux
-# *.bbl  # keep main.bbl for Springer upload
+# *.bbl is ignored at repo root; main_flat.bbl is force-tracked for upload
 *.blg
 *.log
 *.out

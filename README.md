@@ -57,9 +57,11 @@ python3 scripts/run_experiment.py \
     --seed 42 \
     --tag my_run
 
-# Evaluate a checkpoint you produced above on downstream benchmarks.
-# Adapter checkpoints are not distributed with this repository; run an
-# experiment first and point --checkpoint at the state file it writes.
+# Evaluate a checkpoint on downstream benchmarks. Only the three seed-42
+# TinyLlama-1.1B adapters behind Table 4 are included
+# (results/raw/*/*/seed_42/stage3_checkpoint/*/final_adapter_state.pt).
+# For anything else, run an experiment first and point --checkpoint at the
+# state file it writes.
 python3 scripts/evaluate_checkpoint.py \
     --checkpoint <path printed by run_experiment.py> \
     --num-examples 500 \

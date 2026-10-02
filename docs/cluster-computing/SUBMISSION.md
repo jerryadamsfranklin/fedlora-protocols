@@ -19,7 +19,7 @@ latexmk -pdf main.tex           # optional local edit build; main.pdf is gitigno
 | `sn-jnl.cls` | Springer Nature journal class |
 | `sn-mathphys-num.bst` | Numbered MathPhys bibliography style used by this build |
 | `main.bib` | Bibliography database |
-| `main.bbl` | Pre-generated bibliography (submit with the source) |
+| `main_flat.bbl` | Pre-generated bibliography (submit with the source; the name must match `main_flat.tex`) |
 | `figures/Fig1.pdf` … `figures/Fig4.pdf` | Manuscript figures |
 | `main_flat.pdf` | Compiled PDF from `main_flat.tex` (19 pages; this is the PDF to upload) |
 

@@ -20,7 +20,11 @@ python3 scripts/verify_numbers.py --analysis-dir analysis
 ## LoRA target modules
 
 All results reported in the paper use `q_proj` and `v_proj`, as stated in
-Table 1 of the manuscript and in `config/base_config.yaml`.
+Table 1 of the manuscript. The shipped configs resolve to `q_proj` and
+`v_proj` for every experiment; before release, `base_config_4layers.yaml` and
+`base_config_llama3_3b.yaml` listed four projections, a value earlier
+revisions of the runner did not apply. Those earlier values remain in git
+history.
 
 Some run records under `results/raw/` and some rows of
 `qv_only_cuda_per_seed_runs.csv` carry a `target_modules` field of
@@ -38,8 +42,9 @@ Note that `communication_mb`, `upload_mb`, and `download_mb` in
 `results/raw/**/results.json` are cumulative across rounds, not per-round. The
 final round's value is the run total.
 
-The 36 percent B-only fraction derived in Section 3.4 likewise holds only for
-`q_proj` and `v_proj`.
+The 36 percent B-only fraction derived in Section 3.4 holds for `q_proj` and
+`v_proj` and for the four-projection attention set, but not for target sets
+that break the q/o and k/v shape pairing.
 
 ## Superseded files
 
