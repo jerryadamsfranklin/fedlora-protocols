@@ -1,5 +1,7 @@
 # fedlora-protocols
 
+Archived release: v1.0.1, DOI [10.5281/zenodo.23111915](https://doi.org/10.5281/zenodo.23111915)
+
 Communication-efficient federated fine-tuning for large language models, with measured (not theoretical) communication accounting and an adaptive phase-switching aggregator.
 
 ## Overview
@@ -94,7 +96,7 @@ If you use this codebase, please cite the paper:
   author  = {Franklin, Jerry Adams},
   year    = {2026},
   journal = {Cluster Computing},
-  note    = {Manuscript under review}
+  note    = {Manuscript under review. Code and run records: doi:10.5281/zenodo.23111915}
 }
 ```
 

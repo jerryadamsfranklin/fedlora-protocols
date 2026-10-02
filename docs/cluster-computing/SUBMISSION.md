@@ -35,3 +35,9 @@ latexmk -pdf main.tex           # optional local edit build; main.pdf is gitigno
 - `main.pdf` (optional split-source build; gitignored so it cannot drift from `main_flat.pdf` in the repo)
 - Intermediate LaTeX auxiliaries (`.aux`, `.log`, `.out`, …)
 - Unused figure generators under repo-root `figures/` (`fig3_cumulative_comm`, `fig4_downstream_accuracy`)
+
+## Archive
+
+The code, configs and run records behind this manuscript are archived as
+release v1.0.1 (DOI 10.5281/zenodo.23111915), tagged from the commit that
+produced `main_flat.pdf`. Later commits change only DOI references.
