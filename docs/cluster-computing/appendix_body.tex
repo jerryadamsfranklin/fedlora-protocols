@@ -10,7 +10,7 @@ All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^
 
 \textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in Table~\ref{tab:b2}. Per-seed results are in Appendix~\ref{app:perseed}.
 
-\textbf{Hardware:} 34 runs were executed on Apple silicon (MPS), a single Apple M4 Pro workstation with 48\,GB unified memory, approximately 285 hours of compute, and re-executed on commercially rented NVIDIA hardware, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the comparison is in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baselines were produced on the rented hardware only.
+\textbf{Hardware:} The MPS corpus was executed on a single Apple M4 Pro workstation with 48\,GB unified memory; a core of 34 of its runs, approximately 285 hours of compute, was re-executed on commercially rented NVIDIA hardware, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the comparison is in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baselines were produced on the rented hardware only.
 
 \textbf{Data:} Alpaca \cite{taori2023alpaca} via \texttt{tatsu-lab/alpaca} on HuggingFace, 3000-sample subset, and Dolly-15k \cite{dolly2023} via \texttt{databricks/databricks-dolly-15k}, matched subset. Adapter checkpoints are not released, except the final adapter states of the three seed-42 TinyLlama-1.1B runs evaluated in Table~\ref{tab:downstream_tiny}.
 
