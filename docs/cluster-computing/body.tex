@@ -218,7 +218,7 @@ FFA-LoRA                             & 983.13 & 61.87\% & $1.3031 \pm 0.0012$ & 
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{figures/Fig1.pdf}
+\includegraphics[width=\columnwidth]{Fig1.pdf}
 \caption{Measured communication-quality frontier on Alpaca-3k, TinyLlama-1.1B, IID, CUDA corpus. Five protocols, three from prior work, at four distinct operating points; error bars are one sample standard deviation over three seeds, and communication is identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice defined in Section~\ref{sec:heldout}; more negative is better. FLoRA (open circle) and FedIT (filled square) coincide at lower right. The segment from ReverseAdaptive to FFA-LoRA is markedly steeper than the segment preceding it, which Section~\ref{sec:measuredbytes} quantifies}
 \label{fig:frontier}
 \end{figure}
@@ -265,7 +265,7 @@ A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and
 \subsection{Convergence and Switching Behavior}
 \begin{figure*}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/Fig2.pdf}
+\includegraphics[width=\textwidth]{Fig2.pdf}
 \caption{Left: training loss trajectories on TinyLlama-1.1B IID, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Vertical dashed lines mark ReverseAdaptive's switch (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, with full upload, is round 9). Right: cumulative communication on TinyLlama-1.1B (seed 42, deterministic across seeds). Slope changes mark phase transitions; look-ahead download accounting moves the broadcast slope one round before the upload slope}
 \label{fig:convergence}
 \label{fig:cumcomm}
@@ -345,7 +345,7 @@ $\tau$ & Switch round & Final loss & Total comm.\ (MB) & Savings \\
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{figures/Fig3.pdf}
+\includegraphics[width=\columnwidth]{Fig3.pdf}
 \caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus). Communication is backend-invariant; loss values are not comparable with the CUDA results in Table~\ref{tab:frontier}}
 \label{fig:ablation}
 \end{figure}
@@ -374,7 +374,7 @@ ReverseAdaptive & $1.3938 \pm 0.0036$ & $1837.5 \pm 105.0$ & $30.0 \pm 4.0$\% \\
 
 \begin{figure*}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/Fig4.pdf}
+\includegraphics[width=\textwidth]{Fig4.pdf}
 \caption{Scale validation. Left: TinyLlama-1.1B, CUDA corpus (mean $\pm$ 1 standard deviation over three seeds). Right: LLaMA-3.2-3B, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Both panels show the three federated methods on the same axes. Dotted polyline connects the three method points on each panel. The Pareto structure (downward slope from FLoRA to ReverseAdaptive) is preserved across scales. Y-axis ranges differ between panels because absolute training loss is model-dependent; the relative Pareto shape is the invariant being validated. ReverseAdaptive's larger error bar at LLaMA-3.2-3B reflects across-seed variance in switch round (7, 8, 9)}
 \label{fig:scale}
 \end{figure*}
