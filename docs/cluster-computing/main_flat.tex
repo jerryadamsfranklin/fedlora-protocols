@@ -595,7 +595,7 @@ All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^
 
 \textbf{Verification:} A script in the repository (\texttt{scripts/verify\_numbers.py}) recomputes the paper's principal quantitative claims from the released analysis files and run records with 179 automated assertions.
 
-\textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in Table~\ref{tab:b2}. Per-seed results are in Appendix~\ref{app:perseed}.
+\textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in the partition-sensitivity results of Appendix~\ref{app:perseed}, alongside the other per-seed results.
 
 \textbf{Hardware:} The MPS corpus was executed on a single Apple M4 Pro workstation with 48\,GB unified memory; a core of 34 of its runs, approximately 285 hours of compute, was re-executed on commercially rented NVIDIA hardware, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the comparison is in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baselines were produced on the rented hardware only.
 
@@ -610,7 +610,7 @@ Disabling the switch requires care. Setting $\tau$ to a small positive value doe
 \needspace{3\baselineskip}
 \section{Per-Seed Full Results}
 \label{app:perseed}
-Tables in this appendix are labeled with their corpus, which follows the corresponding table in the main text. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~\ref{tab:llama_iid}; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
+Tables~\ref{tab:b1} to~\ref{tab:b4} give per-seed results and are labeled with their corpus, which follows the corresponding table in the main text. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~\ref{tab:llama_iid}; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
 
 \begin{table*}[tbp]
 \centering
@@ -618,7 +618,7 @@ Tables in this appendix are labeled with their corpus, which follows the corresp
 \scriptsize
 \renewcommand{\arraystretch}{0.78}
 \setlength{\tabcolsep}{6pt}
-\caption{Per-seed TinyLlama-1.1B IID results, CUDA corpus, backing Table~\ref{tab:frontier}. Communication is deterministic across seeds. $\dagger$ For Two-Phase the Switch/boundary column shows the predetermined phase boundary $K$, not an adaptive switch event; for FFA-LoRA, $A$ is frozen from initialization (shown as ``init''); for ReverseAdaptive it shows the round at which the plateau signal triggered}
+\caption{Per-seed TinyLlama-1.1B IID results, CUDA corpus, backing Table~\ref{tab:frontier}. Communication is deterministic across seeds. For Two-Phase the Switch/boundary column shows the predetermined phase boundary $K$, not an adaptive switch event; for FFA-LoRA, $A$ is frozen from initialization (shown as ``init''); for ReverseAdaptive it shows the round at which the plateau signal triggered}
 \label{tab:b1}
 \begin{tabular}{@{}llrrr@{}}
 \toprule
@@ -715,7 +715,7 @@ ReverseAdaptive & 456 & 1.667699 & $-0.526547$ & 1533.13 \\
 
 \section{Statistical Tests}
 \label{app:stats}
-Paired $t$-tests over three seeds on final-round training loss and on held-out instruction-following loss. TinyLlama-1.1B results use the CUDA corpus, matching Table~\ref{tab:frontier}; LLaMA-3.2-3B results use the MPS corpus.
+Table~\ref{tab:c1} reports paired $t$-tests over three seeds on final-round training loss and on held-out instruction-following loss. TinyLlama-1.1B results use the CUDA corpus, matching Table~\ref{tab:frontier}; LLaMA-3.2-3B results use the MPS corpus.
 
 With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values. No multiplicity correction is applied in the main results tables. Applying a Bonferroni correction across the six TinyLlama-1.1B Alpaca IID comparisons gives a threshold of $0.0083$, which the ReverseAdaptive vs.\ Two-Phase $K{=}8$ comparison on held-out loss ($p = 0.026$) does not meet. That comparison is secondary under the frontier framing of Section~\ref{sec:discussion}; the load-bearing comparison is ReverseAdaptive vs.\ FFA-LoRA, which holds at $p < 10^{-3}$ on both metrics with a difference roughly twenty times the largest per-method standard deviation.
 
