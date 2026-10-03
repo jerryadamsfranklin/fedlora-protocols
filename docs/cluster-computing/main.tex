@@ -1,5 +1,6 @@
 % Cluster Computing submission (Springer Nature sn-jnl, two-column)
 \documentclass[iicol,pdflatex,sn-mathphys-num]{sn-jnl}
+\graphicspath{{figures/}}
 
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -76,7 +77,7 @@
 \author*{\fnm{Jerry Adams} \sur{Franklin}}\email{jerry.adamsf@gmail.com}
 \affil*{\orgname{Independent Researcher}, \orgaddress{\city{Fairport}, \state{NY}, \postcode{14450}, \country{USA}}}
 
-\abstract{Federated fine-tuning of large language models with low-rank adaptation reduces the number of trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at that knee: it cuts measured round-trip communication by 40.5\% relative to FLoRA at a held-out loss cost of 0.0063, and beats FFA-LoRA, which freezes that factor at initialization, by 0.0182 in held-out loss, more than twenty times the largest per-method seed standard deviation. The same threshold carries to LLaMA-3.2-3B without retuning, where it saves 30.0\%.}
+\abstract{Federated fine-tuning of large language models with low-rank adaptation (LoRA) reduces the number of trainable parameters, but communication remains the dominant cost, and protocols are usually compared by parameter-count ratios rather than by measured bytes. This paper measures per-round upload and download bytes for five federated LoRA protocols, three of them from prior work, and places them on a single communication-quality frontier scored by held-out instruction-following loss. The frontier has a knee. ReverseAdaptive, which learns both LoRA factors before freezing one once the relative improvement in training loss falls below a dimensionless threshold, sits at that knee: it cuts measured round-trip communication by 40.5\% relative to FLoRA at a held-out loss cost of 0.0063, and beats FFA-LoRA, which freezes that factor at initialization, by 0.0182 in held-out loss, more than twenty times the largest per-method seed standard deviation. The same threshold carries to LLaMA-3.2-3B without retuning, where it saves 30.0\%.}
 
 \keywords{federated learning, low-rank adaptation, communication efficiency, large language models, measurement}
 
@@ -98,14 +99,14 @@ The author used Claude (Anthropic) for grammar and language editing of the manus
 \bibliography{main}
 }
 
-\section*{Declarations}
+\section*{Statements and Declarations}
 
 \begin{itemize}
 \item \textbf{Funding:} The author received no funding for this work.
 \item \textbf{Competing interests:} The author declares no competing interests.
 \item \textbf{Ethics approval and consent to participate:} Not applicable.
 \item \textbf{Consent for publication:} Not applicable.
-\item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols} and archived as release v1.0.1 at \doiurl{10.5281/zenodo.23111915}. Final adapter states for the three seed-42 TinyLlama-1.1B runs evaluated in Table~\ref{tab:downstream_tiny} are included; other adapter checkpoints are not. A verification script in the repository recomputes the paper's principal quantitative claims from the released records.
+\item \textbf{Data availability:} Analysis CSVs, run records, and scripts to regenerate tables and figures are available in the public repository at \url{https://github.com/jerryadamsfranklin/fedlora-protocols} and archived as release v1.0.1 at \doiurl{10.5281/zenodo.23111915}~\cite{franklin2026fedloraprotocols}. Final adapter states for the three seed-42 TinyLlama-1.1B runs evaluated in Table~\ref{tab:downstream_tiny} are included; other adapter checkpoints are not. A verification script in the repository recomputes the paper's principal quantitative claims from the released records.
 \item \textbf{Materials availability:} Not applicable.
 \item \textbf{Code availability:} Source code is available in the same repository.
 \item \textbf{Author contributions:} The author performed all work associated with this study.
