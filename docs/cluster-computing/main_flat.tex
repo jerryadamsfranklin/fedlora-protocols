@@ -228,7 +228,7 @@ Alpaca carries no class labels, so partitions that are not independent and ident
 
 \subsection{Setup}
 \label{sec:setup}
-Table~\ref{tab:setup} summarizes the experimental configuration. The corpus was executed on two hardware backends. A core of 34 runs on Apple silicon through the Metal Performance Shaders (MPS) backend, approximately 285 hours of compute, was re-executed on NVIDIA GPUs, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the cross-backend comparison is reported in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baseline runs were produced on the same rented hardware. Both TinyLlama-1.1B and LLaMA-3.2-3B experiments use three seeds for IID training.
+Table~\ref{tab:setup} summarizes the experimental configuration. The corpus was executed on two hardware backends. A core of 34 runs on Apple silicon through the Metal Performance Shaders (MPS) backend, approximately 285 hours of compute, was re-executed on NVIDIA graphics processing units (GPUs), an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the cross-backend comparison is reported in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baseline runs were produced on the same rented hardware. Both TinyLlama-1.1B and LLaMA-3.2-3B experiments use three seeds for IID training.
 
 \begin{table*}[tbp]
 \centering
@@ -475,7 +475,7 @@ At LLaMA-3.2-3B, ReverseAdaptive and Two-Phase $K{=}8$ reach final losses differ
 \label{sec:discussion}
 
 \subsection{Implications for Federated LLM Deployment}
-In mobile or IoT federated settings where uplink bandwidth is scarce and metered, cutting round-trip communication by 30 to 40\% can change the economic viability of federated fine-tuning. At TinyLlama-1.1B the 40.5\% reduction costs 0.0063 in held-out instruction-following loss. Whether that trade is acceptable is a deployment decision rather than a universal one, and the frontier in Section~\ref{sec:frontier} is intended to let a practitioner make it explicitly: the same measurements show that accepting a further 21.3 points of savings costs roughly five times more quality per point. Kairouz et al. \cite{kairouz2021advances} identify communication as a fundamental open problem in federated learning at scale, and measured byte-level reporting is a prerequisite for addressing it.
+In mobile or Internet of Things (IoT) federated settings where uplink bandwidth is scarce and metered, cutting round-trip communication by 30 to 40\% can change the economic viability of federated fine-tuning. At TinyLlama-1.1B the 40.5\% reduction costs 0.0063 in held-out instruction-following loss. Whether that trade is acceptable is a deployment decision rather than a universal one, and the frontier in Section~\ref{sec:frontier} is intended to let a practitioner make it explicitly: the same measurements show that accepting a further 21.3 points of savings costs roughly five times more quality per point. Kairouz et al. \cite{kairouz2021advances} identify communication as a fundamental open problem in federated learning at scale, and measured byte-level reporting is a prerequisite for addressing it.
 
 \subsection{Choosing an Operating Point}
 \label{sec:choosing}
