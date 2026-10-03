@@ -99,6 +99,30 @@ def _load_rounds(path: str) -> List[Dict[str, Any]]:
         return json.load(f)
 
 
+
+def _approx(a: float, b: float, places: int) -> bool:
+    """Half-up comparison at a fixed number of decimal places."""
+    scale = 10 ** places
+    return int(float(a) * scale + 0.5) == int(float(b) * scale + 0.5)
+
+
+def _run_meta_device(results_json: str) -> str:
+    """Return run_meta device (cuda/mps/...) for a results.json path."""
+    parent = Path(results_json).parent
+    meta = parent / "run_meta.json"
+    if not meta.is_file():
+        metas = sorted(parent.glob("run_meta*.json"))
+        if not metas:
+            raise FileNotFoundError(f"No run_meta next to {results_json}")
+        meta = metas[0]
+    with open(meta, encoding="utf-8") as f:
+        data = json.load(f)
+    device = data.get("device")
+    if not device:
+        raise ValueError(f"Missing device in {meta}")
+    return str(device)
+
+
 def _mean_std(vals: Sequence[float]) -> Tuple[float, float]:
     a = np.array(vals, dtype=float)
     return float(np.mean(a)), float(np.std(a, ddof=1)) if len(a) > 1 else 0.0
@@ -183,6 +207,23 @@ def figure1_frontier() -> None:
         raise ValueError(
             "Figure 1 frontier guard failed: expected 5 methods at 4 distinct communication levels"
         )
+
+    # Plotted-data assertions (CUDA corpus, TinyLlama-1.1B, Alpaca, IID).
+    expected_f1 = {
+        "exp_flora_iid": (2578.13, -0.5992),
+        "exp_fedit_iid": (2578.13, -0.5990),
+        "exp_two_phase_k8": (1863.13, -0.5958),
+        "exp_reverse_adaptive_iid": (1533.13, -0.5929),
+        "exp_ffa_lora_iid": (983.13, -0.5746),
+    }
+    for k, (mb_exp, delta_exp) in expected_f1.items():
+        mean, sd, n = hold[k]
+        if n != 3:
+            raise AssertionError(f"Figure 1 {k}: expected 3 seeds, got n={n}")
+        if not _approx(comm[k], mb_exp, 2):
+            raise AssertionError(f"Figure 1 {k}: MB {comm[k]} != {mb_exp}")
+        if not _approx(mean, delta_exp, 4):
+            raise AssertionError(f"Figure 1 {k}: holdout mean {mean} != {delta_exp}")
 
     order = sorted(FIG1_METHODS, key=lambda k: FIG1_METHODS[k][1])
     baseline = comm["exp_flora_iid"]
@@ -304,6 +345,18 @@ def figure2_convergence() -> None:
         warnings.warn("Figure 2: insufficient seeds")
         return
 
+    # Plotted-data assertions (MPS corpus, TinyLlama IID, 3 seeds).
+    if seeds != [42, 123, 456]:
+        raise AssertionError(f"Figure 2: expected seeds [42,123,456], got {seeds}")
+    for label, paths in (("FLoRA", flora), ("Two-Phase K=8", tp), ("ReverseAdaptive", ra)):
+        for s in seeds:
+            device = _run_meta_device(paths[s])
+            if device != "mps":
+                raise AssertionError(f"Figure 2 {label} seed {s}: device={device}, expected mps")
+            nrounds = len(_load_rounds(paths[s]))
+            if nrounds != 15:
+                raise AssertionError(f"Figure 2 {label} seed {s}: {nrounds} rounds, expected 15")
+
     def curve(paths: Dict[int, str]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         mats = []
         for s in seeds:
@@ -351,11 +404,20 @@ def figure2_convergence() -> None:
     ax0.set_title("Loss trajectories", fontsize=8)
 
     if all(cum_paths.values()):
+        expected_cum15 = {
+            "FLoRA": 2578.13,
+            "Two-Phase K=8": 1863.13,
+            "ReverseAdaptive": 1533.13,
+        }
         for label, path in cum_paths.items():
             assert path is not None
             rd = _load_rounds(path)
             xs = np.arange(1, len(rd) + 1)
             ys = [float(x["communication_mb"]) for x in rd]
+            if not _approx(ys[-1], expected_cum15[label], 2):
+                raise AssertionError(
+                    f"Figure 2 right panel {label}: cum MB at round 15 is {ys[-1]}, expected {expected_cum15[label]}"
+                )
             ax1.plot(xs, ys, label=label, linewidth=1.8)
     ax1.set_xlabel("Round")
     ax1.set_ylabel("Cumulative MB")
@@ -491,10 +553,14 @@ def figure4_downstream() -> None:
 
 
 def figure5_threshold_ablation() -> None:
+    """Threshold ablation (manuscript Fig. 3): MPS corpus, seed 42, IID."""
     root = REPO / "results/raw/exp_reverse_adaptive_threshold_ablation/reverse_adaptive/seed_42"
     paths = sorted(glob.glob(str(root / "*" / "*" / "results.json")))
-    rows = []
+    by_tau: Dict[float, Tuple[float, float, float, str]] = {}
     for p in paths:
+        device = _run_meta_device(p)
+        if device != "mps":
+            continue
         data = _load_rounds(p)
         if not data:
             continue
@@ -504,11 +570,30 @@ def figure5_threshold_ablation() -> None:
         sw = agg.get("switch_round")
         if thr is None:
             continue
-        rows.append((float(thr), float(sw), float(fin["avg_loss"])))
-    if len(rows) < 3:
-        warnings.warn("Figure 5: insufficient threshold runs")
-        return
+        tau = float(thr)
+        # Prefer the latest timestamp when duplicate tau values exist.
+        ts = Path(p).parent.name
+        prev = by_tau.get(tau)
+        if prev is None or ts > prev[3]:
+            by_tau[tau] = (tau, float(sw), float(fin["avg_loss"]), ts)
+    rows = [(tau, sw, loss) for tau, sw, loss, _ts in by_tau.values()]
     rows.sort(key=lambda t: t[0])
+
+    expected_taus = {0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2}
+    taus = [r[0] for r in rows]
+    if len(rows) != 8 or set(taus) != expected_taus or len(taus) != len(set(taus)):
+        raise AssertionError(
+            f"Figure 3: expected 8 unique MPS taus {sorted(expected_taus)}, got {taus}"
+        )
+    expected_switch = {0.001: 11, 0.002: 9}
+    expected_loss = {0.001: 1.2638, 0.002: 1.2675}
+    for tau, sw, loss in rows:
+        sw_exp = expected_switch.get(tau, 6)
+        loss_exp = expected_loss.get(tau, 1.2736)
+        if int(sw) != sw_exp:
+            raise AssertionError(f"Figure 3 tau={tau}: switch_round {sw} != {sw_exp}")
+        if not _approx(loss, loss_exp, 4):
+            raise AssertionError(f"Figure 3 tau={tau}: final_loss {loss} != {loss_exp}")
     xs = np.array([r[0] for r in rows])
     sw = np.array([r[1] for r in rows])
     loss = np.array([r[2] for r in rows])
@@ -556,32 +641,53 @@ def figure5_threshold_ablation() -> None:
 
 
 def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
-    tiny = [
-        r
-        for r in rows
-        if r.get("setting") == "iid"
-        and r.get("scale") == "tinyllama_1b"
-        and _f(r.get("total_mb", "") or "") is not None
-        and _f(r.get("final_loss", "") or "") is not None
-    ]
+    # Left panel: CUDA corpus TinyLlama IID (matches Table 2 / frontier).
+    cuda_path = ANALYSIS_DIR / "qv_only_cuda_per_seed_runs.csv"
+    if not cuda_path.is_file():
+        raise FileNotFoundError(cuda_path)
+    cuda_rows = list(csv.DictReader(cuda_path.open(encoding="utf-8")))
 
-    def agg(exp: str, tag_filter: Optional[str]) -> Tuple[float, float, float, float]:
-        rs = [r for r in tiny if r["exp_name"] == exp]
-        if tag_filter:
-            rs = [r for r in rs if tag_filter in r["tag"]]
-        losses = [_f(r["final_loss"]) for r in rs]
-        mbs = [_f(r["total_mb"]) for r in rs]
-        losses = [x for x in losses if x is not None]
-        mbs = [x for x in mbs if x is not None]
+    def agg_cuda(exp: str) -> Tuple[float, float, float, float, List[str]]:
+        rs = [
+            r
+            for r in cuda_rows
+            if r.get("exp_name") == exp
+            and r.get("setting") == "iid"
+            and r.get("backend") == "cuda"
+        ]
+        seeds = [r.get("seed", "") for r in rs]
+        if len(seeds) != len(set(seeds)):
+            raise AssertionError(f"Figure 4 left {exp}: duplicate seeds {seeds}")
+        losses = [float(r["final_avg_loss"]) for r in rs]
+        mbs = [float(r["total_communication_mb"]) for r in rs]
         if not losses:
-            return (float("nan"),) * 4
+            return (float("nan"),) * 4 + ([],)
         lm, ls = _mean_std(losses)
         mm, ms = _mean_std(mbs)
-        return mm, ms, lm, ls
+        return mm, ms, lm, ls, seeds
 
-    mb_f, eb_f, lf, elf = agg("exp_flora_iid", "run_")
-    mb_8, eb_8, l8, el8 = agg("exp_two_phase_k8", "stage1_bidirectional")
-    mb_ra, eb_ra, l_ra, el_ra = agg("exp_reverse_adaptive_iid", "stage2_adaptive")
+    mb_f, eb_f, lf, elf, seeds_f = agg_cuda("exp_flora_iid")
+    mb_8, eb_8, l8, el8, seeds_8 = agg_cuda("exp_two_phase_k8")
+    mb_ra, eb_ra, l_ra, el_ra, seeds_ra = agg_cuda("exp_reverse_adaptive_iid")
+
+    expected_left = {
+        "FLoRA": (2578.13, 1.2608, seeds_f),
+        "Two-Phase K=8": (1863.13, 1.2705, seeds_8),
+        "ReverseAdaptive": (1533.13, 1.2749, seeds_ra),
+    }
+    actual_left = {
+        "FLoRA": (mb_f, lf, seeds_f),
+        "Two-Phase K=8": (mb_8, l8, seeds_8),
+        "ReverseAdaptive": (mb_ra, l_ra, seeds_ra),
+    }
+    for name, (mb_exp, loss_exp, seeds) in expected_left.items():
+        mb_a, loss_a, seeds_a = actual_left[name]
+        if sorted(str(s) for s in seeds_a) != ["123", "42", "456"]:
+            raise AssertionError(f"Figure 4 left {name}: seeds {seeds_a}, expected 42/123/456")
+        if not _approx(mb_a, mb_exp, 2):
+            raise AssertionError(f"Figure 4 left {name}: MB {mb_a} != {mb_exp}")
+        if not _approx(loss_a, loss_exp, 4):
+            raise AssertionError(f"Figure 4 left {name}: mean final_loss {loss_a} != {loss_exp}")
 
     def agg_llama(exp: str) -> Tuple[float, float, float, float]:
         """Mean ± std over seeds for LLaMA IID; latest timestamp per seed if multiple tags."""
@@ -605,6 +711,8 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
         rs2 = list(by_seed.values())
         if not rs2:
             return (float("nan"),) * 4
+        if len(by_seed) != len(rs2):
+            raise AssertionError(f"Figure 4 right {exp}: duplicate (method, seed) after latest-ts filter")
         losses = [float(r["final_loss"]) for r in rs2]
         mbs = [float(r["total_mb"]) for r in rs2]
         lm, ls = _mean_std(losses)
@@ -614,6 +722,27 @@ def figure6_scale_validation(rows: List[Dict[str, str]]) -> None:
     lf_mb, lf_eb, los_l, el_l = agg_llama("exp_llama3_flora_iid")
     l8_mb, l8_eb, l8_ls, el_8 = agg_llama("exp_llama3_two_phase_k8_iid")
     lr_mb, lr_eb, lr_ls, el_r = agg_llama("exp_llama3_reverse_adaptive_iid")
+
+    expected_right = {
+        "FLoRA": (2625.0, 1.3724, 0.0),
+        "Two-Phase K=8": (1942.5, 1.3938, 0.0),
+        "ReverseAdaptive": (1837.5, 1.3938, 105.0),
+    }
+    actual_right = {
+        "FLoRA": (lf_mb, los_l, lf_eb),
+        "Two-Phase K=8": (l8_mb, l8_ls, l8_eb),
+        "ReverseAdaptive": (lr_mb, lr_ls, lr_eb),
+    }
+    for name, (mb_exp, loss_exp, mb_std_exp) in expected_right.items():
+        mb_a, loss_a, mb_std_a = actual_right[name]
+        if abs(mb_a - mb_exp) > 1e-6:
+            raise AssertionError(f"Figure 4 right {name}: MB {mb_a} != {mb_exp}")
+        if not _approx(loss_a, loss_exp, 4):
+            raise AssertionError(f"Figure 4 right {name}: mean final_loss {loss_a} != {loss_exp}")
+        if name == "ReverseAdaptive" and not _approx(mb_std_a, mb_std_exp, 1):
+            raise AssertionError(
+                f"Figure 4 right {name}: MB sample std {mb_std_a} != {mb_std_exp}"
+            )
 
     fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(FULL_W, 2.70))
 
