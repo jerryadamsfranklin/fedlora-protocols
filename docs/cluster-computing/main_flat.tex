@@ -90,12 +90,12 @@
 
 Federated learning enables model training across distributed clients without sharing raw data, making it attractive for privacy-sensitive applications of large language models (LLMs) \cite{kairouz2021advances}. Fine-tuning with low-rank adaptation (LoRA) \cite{hu2022lora} substantially reduces the number of trainable parameters per client, but federated LoRA aggregation still transmits nontrivial bytes per round. Because adapters cross the network in every round, cumulative communication often determines whether a protocol is deployable where uplink bandwidth is scarce or metered.
 
-Existing federated LoRA methods differ in what they aggregate and when. FedIT \cite{zhang2024federatedgpt} applies FedAvg \cite{mcmahan2017communication} directly to LoRA's $A$ and $B$ matrices, paying full bidirectional cost per round. FFA-LoRA \cite{sun2024ffalora} freezes $A$ at its initialization so that clients train and transmit only $B$ from the first round, giving a theoretical 50\% upload saving. FLoRA \cite{wang2024flora} stacks client LoRA modules and compresses via singular value decomposition (SVD), preserving product-space semantics at full bidirectional cost. FlexLoRA \cite{bai2024flexlora} supports heterogeneous client ranks and is orthogonal to the communication protocol studied here. These four report communication savings as parameter-count ratios rather than measured bytes; more recent work does measure transmitted volume directly \cite{yan2026fedsrd,ramesh2026florist}. To the author's knowledge, no study has placed these protocols on one measured communication axis against a quality metric that separates them. No study reports the asymmetric round that a mid-training change of aggregation mode creates.
+Existing federated LoRA methods differ in what they aggregate and when. FedIT \cite{zhang2024federatedgpt} applies FedAvg \cite{mcmahan2017communication} directly to LoRA's $A$ and $B$ matrices, paying full bidirectional cost per round. FFA-LoRA \cite{sun2024ffalora} freezes $A$ at its initialization so that clients train and transmit only $B$ from the first round, giving a theoretical 50\% upload saving. FLoRA \cite{wang2024flora} stacks client LoRA modules and compresses via singular value decomposition (SVD), preserving product-space semantics at full bidirectional cost. FlexLoRA \cite{bai2024flexlora} supports heterogeneous client ranks and is orthogonal to the communication protocol studied here. These four report communication savings as parameter-count ratios rather than measured bytes; more recent work does measure transmitted volume directly \cite{yan2026fedsrd,ramesh2026florist}. To the author's knowledge, no study has placed these protocols on one measured communication axis against a quality metric that separates them. Nor, to the author's knowledge, does any study report the asymmetric round that a mid-training change of aggregation mode creates.
 
 This paper addresses these gaps with three contributions.
 
 \textbf{A five-method frontier and its knee.}
-Five protocols, three from prior work, are placed on one measured frontier on Alpaca at TinyLlama-1.1B scale; three of them are also compared on Dolly-15k and at LLaMA-3.2-3B. Quality is evaluated by held-out instruction-following loss rather than by zero-shot benchmarks, which do not discriminate between protocols at the smaller scale. The frontier has a knee at ReverseAdaptive: savings beyond that point cost roughly five times more quality per point. Total communication follows a closed form in the switch round that predicts every measured total at full participation to the byte.
+Five protocols, three from prior work, are placed on one measured frontier on Alpaca at TinyLlama-1.1B scale; three of them are also compared on Dolly-15k and at LLaMA-3.2-3B. Quality is evaluated by held-out instruction-following loss rather than by zero-shot benchmarks, which do not discriminate between protocols at the smaller scale; at LLaMA-3.2-3B, where held-out loss was not computed, final training loss and downstream accuracy are reported. The frontier has a knee at ReverseAdaptive: savings beyond that point cost roughly five times more quality per point. Total communication follows a closed form in the switch round that predicts every measured total at full participation to the byte.
 
 \textbf{Bidirectional B-only protocol with measured byte tracking.}
 The protocol implements both upload and download B-only transmission for Two-Phase and ReverseAdaptive aggregators. Per-round upload and download megabytes are recorded from the tensors actually transmitted. The transition round, in which the server seeds its frozen $A$ from client uploads, is accounted for explicitly, producing a one-round asymmetry between when download savings begin and when upload savings begin. Two internal checks bound the instrument: FedIT, implemented independently as a full-state protocol, lands on FLoRA's measured total to the byte, and disabling the switch reproduces the matched FLoRA run to 10 decimal places.
@@ -128,7 +128,7 @@ FlexLoRA \cite{bai2024flexlora} extends federated LoRA to the heterogeneous-rank
 Communication efficiency in federated learning has been a central concern since FedAvg \cite{mcmahan2017communication} introduced local multi-step updates to reduce communication rounds. The broader challenge of open problems in federated learning is surveyed by Kairouz et al. \cite{kairouz2021advances}. Subsequent work has pursued per-round payload reduction through gradient compression. QSGD \cite{alistarh2017qsgd} reduces the bit-width of transmitted gradients through stochastic quantization. Deep gradient compression \cite{lin2017deep} applies aggressive sparsification, sending only 0.1\% of gradients per round with error feedback. FedPAQ \cite{reisizadeh2020fedpaq} combines periodic averaging with quantization, showing that 8-bit transmission incurs negligible accuracy loss. These techniques are orthogonal to the B-only protocol studied here and could in principle be composed with it for additional savings.
 
 \subsection{Adaptive Aggregation and Scheduling}
-Several federated learning methods adapt their behavior based on observed training dynamics. FedProx \cite{li2020fedprox} adds an adaptive proximal term to the local objective, controlling deviation from the global model. FedNova \cite{wang2020fednova} normalizes local gradients by effective step count, adaptively correcting for heterogeneous local training. FedAdam and FedYogi \cite{reddi2020adaptive} apply adaptive moment estimation at the server level, treating the aggregated pseudo-gradient as input to Adam-style updates. To the author's knowledge, no prior federated LoRA work uses a loss-plateau signal to switch between distinct aggregation modes during training.
+Several federated learning methods adapt their behavior based on observed training dynamics. FedProx \cite{li2020fedprox} adds a proximal term to the local objective, controlling deviation from the global model. FedNova \cite{wang2020fednova} normalizes local gradients by effective step count, adaptively correcting for heterogeneous local training. FedAdam and FedYogi \cite{reddi2020adaptive} apply adaptive moment estimation at the server level, treating the aggregated pseudo-gradient as input to Adam-style updates. To the author's knowledge, no prior federated LoRA work uses a loss-plateau signal to switch between distinct aggregation modes during training.
 
 \needspace{5\baselineskip}
 \section{Method}
@@ -273,7 +273,7 @@ ReverseAdaptive defaults & \texttt{warmup\_rounds}=5, $\tau{=}0.01$, \texttt{sta
 
 \textbf{Prompt format.} Examples are rendered as \texttt{\#\#\# Instruction:} followed by the instruction text, then \texttt{\#\#\# Response:} followed by the output, truncated and padded to 256 tokens. Alpaca's optional \texttt{input} field, populated in roughly 40\% of examples, is not included in training or in evaluation. Dolly-15k differs in training: when its \texttt{context} field is non-empty, a \texttt{\#\#\# Context:} block carrying it is inserted between instruction and response, which applies to 913 of the 3000 training examples. The held-out evaluation omits that block for every example, including the 130 of 500 held-out examples that carry a context, so Dolly-15k held-out losses are measured on a format partly unseen in training. Every method is scored on the same format, so the between-method gaps on Dolly-15k are unaffected; the Dolly-15k levels are not comparable to a context-aware evaluation. Loss is computed over the full formatted sequence including prompt tokens, with padding masked to $-100$. This differs from the two-template formatting used in the original Alpaca release and shifts absolute loss values; because all methods are trained and evaluated identically, comparisons between methods are unaffected. Note that if the tokenizer aliases \texttt{pad\_token} to \texttt{eos\_token}, the end-of-sequence token is masked along with padding; this is consistent across all runs but is relevant to anyone recomputing the base-model reference values of Section~\ref{sec:heldout}.
 
-\textbf{Backend provenance.} Communication totals are protocol-deterministic and identical across backends. Loss values are not: Appendix~\ref{app:crossbackend} reports cross-backend agreement within $0.01$ for IID settings, which exceeds some of the between-method differences reported below. Comparisons here are therefore made within a backend, and tables are labeled with their corpus. The five-method frontier (Table~\ref{tab:frontier}), the Dolly-15k replication (Table~\ref{tab:dolly}), and all statistical tests use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly runs exist only there. The threshold ablation (Section~\ref{sec:ablation}) and the LLaMA-3.2-3B results use MPS. Communication values are comparable across tables; loss values are comparable only within a backend. All 34 runs have a counterpart on the second backend, and Appendix~\ref{app:crossbackend} reports the comparison.
+\textbf{Backend provenance.} Communication totals are protocol-deterministic given the switch round; the backends agree on every IID run at $\tau$=0.01 and differ by one switch round only near a switching boundary (Appendix~\ref{app:crossbackend}). Loss values differ across backends: Appendix~\ref{app:crossbackend} reports cross-backend agreement within $0.01$ for IID settings, which exceeds some of the between-method differences reported below. Comparisons here are therefore made within a backend, and tables are labeled with their corpus. The five-method frontier (Table~\ref{tab:frontier}), the Dolly-15k replication (Table~\ref{tab:dolly}), and all statistical tests use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly runs exist only there. The threshold ablation (Section~\ref{sec:ablation}) and the LLaMA-3.2-3B results use MPS. Communication values are comparable across tables; loss values are comparable only within a backend. All 34 runs have a counterpart on the second backend, and Appendix~\ref{app:crossbackend} reports the comparison.
 
 \subsection{Held-Out Instruction-Following Metric}
 \label{sec:heldout}
@@ -316,7 +316,7 @@ ReverseAdaptive outperforms FFA-LoRA by 0.0282 on final loss and 0.0182 on held-
 
 FedIT lands on FLoRA's communication volume exactly, to the byte, and within 0.0006 on both quality metrics. It contributes no new operating point, which is the intended result: FedIT is an independently implemented full-state protocol, so its coincidence with FLoRA is evidence that the byte accounting measures the protocol rather than an implementation artifact.
 
-Loss differences between methods are resolved across three seeds: the 0.0141 gap between FLoRA and ReverseAdaptive at $\tau{=}0.01$ is more than twenty times the per-seed spread. Paired $t$-tests on final loss give $p < 10^{-3}$ for every comparison against FLoRA except FedIT, which is correctly indistinguishable. These tests have limited power at three seeds (Appendix~\ref{app:stats}), so effect sizes should be read alongside the $p$-values, and no multiplicity correction is applied in Table~\ref{tab:frontier}; Appendix~\ref{app:stats} reports the complete set of paired tests on both metrics with the correction stated.
+Loss differences between methods are resolved across three seeds: the 0.0141 gap between FLoRA and ReverseAdaptive at $\tau{=}0.01$ is more than twenty times the per-seed standard deviation. Paired $t$-tests on final loss give $p < 10^{-3}$ for every comparison against FLoRA except FedIT, which is correctly indistinguishable. These tests have limited power at three seeds (Appendix~\ref{app:stats}), so effect sizes should be read alongside the $p$-values, and no multiplicity correction is applied in Table~\ref{tab:frontier}; Appendix~\ref{app:stats} reports the complete set of paired tests on both metrics with the correction stated.
 
 
 
@@ -353,7 +353,7 @@ A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and
 \begin{figure*}[tbp]
 \centering
 \includegraphics[width=\textwidth]{Fig2.pdf}
-\caption{Left: training loss trajectories on TinyLlama-1.1B IID, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Vertical dashed lines mark ReverseAdaptive's switch (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, with full upload, is round 9). Right: cumulative communication on TinyLlama-1.1B (seed 42, deterministic across seeds). Slope changes mark phase transitions; look-ahead download accounting moves the broadcast slope one round before the upload slope}
+\caption{Left: training loss trajectories on TinyLlama-1.1B IID, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Vertical lines mark ReverseAdaptive's switch (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, with full upload, is round 9). Right: cumulative communication on TinyLlama-1.1B (seed 42, deterministic across seeds). Slope changes mark phase transitions; look-ahead download accounting moves the broadcast slope one round before the upload slope}
 \label{fig:convergence}
 \label{fig:cumcomm}
 \end{figure*}
@@ -387,7 +387,7 @@ Spread (max--min) & 0.006 & 0.010 & 0.000 & -- \\
 \end{tabular}
 \end{table*}
 
-At LLaMA-3.2-3B scale, the three federated methods are indistinguishable on downstream benchmarks within seed variation. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and the per-method error bars overlap on every benchmark. Relative to the base model they do not regress as at 1.1B (Section~\ref{sec:baseregression}): the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and every federated method matches or exceeds the first three while sitting 0.1 to 0.5 percentage points below the base on HellaSwag. The within-method seed variance is also smaller at 3B than at TinyLlama.
+At LLaMA-3.2-3B scale, the three federated methods are indistinguishable on downstream benchmarks within seed variation. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and the per-method error bars overlap on every benchmark. Relative to the base model they do not regress as at 1.1B (Section~\ref{sec:baseregression}): the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and every federated method matches or exceeds the first three while sitting 0.1 to 0.5 percentage points below the base on HellaSwag.
 
 \begin{table*}[bp]
 \centering
@@ -433,7 +433,7 @@ $\tau$ & Switch round & Final loss & Total comm.\ (MB) & Savings \\
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{Fig3.pdf}
-\caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus). Communication is backend-invariant; loss values are not comparable with the CUDA results in Table~\ref{tab:frontier}}
+\caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus). Loss values are not comparable with the CUDA results in Table~\ref{tab:frontier}, and the $\tau$=0.001 and $\tau$=0.002 settings switch one round earlier on CUDA (Appendix~\ref{app:crossbackend})}
 \label{fig:ablation}
 \end{figure}
 
@@ -520,7 +520,7 @@ The experiments use two instruction-following datasets (Alpaca-3k \cite{taori202
 
 FFA-LoRA and FedIT were evaluated on Alpaca only, so Table~\ref{tab:dolly} compares three protocols where Table~\ref{tab:frontier} compares five. The cross-dataset result therefore speaks to the cost of the adaptive transition rather than to the stability of the whole frontier across datasets.
 
-The study covers only Llama-style decoder-only architectures with LoRA targeting \texttt{q\_proj} and \texttt{v\_proj}. Other architectures, encoder-decoder models, larger target sets, or heterogeneous rank configurations may produce different B-only fractions and different savings profiles. The reported percentages are specific to this target set and to the grouped-query attention configurations of the two models tested.
+The study covers only Llama-style decoder-only architectures with LoRA targeting \mbox{\texttt{q\_proj} and \texttt{v\_proj}}. Other architectures, encoder-decoder models, larger target sets, or heterogeneous rank configurations may produce different B-only fractions and different savings profiles. The reported percentages are specific to this target set and to the grouped-query attention configurations of the two models tested.
 
 The simulation assumes full client participation in every round. Real federated deployments typically involve partial participation, where only a fraction of clients respond per round. The effect of partial participation on transition-round timing and on ReverseAdaptive's plateau detection is not studied here.
 
@@ -595,7 +595,7 @@ All experiments use AdamW \cite{loshchilov2019decoupled} with learning rate $10^
 
 \textbf{Verification:} A script in the repository (\texttt{scripts/verify\_numbers.py}) recomputes the paper's principal quantitative claims from the released analysis files and run records with 179 automated assertions.
 
-\textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in Table~\ref{tab:b2}. Per-seed results are in Appendix~\ref{app:perseed}.
+\textbf{Seeds:} The IID seeds are listed in Table~\ref{tab:setup}. The $\alpha{=}0.1$ partition-sensitivity runs additionally use seeds 789 and 1000, which appear only in the partition-sensitivity results of Appendix~\ref{app:perseed}, alongside the other per-seed results.
 
 \textbf{Hardware:} The MPS corpus was executed on a single Apple M4 Pro workstation with 48\,GB unified memory; a core of 34 of its runs, approximately 285 hours of compute, was re-executed on commercially rented NVIDIA hardware, an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the comparison is in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baselines were produced on the rented hardware only.
 
@@ -610,7 +610,7 @@ Disabling the switch requires care. Setting $\tau$ to a small positive value doe
 \needspace{3\baselineskip}
 \section{Per-Seed Full Results}
 \label{app:perseed}
-Tables in this appendix are labeled with their corpus, which follows the corresponding table in the main text. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~\ref{tab:llama_iid}; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
+Tables~\ref{tab:b1} to~\ref{tab:b4} give per-seed results and are labeled with their corpus, which follows the corresponding table in the main text. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~\ref{tab:llama_iid}; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
 
 \begin{table*}[tbp]
 \centering
@@ -618,7 +618,7 @@ Tables in this appendix are labeled with their corpus, which follows the corresp
 \scriptsize
 \renewcommand{\arraystretch}{0.78}
 \setlength{\tabcolsep}{6pt}
-\caption{Per-seed TinyLlama-1.1B IID results, CUDA corpus, backing Table~\ref{tab:frontier}. Communication is deterministic across seeds. $\dagger$ For Two-Phase the Switch/boundary column shows the predetermined phase boundary $K$, not an adaptive switch event; for FFA-LoRA, $A$ is frozen from initialization (shown as ``init''); for ReverseAdaptive it shows the round at which the plateau signal triggered}
+\caption{Per-seed TinyLlama-1.1B IID results, CUDA corpus, backing Table~\ref{tab:frontier}. Communication is deterministic across seeds. For Two-Phase the Switch/boundary column shows the predetermined phase boundary $K$, not an adaptive switch event; for FFA-LoRA, $A$ is frozen from initialization (shown as ``init''); for ReverseAdaptive it shows the round at which the plateau signal triggered}
 \label{tab:b1}
 \begin{tabular}{@{}llrrr@{}}
 \toprule
@@ -715,7 +715,7 @@ ReverseAdaptive & 456 & 1.667699 & $-0.526547$ & 1533.13 \\
 
 \section{Statistical Tests}
 \label{app:stats}
-Paired $t$-tests over three seeds on final-round training loss and on held-out instruction-following loss. TinyLlama-1.1B results use the CUDA corpus, matching Table~\ref{tab:frontier}; LLaMA-3.2-3B results use the MPS corpus.
+Table~\ref{tab:c1} reports paired $t$-tests over three seeds on final-round training loss and on held-out instruction-following loss. TinyLlama-1.1B results use the CUDA corpus, matching Table~\ref{tab:frontier}; LLaMA-3.2-3B results use the MPS corpus.
 
 With three seeds these tests have very low power, so effect sizes should be read alongside the $p$-values. No multiplicity correction is applied in the main results tables. Applying a Bonferroni correction across the six TinyLlama-1.1B Alpaca IID comparisons gives a threshold of $0.0083$, which the ReverseAdaptive vs.\ Two-Phase $K{=}8$ comparison on held-out loss ($p = 0.026$) does not meet. That comparison is secondary under the frontier framing of Section~\ref{sec:discussion}; the load-bearing comparison is ReverseAdaptive vs.\ FFA-LoRA, which holds at $p < 10^{-3}$ on both metrics with a difference roughly twenty times the largest per-method standard deviation.
 
