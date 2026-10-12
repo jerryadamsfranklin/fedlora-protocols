@@ -189,7 +189,7 @@ Naive (no Step7 norm) missing count was 96, dominated by Section/Appendix/Table 
 | 7 | 6408e6e |
 | 8 | 5e7af2c |
 | 9 | 6e4dbbd |
-| 10 | (this commit) |
+| 10 | c6ff72b |
 
 ## Artifacts
 - `docs/scientific-reports/sr_main.pdf`
