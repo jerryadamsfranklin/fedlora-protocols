@@ -1,6 +1,5 @@
-% Cluster Computing submission (Springer Nature sn-jnl, two-column)
-\documentclass[iicol,pdflatex,sn-mathphys-num]{sn-jnl}
-\graphicspath{{figures/}}
+% Scientific Reports submission (Springer Nature sn-jnl, sn-nature)
+\documentclass[pdflatex,sn-nature,lineno]{sn-jnl}
 
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -231,7 +230,7 @@ Alpaca carries no class labels, so partitions that are not independent and ident
 \label{sec:setup}
 Table~\ref{tab:setup} summarizes the experimental configuration. The corpus was executed on two hardware backends. A core of 34 runs on Apple silicon through the Metal Performance Shaders (MPS) backend, approximately 285 hours of compute, was re-executed on NVIDIA graphics processing units (GPUs), an RTX 4090 for TinyLlama-1.1B and an A100 40\,GB for LLaMA-3.2-3B; the cross-backend comparison is reported in Appendix~\ref{app:crossbackend}. The Dolly-15k replication and the FFA-LoRA and FedIT baseline runs were produced on the same rented hardware. Both TinyLlama-1.1B and LLaMA-3.2-3B experiments use three seeds for IID training.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \caption{Experimental setup}
 \label{tab:setup}
@@ -267,7 +266,7 @@ Seeds (LLaMA-3.2-3B) & \{42, 123, 456\} \\
 ReverseAdaptive defaults & \texttt{warmup\_rounds}=5, $\tau{=}0.01$, \texttt{stability\_threshold}=1.1, \texttt{transition\_rounds}=0 (instantaneous) \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 \textbf{Baselines.} FFA-LoRA \cite{sun2024ffalora} and FedIT \cite{zhang2024federatedgpt} are reimplemented within this codebase rather than taken from the original authors' released code, which places all five protocols on one training loop and one byte-accounting path; their absolute results may differ from those of the original implementations. Following Sun et al., the FFA-LoRA implementation freezes $A$ at initialization: client-side $A$ parameters are set non-trainable before local optimization begins and are excluded from the optimizer parameter group, so clients train only $B$ from the first round. Clients transmit $B$ only, a measured 3{,}244{,}032 bytes per client per direction against 9{,}011{,}200 for full $A{+}B$ transmission. The former is $(32768 + 4096) \times 22$ parameters at 4 bytes each, exactly the B-only payload, and could not arise if $A$ were being transmitted. FedIT applies FedAvg independently to $A$ and $B$ and transmits full state in both directions, so its communication volume matches FLoRA's by construction.
 
@@ -283,7 +282,7 @@ Final training loss measures fit to the federated objective, and the four zero-s
 \label{sec:frontier}
 Table~\ref{tab:frontier} and Fig.~\ref{fig:frontier} place five federated LoRA protocols on a single measured communication-quality frontier for TinyLlama-1.1B \cite{zhang2024tinyllama} under IID partitioning. The five methods occupy four distinct operating points. FLoRA \cite{wang2024flora} and FedIT \cite{zhang2024federatedgpt} coincide at 2578.13 MB, since both transmit full $A$ and $B$ in both directions every round. Two-Phase $K{=}8$ reaches 1863.13 MB (27.73\% savings), ReverseAdaptive at $\tau{=}0.01$ reaches 1533.13 MB (40.53\%), and FFA-LoRA \cite{sun2024ffalora} reaches 983.13 MB (61.87\%). Across the four distinct points communication falls and both quality metrics degrade in the same order, so the frontier is monotone on each metric independently rather than only on the metric used to construct it.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -300,12 +299,12 @@ ReverseAdaptive ($\tau{=}0.01$)     & 1533.13 & 40.53\% & $1.2749 \pm 0.0006$ & 
 FFA-LoRA                             & 983.13 & 61.87\% & $1.3031 \pm 0.0012$ & $-0.5746 \pm 0.0004$ & $1.7 \times 10^{-4}$ \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{Fig1.pdf}
+\includegraphics[width=0.75\textwidth]{Fig1.pdf}
 \caption{Measured communication-quality frontier on Alpaca-3k, TinyLlama-1.1B, IID, CUDA corpus. Five protocols, three from prior work, at four distinct operating points; error bars are one sample standard deviation over three seeds, and communication is identical across seeds. Held-out $\Delta$loss is tuned minus base on the 500-example slice defined in Section~\ref{sec:heldout}; more negative is better. FLoRA (open circle) and FedIT (filled square) coincide at lower right. The segment from ReverseAdaptive to FFA-LoRA is markedly steeper than the segment preceding it, which Section~\ref{sec:measuredbytes} quantifies}
 \label{fig:frontier}
 \end{figure}
@@ -326,7 +325,7 @@ This frontier sweeps through the fixed-$K$ Two-Phase operating points: on the MP
 \label{sec:dolly}
 Table~\ref{tab:dolly} repeats the three-method comparison on Databricks Dolly-15k \cite{dolly2023}, an instruction dataset with a different length distribution and a broader task mix than Alpaca. Communication is identical to the Alpaca corpus, since the protocols are dataset-independent and ReverseAdaptive fired at round 6 on every IID seed of both datasets. The quantity of interest is therefore the quality cost of switching rather than the absolute loss.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -341,7 +340,7 @@ Two-Phase $K{=}8$               & 1863.13 & $1.6643 \pm 0.0021$ & $-0.5287 \pm 0
 ReverseAdaptive ($\tau{=}0.01$) & 1533.13 & $1.6686 \pm 0.0022$ & $-0.5268 \pm 0.0005$ & 0.0061 & 0.0063 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 Held-out deltas are not comparable across datasets, since the base model scores 1.9352 on the Alpaca slice and 2.2608 on the Dolly slice. Table~\ref{tab:dolly} reports the gap to each dataset's own FLoRA baseline, which is comparable. ReverseAdaptive costs 0.0063 held-out loss on Alpaca and 0.0061 on Dolly, a shift of 0.0002, or 3.0\% of the gap's own magnitude. The quality cost of the adaptive transition is stable across these two datasets.
 
@@ -350,13 +349,13 @@ Two-Phase $K{=}8$ costs 0.0034 on Alpaca and 0.0043 on Dolly, a shift of 25.5\%.
 A non-IID Dolly run at $\alpha{=}0.5$ switched at round 6 on all three seeds and reached the same 1533.13 MB, matching the IID behavior on both datasets. No Dolly FLoRA baseline was run under heterogeneity, so no quality cost is reported for that configuration.
 
 \subsection{Convergence and Switching Behavior}
-\begin{figure*}[tbp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{Fig2.pdf}
 \caption{Left: training loss trajectories on TinyLlama-1.1B IID, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Vertical lines mark ReverseAdaptive's switch (round 6) and Two-Phase $K{=}8$'s phase boundary (round 8; the transition round, with full upload, is round 9). Right: cumulative communication on TinyLlama-1.1B (seed 42, deterministic across seeds). Slope changes mark phase transitions; look-ahead download accounting moves the broadcast slope one round before the upload slope}
 \label{fig:convergence}
 \label{fig:cumcomm}
-\end{figure*}
+\end{figure}
 Fig.~\ref{fig:convergence} shows mean $\pm$ std loss trajectories (left) and cumulative communication (right) across three seeds for FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive. All three methods converge similarly through the FLoRA phase. Phase transitions are visible as slight slope changes but do not destabilize training. The final ${\sim}0.01$ loss gap accumulates gradually after the switch rather than appearing as a sharp discontinuity. FLoRA stays linear at 85.94 MB per round per direction throughout. Two-Phase $K{=}8$ maintains the same slope through round 9, then reduces as B-only transmission activates. ReverseAdaptive splits off at round 6 (at TinyLlama-1.1B scale), producing the steepest savings trajectory.
 
 The no-switch sanity baseline (ReverseAdaptive with \mbox{\texttt{switch\_threshold}}\,{=}\,{-}1.0, \mbox{\texttt{warmup\_rounds}}\,{=}\,999) produces final loss 1.2594342812 on seed 42 under the MPS corpus, matching the corresponding FLoRA run to 10 decimal places. The CUDA per-seed values in Appendix~\ref{app:perseed} differ, as expected across backends; the guarantee is a within-backend statement. Upload and download match to the byte across all 15 rounds.
@@ -367,7 +366,7 @@ Tables~\ref{tab:downstream_tiny}--\ref{tab:downstream_llama} present downstream 
 
 At TinyLlama-1.1B (Table~\ref{tab:downstream_tiny}), all federated methods cluster within 1.0 percentage points of each other across the three informative benchmarks and regress modestly relative to the base model (Section~\ref{sec:baseregression}).
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -385,11 +384,11 @@ ReverseAdaptive   & 0.252 & 0.552 & 0.420 & $-7.4$ pp \\
 Spread (max--min) & 0.006 & 0.010 & 0.000 & -- \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 At LLaMA-3.2-3B scale, the three federated methods are indistinguishable on downstream benchmarks within seed variation. Mean accuracies across three seeds differ by at most 0.5 percentage points on any benchmark, and the per-method error bars overlap on every benchmark. Relative to the base model they do not regress as at 1.1B (Section~\ref{sec:baseregression}): the LLaMA base achieves MMLU 0.544, ARC-Easy 0.832, BoolQ 0.706, and HellaSwag 0.540, and every federated method matches or exceeds the first three while sitting 0.1 to 0.5 percentage points below the base on HellaSwag.
 
-\begin{table*}[bp]
+\begin{table}[bp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -405,7 +404,7 @@ Two-Phase $K{=}8$ & $0.558 \pm 0.002$ & $0.837 \pm 0.008$ & $0.738 \pm 0.010$ & 
 ReverseAdaptive   & $0.557 \pm 0.003$ & $0.839 \pm 0.008$ & $0.739 \pm 0.004$ & $0.538 \pm 0.004$ \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 \subsection{Threshold Ablation}
 \label{sec:ablation}
@@ -413,7 +412,7 @@ Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} characterize how $\tau$ con
 
 A practitioner seeking maximum savings can set $\tau$ anywhere in $[0.005, 0.2]$ without precision loss. The $\tau{=}0.001$ and $\tau{=}0.002$ operating points show the switch round responding to the loss trajectory.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -428,11 +427,11 @@ $\tau$ & Switch round & Final loss & Total comm.\ (MB) & Savings \\
 0.005--0.2 & 6  & 1.2736 & 1533.13 & 40.53\% \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{Fig3.pdf}
+\includegraphics[width=0.75\textwidth]{Fig3.pdf}
 \caption{ReverseAdaptive threshold sensitivity (TinyLlama IID, seed 42, MPS corpus). Loss values are not comparable with the CUDA results in Table~\ref{tab:frontier}, and the $\tau$=0.001 and $\tau$=0.002 settings switch one round earlier on CUDA (Appendix~\ref{app:crossbackend})}
 \label{fig:ablation}
 \end{figure}
@@ -442,7 +441,7 @@ Table~\ref{tab:llama_iid} and Fig.~\ref{fig:scale} confirm that the Pareto struc
 
 Three random seeds (42, 123, 456) were run for each of FLoRA, Two-Phase $K{=}8$, and ReverseAdaptive, producing nine total runs. Final-round results (mean $\pm$ standard deviation): FLoRA reaches loss $1.3724 \pm 0.0009$ with 2625.0 MB total communication. Two-Phase $K{=}8$ reaches loss $1.3938 \pm 0.0011$ with 1942.5 MB (savings 26.0\%). ReverseAdaptive reaches loss $1.3938 \pm 0.0036$ with $1837.5 \pm 105.0$ MB (savings $30.0 \pm 4.0$\%). The protocol-deterministic communication for FLoRA and Two-Phase $K{=}8$ produces zero seed-to-seed variance; ReverseAdaptive's variance reflects across-seed differences in switch round (7, 8, 9 across the three seeds, mean $8.0 \pm 1.0$).
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -457,14 +456,14 @@ Two-Phase $K{=}8$ & $1.3938 \pm 0.0011$ & 1942.5 & 26.0\% \\
 ReverseAdaptive & $1.3938 \pm 0.0036$ & $1837.5 \pm 105.0$ & $30.0 \pm 4.0$\% \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
-\begin{figure*}[tbp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{Fig4.pdf}
 \caption{Scale validation. Left: TinyLlama-1.1B, CUDA corpus (mean $\pm$ 1 standard deviation over three seeds). Right: LLaMA-3.2-3B, MPS corpus (mean $\pm$ 1 standard deviation over three seeds). Both panels show the three federated methods on the same axes. Dotted polyline connects the three method points on each panel. The Pareto structure (downward slope from FLoRA to ReverseAdaptive) is preserved across scales. Y-axis ranges differ between panels because absolute training loss is model-dependent; the relative Pareto shape is the invariant being validated. ReverseAdaptive's larger error bar at LLaMA-3.2-3B reflects across-seed variance in switch round (7, 8, 9)}
 \label{fig:scale}
-\end{figure*}
+\end{figure}
 
 The communication savings are slightly lower at 3B than at 1.1B: 26.0\% vs.\ 27.7\% for Two-Phase $K{=}8$, and 30.0\% vs.\ 40.5\% for ReverseAdaptive. The B-only fraction of the full state is 40\% at LLaMA-3.2-3B (vs.\ 36\% for TinyLlama) due to different GQA configurations, meaning each B-only round saves a smaller fraction of the full payload at 3B scale.
 
@@ -612,7 +611,7 @@ Disabling the switch requires care. Setting $\tau$ to a small positive value doe
 \label{app:perseed}
 Tables~\ref{tab:b1} to~\ref{tab:b4} give per-seed results and are labeled with their corpus, which follows the corresponding table in the main text. The TinyLlama-1.1B method comparisons use the CUDA corpus, since the FFA-LoRA, FedIT, and Dolly-15k runs exist only there; the LLaMA-3.2-3B results use MPS, matching Table~\ref{tab:llama_iid}; and the partition-sensitivity results retain the larger MPS seed set, where five seeds at $\alpha{=}0.1$ provide better evidence than three.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \scriptsize
@@ -641,11 +640,11 @@ FFA-LoRA & 123 & 1.301738 & 983.13 & init \\
 FFA-LoRA & 456 & 1.303628 & 983.13 & init \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 At $\alpha{=}0.5$, mean final loss is statistically indistinguishable from IID for every method in the released analysis CSVs, with differences of 0.001 to 0.007 against per-seed standard deviations near 0.02 over three seeds. Heterogeneity manifests instead as sensitivity to the partition draw: seed-to-seed standard deviation rises by roughly an order of magnitude, from $0.5$ to $1.6 \times 10^{-3}$ under IID in Table~\ref{tab:b1} to $18$ to $25 \times 10^{-3}$ at $\alpha{=}0.5$ across the methods in the released CSVs, which is also why the per-seed spread at $\alpha{=}0.1$ in Table~\ref{tab:b2} is wide.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -665,9 +664,9 @@ ReverseAdaptive, $\alpha{=}0.1$ & 789 & 1.259200 & 1533.13 & 6 & 10 \\
 ReverseAdaptive, $\alpha{=}0.1$ & 1000 & 1.273046 & 1226.50 & 6 & 8 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -688,9 +687,9 @@ ReverseAdaptive & 123 & 1.390265 & 1942.5 & 9 \\
 ReverseAdaptive & 456 & 1.397366 & 1732.5 & 7 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{6pt}
@@ -711,7 +710,7 @@ ReverseAdaptive & 123 & 1.666995 & $-0.527418$ & 1533.13 \\
 ReverseAdaptive & 456 & 1.667699 & $-0.526547$ & 1533.13 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 \section{Statistical Tests}
 \label{app:stats}
@@ -721,7 +720,7 @@ With three seeds these tests have very low power, so effect sizes should be read
 
 The LLaMA-3.2-3B comparison between ReverseAdaptive and Two-Phase $K{=}8$ has a 95\% confidence interval of $[{-}0.0114, 0.0114]$, which contains the $0.0043$ difference observed between the same methods at TinyLlama-1.1B. The test therefore cannot distinguish equivalence from a difference of the magnitude seen at the smaller scale.
 
-\begin{table*}[tbp]
+\begin{table}[tbp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{5pt}
@@ -750,7 +749,7 @@ ReverseAdaptive vs.\ FLoRA & $+0.0215$ & $1.3 \times 10^{-2}$ & -- & -- \\
 ReverseAdaptive vs.\ Two-Phase $K{=}8$ & $+0.000012$ & $0.997$ & -- & -- \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 \section{Cross-Backend Verification}
 \label{app:crossbackend}
