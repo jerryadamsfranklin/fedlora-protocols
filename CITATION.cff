@@ -6,8 +6,11 @@ date-released: 2026-10-12
 license: MIT
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.23111915"
-    description: "Version DOI for v1.0.1 (Zenodo)"
+    value: "10.5281/zenodo.23111914"
+    description: "Concept DOI (all versions, Zenodo)"
+  - type: doi
+    value: "10.5281/zenodo.23309301"
+    description: "Version DOI for v1.0.2 (Zenodo)"
 repository-code: "https://github.com/jerryadamsfranklin/fedlora-protocols"
 url: "https://github.com/jerryadamsfranklin/fedlora-protocols"
 abstract: "Code, run records, analysis CSVs and verification script for a measured communication-quality frontier of five federated LoRA protocols, including the ReverseAdaptive phase-switching aggregator."

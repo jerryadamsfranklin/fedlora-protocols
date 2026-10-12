@@ -1,6 +1,6 @@
 # fedlora-protocols
 
-Archived release: v1.0.1, DOI [10.5281/zenodo.23111915](https://doi.org/10.5281/zenodo.23111915)
+Archived release: v1.0.2, DOI [10.5281/zenodo.23309301](https://doi.org/10.5281/zenodo.23309301) (all versions: [10.5281/zenodo.23111914](https://doi.org/10.5281/zenodo.23111914))
 
 Communication-efficient federated fine-tuning for large language models, with measured (not theoretical) communication accounting and an adaptive phase-switching aggregator.
 
@@ -43,7 +43,7 @@ fedlora-protocols/
 ├── results/                # Run manifest, raw per-round records (raw/), downstream eval (downstream/)
 ├── analysis/               # Master CSVs and statistical tests
 ├── figures/                # Paper-ready PDFs
-└── docs/                   # Submission materials (docs/cluster-computing/)
+└── docs/                   # Journal and preprint sources (docs/scientific-reports/ current)
 ```
 
 ## Quick start
@@ -99,7 +99,7 @@ If you use this codebase, please cite the paper:
   archivePrefix = {arXiv},
   note          = {Preprint: arXiv:2609.13512. Submitted for journal
                    publication. Code and run records:
-                   doi:10.5281/zenodo.23111915}
+                   doi:10.5281/zenodo.23111914}
 }
 ```
 
