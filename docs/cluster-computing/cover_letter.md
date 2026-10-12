@@ -20,5 +20,5 @@ Sincerely,
 
 Jerry Adams Franklin
 Independent Researcher
-jerry.adamsf@gmail.com
+franklin.je@northeastern.edu
 ORCID: 0009-0006-8470-8349

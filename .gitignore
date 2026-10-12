@@ -95,3 +95,4 @@ docs/arxiv/*.aux
 docs/arxiv/*.log
 docs/arxiv/*.out
 docs/arxiv/*.blg
+docs/scientific-reports/render/
