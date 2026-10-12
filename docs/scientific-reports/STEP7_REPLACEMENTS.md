@@ -1,0 +1,61 @@
+# Step 7 replacement log
+
+- `sr_main.tex:413`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:413`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:413`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:407`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:284`: `Appendix~\ref{app:perseed}` → `Supplementary Note 2`
+- `sr_main.tex:270`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:268`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:223`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:205`: `Appendix~\ref{app:noswitch}` → `Supplementary Note 1`
+- `sr_main.tex:204`: `Appendix~\ref{app:perseed}` → `Supplementary Note 2`
+- `sr_main.tex:165`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_main.tex:163`: `Appendix~\ref{app:stats}` → `Supplementary Note 3`
+- `sr_main.tex:163`: `Appendix~\ref{app:stats}` → `Supplementary Note 3`
+- `sr_main.tex:135`: `Appendix~\ref{app:stats}` → `Supplementary Note 3`
+- `sr_main.tex:122`: `Appendix~\ref{app:repro}` → `Supplementary Note 1`
+- `sr_main.tex:355`: `Algorithm~\ref{alg:bonly}` → `Supplementary Algorithm S1`
+- `sr_main.tex:208`: `Tables~\ref{tab:downstream_tiny}--\ref{tab:downstream_llama}` → `Supplementary Tables S1--S2`
+- `sr_main.tex:438`: `Table~\ref{tab:downstream_tiny}` → `Supplementary Table S1`
+- `sr_main.tex:407`: `Table~\ref{tab:setup}` → `Supplementary Table S4`
+- `sr_main.tex:216`: `Table~\ref{tab:ablation}` → `Supplementary Table S3`
+- `sr_main.tex:210`: `Table~\ref{tab:downstream_tiny}` → `Supplementary Table S1`
+- `sr_main.tex:417`: `Section~\ref{sec:dolly}` → `Results`
+- `sr_main.tex:417`: `Section~\ref{sec:setup}` → `Methods`
+- `sr_main.tex:417`: `Section~\ref{sec:baseregression}` → `Discussion`
+- `sr_main.tex:413`: `Section~\ref{sec:ablation}` → `Results`
+- `sr_main.tex:411`: `Section~\ref{sec:heldout}` → `Methods`
+- `sr_main.tex:403`: `Section~\ref{sec:limitations}` → `Discussion`
+- `sr_main.tex:360`: `Section~\ref{sec:ablation}` → `Results`
+- `sr_main.tex:358`: `Section~\ref{sec:choosing}` → `Discussion`
+- `sr_main.tex:340`: `Section~\ref{sec:implementation}` → `Methods`
+- `sr_main.tex:314`: `Section~\ref{sec:implementation}` → `Methods`
+- `sr_main.tex:312`: `Section~\ref{sec:baseregression}` → `Discussion`
+- `sr_main.tex:286`: `Section~\ref{sec:limitations}` → `Discussion`
+- `sr_main.tex:286`: `Section~\ref{sec:implementation}` → `Methods`
+- `sr_main.tex:284`: `Section~\ref{sec:frontier}` → `Results`
+- `sr_main.tex:270`: `Section~\ref{sec:limitations}` → `Discussion`
+- `sr_main.tex:270`: `Section~\ref{sec:ablation}` → `Results`
+- `sr_main.tex:263`: `Section~\ref{sec:frontier}` → `Results`
+- `sr_main.tex:212`: `Section~\ref{sec:baseregression}` → `Discussion`
+- `sr_main.tex:210`: `Section~\ref{sec:baseregression}` → `Discussion`
+- `sr_main.tex:175`: `Section~\ref{sec:method}` → `Methods`
+- `sr_main.tex:159`: `Section~\ref{sec:implementation}` → `Methods`
+- `sr_main.tex:153`: `Section~\ref{sec:measuredbytes}` → `Discussion`
+- `sr_main.tex:153`: `Section~\ref{sec:heldout}` → `Methods`
+- `sr_main.tex:135`: `Section~\ref{sec:heldout}` → `Methods`
+- `sr_main.tex:100`: `Section~\ref{sec:implementation}` → `Methods`
+- `sr_supplementary.tex:437`: `Section~\ref{sec:choosing}` → `main text Discussion`
+- `sr_supplementary.tex:435`: `Section~\ref{sec:measuredbytes}` → `main text Discussion`
+- `sr_supplementary.tex:379`: `Section~\ref{sec:discussion}` → `main text Discussion`
+- `sr_supplementary.tex:441`: `Table~\ref{tab:frontier}` → `main text Table 1`
+- `sr_supplementary.tex:345`: `Table~\ref{tab:frontier}` → `main text Table 1`
+- `sr_supplementary.tex:321`: `Table~\ref{tab:dolly}` → `main text Table 2`
+- `sr_supplementary.tex:297`: `Table~\ref{tab:llama_iid}` → `main text Table 3`
+- `sr_supplementary.tex:244`: `Table~\ref{tab:frontier}` → `main text Table 1`
+- `sr_supplementary.tex:236`: `Table~\ref{tab:llama_iid}` → `main text Table 3`
+- `sr_supplementary.tex:274`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_supplementary.tex:228`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_supplementary.tex:222`: `Appendix~\ref{app:crossbackend}` → `Supplementary Note 4`
+- `sr_supplementary.tex:220`: `Appendix~\ref{app:perseed}` → `Supplementary Note 2`
