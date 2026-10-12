@@ -4,6 +4,7 @@
 %%
 %% The original source files were: merlin.mbs
 %% ------------------------------------------
+%% PATCHED: format.in.ed.booktitle now pushes format.booktitle (venue bug fix)
  % This bibliographic style (bst) file has been generated from one or
  % more master bibliographic style (mbs) files, listed above.
  %
@@ -1048,7 +1049,7 @@ FUNCTION {format.booktitle}
   emphasize
 }
 FUNCTION {format.in.ed.booktitle}
-{  duplicate$ empty$ 'skip$
+{  format.booktitle duplicate$ empty$ 'skip$
     { 
 editor "editor" format.names.ed duplicate$ empty$ 'pop$
         {  
