@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the accompanying paper."
 title: "fedlora-protocols: Communication-efficient federated LoRA fine-tuning"
-version: "1.0.0"
-date-released: 2026-10-02
+version: "1.0.2"
+date-released: 2026-10-12
 license: MIT
 identifiers:
   - type: doi
