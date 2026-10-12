@@ -29,5 +29,9 @@ preferred-citation:
       orcid: "https://orcid.org/0009-0006-8470-8349"
   title: "A Measured Communication-Quality Frontier for Federated LoRA Fine-Tuning with Adaptive Phase-Switching"
   year: 2026
-  journal: "Cluster Computing"
-  notes: "Manuscript under review."
+  url: "https://doi.org/10.48550/arXiv.2609.13512"
+  identifiers:
+    - type: other
+      value: "arXiv:2609.13512"
+      description: "arXiv preprint"
+  notes: "Preprint: arXiv:2609.13512. Submitted for journal publication."

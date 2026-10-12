@@ -90,17 +90,20 @@ The primary experiment corpus was produced on Apple M4 Pro (48 GB unified memory
 If you use this codebase, please cite the paper:
 
 ```
-@article{franklin2026fedlora,
-  title   = {A Measured Communication-Quality Frontier for Federated
-             LoRA Fine-Tuning with Adaptive Phase-Switching},
-  author  = {Franklin, Jerry Adams},
-  year    = {2026},
-  journal = {Cluster Computing},
-  note    = {Manuscript under review. Code and run records: doi:10.5281/zenodo.23111915}
+@misc{franklin2026fedlora,
+  title         = {A Measured Communication-Quality Frontier for Federated
+                   LoRA Fine-Tuning with Adaptive Phase-Switching},
+  author        = {Franklin, Jerry Adams},
+  year          = {2026},
+  eprint        = {2609.13512},
+  archivePrefix = {arXiv},
+  note          = {Preprint: arXiv:2609.13512. Submitted for journal
+                   publication. Code and run records:
+                   doi:10.5281/zenodo.23111915}
 }
 ```
 
-(Update with the actual citation once the paper is published.)
+(Update with the published citation once available.)
 
 ## License
 

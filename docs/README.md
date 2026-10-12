@@ -5,7 +5,9 @@ reproduction artifacts elsewhere in the repository.
 
 ## Contents
 
-- `cluster-computing/`: current submission (Springer sn-jnl sources,
+- `scientific-reports/`: current journal-format sources (Scientific Reports /
+  Springer Nature sn-jnl, bibliography, figures, supplementary information).
+- `cluster-computing/`: earlier journal-format sources (Springer sn-jnl,
   bibliography, figures, cover letter, upload checklist).
 - `arxiv/`: preprint sources for arXiv:2609.13512 (v2, built from
   `cluster-computing/main_flat.tex` plus a page-1 preprint notice; v1
